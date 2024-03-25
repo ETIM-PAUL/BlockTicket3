@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #fff !important;
+}
+
+@keyframes colorChange {
+  0% {
+    color: #FF5733;
+  }
+
+  25% {
+    color: #3366FF;
+  }
+
+  50% {
+    color: #33FF66;
+  }
+
+  75% {
+    color: #FF33FF;
+  }
+
+  100% {
+    color: #FF5733;
+  }
+}
+
+.animated-text {
+  animation: colorChange 5s infinite;
+}

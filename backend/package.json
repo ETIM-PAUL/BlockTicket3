@@ -1,0 +1,28 @@
+{
+  "name": "my-dapp",
+  "version": "0.1.0",
+  "description": "JS DApp",
+  "type": "module",
+  "dependencies": {
+    "ethers": "^6.7.1",
+    "viem": "^2.5.0",
+    "@types/node": "^20",
+    "esbuild": "^0.19",
+    "npm-run-all": "^4",
+    "openapi-typescript": "^6",
+    "ts-node": "^10",
+    "typescript": "^5",
+    "vitest": "^0.34"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.2"
+  },
+  "scripts": {
+    "build": "esbuild ./src/index.js --bundle --outfile=dist/index.js --platform=node --target=node20",
+    "start": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:8080/host-runner\" node src/index.js"
+  },
+  "keywords": [
+    "cartesi"
+  ],
+  "license": "MIT"
+}

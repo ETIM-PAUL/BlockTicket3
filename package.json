@@ -1,0 +1,11 @@
+{
+  "name": "cartesi-wallet-template",
+  "version": "1.0.0",
+  "description": "This template consist of both frontend and backend code, it bootstraps a simple wallet functionality for handling both erc20 and ethers transactions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
