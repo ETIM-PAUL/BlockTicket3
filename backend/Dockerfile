@@ -35,6 +35,7 @@ ENV PATH="/opt/cartesi/bin:${PATH}"
 
 WORKDIR /opt/cartesi/dapp
 COPY --from=build-stage /opt/cartesi/dapp/dist .
+COPY --from=build-stage /opt/cartesi/dapp/node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm /opt/cartesi/dapp/
 
 ENV ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:8080/host-runner"
 

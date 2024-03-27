@@ -1,11 +1,16 @@
 {
   "name": "my-dapp",
   "version": "0.1.0",
-  "description": "JS DApp",
-  "type": "module",
+  "description": "BlockTicket3 DApp",
   "dependencies": {
+    "node-sqlite3-wasm": "^0.8.5",
+    "openapi-fetch": "^0.7",
     "ethers": "^6.7.1",
     "viem": "^2.5.0",
+    "@types/node": "^20",
+    "npm-run-all": "^4"
+  },
+  "devDependencies": {
     "@types/node": "^20",
     "esbuild": "^0.19",
     "npm-run-all": "^4",
@@ -14,12 +19,11 @@
     "typescript": "^5",
     "vitest": "^0.34"
   },
-  "devDependencies": {
-    "esbuild": "^0.19.2"
-  },
   "scripts": {
-    "build": "esbuild ./src/index.js --bundle --outfile=dist/index.js --platform=node --target=node20",
-    "start": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:8080/host-runner\" node src/index.js"
+    "build": "run-s codegen compile",
+    "codegen": "ts-node schema.ts",
+    "compile": "tsc && esbuild ./src/index.ts --bundle --outfile=dist/index.js --platform=node --target=node20",
+    "start": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:8080/host-runner\" ts-node src/index.ts"
   },
   "keywords": [
     "cartesi"

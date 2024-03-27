@@ -1,2 +1,6 @@
-node_modules
-dist
+.sunodo
+/dist
+/node_modules
+src/schema.d.ts
+testnet.env
+sunodo.env
