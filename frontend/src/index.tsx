@@ -15,12 +15,17 @@ import App from "./App";
 import configFile from "./config.json";
 import reportWebVitals from "./reportWebVitals";
 import "./index.css";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Web3OnboardProvider, init } from '@web3-onboard/react'
-import injectedModule from '@web3-onboard/injected-wallets'
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Web3OnboardProvider, init } from "@web3-onboard/react";
+import injectedModule from "@web3-onboard/injected-wallets";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import CreateTicketPage from "./pages/CreateTicketPage";
+import AllEventsPage from "./pages/AllEventsPage";
+import UpcomingEventsPage from "./pages/UpcomingEventsPage";
+import LiveEventsPage from "./pages/LiveEventsPage";
+import EventDetailsPage from "./pages/EventDetailsPage";
 const container = document.getElementById("root");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
 
@@ -28,37 +33,62 @@ const config = configFile;
 
 const injected = injectedModule();
 const web3Onboard = init({
-  wallets: [injected],
-  chains: Object.entries(config).map(([k, v], i) => ({
-    id: k,
-    token: v.token,
-    label: v.label,
-    rpcUrl: v.rpcUrl,
-  })),
-  appMetadata: {
-    name: "Cartesi Rollups Test DApp",
-    icon: "<svg><svg/>",
-    description: "Demo app for Cartesi Rollups",
-    recommendedInjectedWallets: [
-      { name: "MetaMask", url: "https://metamask.io" },
-    ],
-  },
+    wallets: [injected],
+    chains: Object.entries(config).map(([k, v], i) => ({
+        id: k,
+        token: v.token,
+        label: v.label,
+        rpcUrl: v.rpcUrl,
+    })),
+    appMetadata: {
+        name: "Cartesi Rollups Test DApp",
+        icon: "<svg><svg/>",
+        description: "Demo app for Cartesi Rollups",
+        recommendedInjectedWallets: [
+            { name: "MetaMask", url: "https://metamask.io" },
+        ],
+    },
 });
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
+    {
+        path: "/",
+        element: <App />,
+    },
+
+    {
+        path: "/events",
+        element: <AllEventsPage />,
+    },
+
+    {
+        path: "/create-ticket",
+        element: <CreateTicketPage />,
+    },
+
+    {
+        path: "/upcoming-events",
+        element: <UpcomingEventsPage />,
+    },
+
+    {
+        path: "/live-events",
+        element: <LiveEventsPage />,
+    },
+
+    {
+        path: "/event-details/:id",
+        element: <EventDetailsPage />,
+    },
 ]);
 
 root.render(
-  <React.StrictMode>
-    <Web3OnboardProvider web3Onboard={web3Onboard}>
-      <RouterProvider router={router} />
-      <ToastContainer />
-    </Web3OnboardProvider>
-  </React.StrictMode>
+    <React.StrictMode>
+        <Web3OnboardProvider web3Onboard={web3Onboard}>
+            <RouterProvider router={router} />
+            <ToastContainer />
+        </Web3OnboardProvider>
+    </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
