@@ -1,14 +1,14 @@
-import React from "react";
-import LiveEvents from "../components/LiveEvents";
+// import React from "react";
+// import LiveEvents from "../components/LiveEvents";
 
-type Props = {};
+// type Props = {};
 
-const LiveEventsPage = (props: Props) => {
-    return (
-        <div>
-            <LiveEvents />
-        </div>
-    );
-};
+// const LiveEventsPage = (props: Props) => {
+//     return (
+//         <div>
+//             <LiveEvents />
+//         </div>
+//     );
+// };
 
-export default LiveEventsPage;
+// export default LiveEventsPage;

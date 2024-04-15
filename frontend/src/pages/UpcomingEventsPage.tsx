@@ -1,14 +1,14 @@
-import React from "react";
-import UpcomingEvents from "../components/UpcomingEvents";
+// import React from "react";
+// import UpcomingEvents from "../components/UpcomingEvents";
 
-type Props = {};
+// type Props = {};
 
-const UpcomingEventsPage = (props: Props) => {
-    return (
-        <div>
-            <UpcomingEvents />
-        </div>
-    );
-};
+// const UpcomingEventsPage = (props: Props) => {
+//     return (
+//         <div>
+//             <UpcomingEvents />
+//         </div>
+//     );
+// };
 
-export default UpcomingEventsPage;
+// export default UpcomingEventsPage;

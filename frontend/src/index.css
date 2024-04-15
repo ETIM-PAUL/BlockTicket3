@@ -3,31 +3,39 @@
 @tailwind utilities;
 
 body {
-  background: #fff !important;
+    background: #fff !important;
 }
 
 @keyframes colorChange {
-  0% {
-    color: #FF5733;
-  }
+    0% {
+        color: #ff5733;
+    }
 
-  25% {
-    color: #3366FF;
-  }
+    25% {
+        color: #3366ff;
+    }
 
-  50% {
-    color: #33FF66;
-  }
+    50% {
+        color: #33ff66;
+    }
 
-  75% {
-    color: #FF33FF;
-  }
+    75% {
+        color: #ff33ff;
+    }
 
-  100% {
-    color: #FF5733;
-  }
+    100% {
+        color: #ff5733;
+    }
 }
 
 .animated-text {
-  animation: colorChange 5s infinite;
+    animation: colorChange 5s infinite;
+}
+
+.logoGradient {
+    background: linear-gradient(89.56deg, #fc8c02 -42.7%, #5618ff 117.16%);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }

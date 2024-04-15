@@ -5,14 +5,19 @@ type Props = {};
 
 const Logo = (props: Props) => {
     return (
-        <div className="ml-10">
+        <div className="">
             <Link
                 to="/"
-                className="flex items-center space-x-3 rtl:space-x-reverse"
+                className=""
             >
-                <span className="  self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                    BlockTicket3
-                </span>
+              <div className="text-4xl font-semibold">
+              <h2 className="   whitespace-nowrap dark:text-white">
+                    Block<span className=" font-semibold">Ticket3</span>
+                </h2>
+              </div>
+
+
+               
             </Link>
         </div>
     );
