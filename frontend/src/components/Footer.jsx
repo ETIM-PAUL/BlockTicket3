@@ -7,8 +7,8 @@ const Footer = () => {
     return (
         // <section className="flex justify-center items-cente flex-col  bg-[#FFFFFF]">
 
-        <div className="w-[100%] rounded- flex  justify-between items-center md:flex-row flex-col p-6 bg-[#080E26] ">
-            <p className="font-poppins font-normal text-xs text-center text-[#FFFFFF] leading-[27px]">
+        <div className="w-[100%] rounded- flex  justify-between items-center md:flex-row flex-col px-20 py-10 bg-[#080E26] ">
+            <p className="font-poppins font-normal text-lg text-center text-[#FFFFFF] leading-[27px] -ml-6">
                 Copyright Ⓒ 2024 BlockTicket3. All Rights Reserved.
             </p>
 

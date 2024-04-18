@@ -26,6 +26,8 @@ import AllEventsPage from "./pages/AllEventsPage";
 import UpcomingEventsPage from "./pages/UpcomingEventsPage";
 import LiveEventsPage from "./pages/LiveEventsPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
+import Footer from "./components/Footer";
+import CreateEventPage from "./pages/CreateEventPage";
 const container = document.getElementById("root");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
 
@@ -80,6 +82,11 @@ const router = createBrowserRouter([
         path: "/event-details/:id",
         element: <EventDetailsPage />,
     },
+
+    {
+        path: "/create-event",
+        element: <CreateEventPage />,
+    },
 ]);
 
 root.render(
@@ -88,6 +95,7 @@ root.render(
             <RouterProvider router={router} />
             <ToastContainer />
         </Web3OnboardProvider>
+        <Footer />
     </React.StrictMode>
 );
 
