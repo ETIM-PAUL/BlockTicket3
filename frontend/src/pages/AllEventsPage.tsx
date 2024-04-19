@@ -5,7 +5,7 @@ type Props = {};
 
 const AllEventsPage = (props: Props) => {
     return (
-        <div>
+        <div className="bg-[#1E1E1E]">
             <AllEvents />
         </div>
     );

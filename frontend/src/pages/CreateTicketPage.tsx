@@ -1,14 +1,14 @@
-import React from "react";
-import CreateTicket from "../components/CreateTicket";
+// import React from "react";
+// import CreateTicket from "../components/CreateTicket";
 
-type Props = {};
+// type Props = {};
 
-const CreateTicketPage = (props: Props) => {
-    return (
-        <div>
-            <CreateTicket />
-        </div>
-    );
-};
+// const CreateTicketPage = (props: Props) => {
+//     return (
+//         <div>
+//             <CreateTicket />
+//         </div>
+//     );
+// };
 
-export default CreateTicketPage;
+// export default CreateTicketPage;

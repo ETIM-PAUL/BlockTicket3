@@ -4,21 +4,23 @@ import Logo from "../components/Logo";
 import WalletConnect from "../components/WalletConnect";
 
 function TopNav() {
-    const [{ wallet }, connect, disconnect] = useConnectWallet();
+  
     return (
-        <nav className="bg-white border-gray-200 dark:bg-gray-900">
-            <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                <Logo />
-                <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse gap-6">
-                    <Link to="/" className="btn btn-ghost">
+        <nav className="bg-white border-gray-200 dark:bg-gray-900 py-2">
+            <div className="max-w-screen-xl flex flex-wrap  justify-between mx-auto p-4">
+              <div className="-ml-8">
+              <Logo />
+              </div>
+                <div className=" -mr-8 flex md:order-2 md:space-x-0 rtl:space-x-reverse gap-6">
+                    <Link to="/" className="btn btn-ghost text-white font-medium text-lg">
                         About Us
                     </Link>
 
-                    <Link to="/" className="btn btn-ghost">
+                    <Link to="/" className="btn btn-ghost text-white font-medium text-lg ">
                         Contact Us
                     </Link>
-
                     <WalletConnect />
+                 
                     <button
                         data-collapse-toggle="navbar-cta"
                         type="button"
