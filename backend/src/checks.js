@@ -46,11 +46,15 @@ class CheckActions {
         }
     }
 
-    buy_event_ticket(payload, event_tickets, msg_sender) {
+    buy_event_ticket(payload, event_tickets, msg_sender, event_referrals, min_referrals, referral_discount) {
         const balance = this.wallet.balance_get(msg_sender);
         const eth_balance = balance.ether_get();
-        const ticket_fee = event_tickets.find((event_ticket) => event_ticket.type.id === payload.type.id).type.amount;
-
+        let ticket_fee = event_tickets.find((event_ticket) => event_ticket.type.id === payload.type.id).type.amount;
+        const user_referral = event_referrals.find((event_referral) => event_referral.owner === msg_sender)
+        if (user_referral.count >= min_referrals) {
+            let holding_ticket_fee = ticket_fee;
+            ticket_fee = (referral_discount * holding_ticket_fee) / 100
+        }
         if (Number(eth_balance) < Number(ticket_fee)) {
             console.log(`User ethers balance not enough to buy the ${payload.type.name} ticket`);
         } else check = true;

@@ -141,10 +141,16 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
           throw new Error("Access Denied");
         } else {
           const referralCodes = await db.all(`SELECT * FROM event_referrals`);
+          const event_referrals = referralCodes.filter(
+            (referral_code: any) => referral_code.event_id === event.id
+          );
           const ticket_process = check_actions.buy_event_ticket(
             eventPayload.ticket,
             JSON.parse(event.tickets),
-            data.metadata.msg_sender
+            data.metadata.msg_sender,
+            event_referrals,
+            event.minReferrals,
+            event.referralDiscount
           );
           if (ticket_process) {
             const generatedCode = generate_code(referralCodes);
@@ -155,15 +161,22 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
                 ":ticket_data": JSON.stringify(eventPayload.ticket),
               }
             );
-            db.run(
-              "INSERT INTO event_referrals VALUES (NULL, :code, :event_id, :owner, :count)",
-              {
-                ":code": generatedCode,
-                ":event_id": eventPayload.id,
-                ":owner": msg_sender,
-                ":count": 0,
-              }
-            );
+
+            if (
+              !event_referrals.find(
+                (referral: any) => referral.owner === msg_sender
+              )
+            ) {
+              db.run(
+                "INSERT INTO event_referrals VALUES (NULL, :code, :event_id, :owner, :count)",
+                {
+                  ":code": generatedCode,
+                  ":event_id": eventPayload.id,
+                  ":owner": msg_sender,
+                  ":count": 0,
+                }
+              );
+            }
 
             if (eventPayload.referral_code) {
               const code_details = check_actions.get_referral_code_details(
@@ -191,22 +204,6 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
           processed = true;
         } else throw new Error("Access Denied");
       }
-
-      // if (eventPayload.action === "update_event_creation_price") {
-      //   const event = await db.get(
-      //     `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
-      //   );
-      //   if (
-      //     event.organizer === data.metadata.msg_sender.toLowerCase() &&
-      //     SYSTEM_ADMINS.includes(data.metadata.msg_sender.toLowerCase())
-      //   ) {
-      //     throw new Error("Access Denied");
-      //   } else
-      //     db.run(
-      //       `UPDATE events SET status = ${EventStatus?.Ongoing}, WHERE id = ${eventPayload.id};`
-      //     );
-      //   processed = true;
-      // }
 
       if (eventPayload.action === "delete")
         if (SYSTEM_ADMINS.includes(data.metadata.msg_sender.toLowerCase())) {
