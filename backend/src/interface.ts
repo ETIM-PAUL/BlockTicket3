@@ -36,6 +36,7 @@ export interface Event {
   logoUrl: string;
   balance: number;
   ether_amount: number;
+  referral_code: number;
   ticket: EventParticipants;
 }
 

@@ -164,6 +164,18 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
                 ":count": 0,
               }
             );
+
+            if (eventPayload.referral_code) {
+              const code_details = check_actions.get_referral_code_details(
+                eventPayload.referral_code
+              );
+              //if there is a referral code, check if it exist and then increase the count
+              db.run(
+                `UPDATE event_referrals SET count = ${code_details.code++}, WHERE code = ${
+                  code_details.id
+                };`
+              );
+            }
             processed = true;
           }
         }

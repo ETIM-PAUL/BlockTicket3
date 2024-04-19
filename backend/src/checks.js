@@ -62,6 +62,13 @@ class CheckActions {
             return false;
         }
     }
+
+    get_referral_code_details(referral_codes) {
+        const referral_code_details = referral_codes.find((referral) => referral.code === referral.code);
+        if (referral_code_details) {
+            return referral_code_details
+        }
+    }
 }
 
 module.exports = { CheckActions };
