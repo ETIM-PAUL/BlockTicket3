@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "description": "BlockTicket3 DApp",
   "dependencies": {
-    "node-sqlite3-wasm": "^0.8.5",
-    "openapi-fetch": "^0.7",
-    "ethers": "^6.7.1",
-    "viem": "^2.5.0",
     "@types/node": "^20",
-    "npm-run-all": "^4"
+    "cartesi-wallet": "^1.0.5",
+    "ethers": "^6.7.1",
+    "node-sqlite3-wasm": "^0.8.5",
+    "npm-run-all": "^4",
+    "openapi-fetch": "^0.7",
+    "viem": "^2.5.0"
   },
   "devDependencies": {
     "@types/node": "^20",

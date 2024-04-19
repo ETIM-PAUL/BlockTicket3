@@ -1,22 +1,17 @@
-interface EventPrice {
-  amount: number;
-  name: string;
-}
+import { Address } from "viem";
 
-interface EventParticipantReferrals {
+interface EventTicket {
+  id: number;
   amount: number;
   name: string;
-  participant: string;
 }
 
 interface EventParticipants {
   participant: string;
-  ticket: EventPrice;
-  referral_code: string;
-  referrals: Array<EventParticipantReferrals>;
+  type: EventTicket;
 }
 
-enum EventStatus {
+export enum EventStatus {
   "Pending",
   "Ongoing",
   "Ended",
@@ -29,16 +24,19 @@ export interface Event {
   title: string;
   date: string;
   location: string;
-  prices: Array<EventPrice>;
+  tickets: Array<EventTicket>;
   capacity: number;
   organizer: string;
   dao: boolean;
   referral: boolean;
   status: EventStatus;
-  participants: EventParticipants;
   minReferrals: number;
   referralDiscount: number;
   tokenUrl: string;
+  logoUrl: string;
+  balance: number;
+  ether_amount: number;
+  ticket: EventParticipants;
 }
 
 export interface EventPayload {
