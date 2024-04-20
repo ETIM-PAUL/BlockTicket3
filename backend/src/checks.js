@@ -1,9 +1,4 @@
-// export const checkEthValue = (payload: Event, amount: String | Number) => {
-//   if (payload.dao && payload.referral && amount !== Number(parseEther(String(parseInt("0.001")), "gwei"))) {
-//     throw new Error("Invalid ethers amount, ")
-//   }
-// } 
-
+import { EventStatus } from "./interface";
 
 class CheckActions {
     constructor(wallet) {
@@ -16,25 +11,25 @@ class CheckActions {
         const event_price = 0;
         if (!event_data?.dao && !event_data?.referral) {
             if (Number(eth_balance) < Number(event_types[0]?.price)) {
-                console.log("User deposit not enough to create a basic event");
+                console.log("User balance not enough to create a basic event");
             } else check = true;
             event_price = BigInt(event_types[0]?.price)
         }
         if (event_data?.dao && !event_data?.referral) {
             if (Number(eth_balance) < Number(event_types[1]?.price)) {
-                console.log("User deposit not enough to create a dao based event");
+                console.log("User balance not enough to create a dao based event");
             } else check = true;
             event_price = BigInt(event_types[1]?.price)
         }
         if (!event_data?.dao && event_data?.referral) {
             if (Number(eth_balance) < Number(event_types[2]?.price)) {
-                console.log("User deposit not enough to create a referral based event");
+                console.log("User balance not enough to create a referral based event");
             } else check = true;
             event_price = BigInt(event_types[2]?.price)
         }
         if (!event_data?.dao && event_data?.referral) {
             if (Number(eth_balance) < Number(event_types[3]?.price)) {
-                console.log("User deposit not enough to create a complete package event");
+                console.log("User balance not enough to create a complete package event");
             } else check = true;
             event_price = BigInt(event_types[3]?.price)
         }
@@ -46,17 +41,25 @@ class CheckActions {
         }
     }
 
-    buy_event_ticket(payload, event_tickets, msg_sender, event_referrals, min_referrals, referral_discount) {
+    buy_event_ticket(payload, event_tickets, msg_sender, event_referrals, event_data, event_participants) {
+
+        if (event_data.status !== EventStatus.Pending) {
+            throw new Error("Event has either ended, cancelled or ongoing");
+        }
+        if (event_participants === event_data.capacity) {
+            throw new Error(`Event participants has reached it's capacity`);
+        }
+
         const balance = this.wallet.balance_get(msg_sender);
         const eth_balance = balance.ether_get();
         let ticket_fee = event_tickets.find((event_ticket) => event_ticket.type.id === payload.type.id).type.amount;
         const user_referral = event_referrals.find((event_referral) => event_referral.owner === msg_sender)
-        if (user_referral.count >= min_referrals) {
+        if (user_referral.count >= event_data.min_referrals) {
             let holding_ticket_fee = ticket_fee;
-            ticket_fee = (referral_discount * holding_ticket_fee) / 100
+            ticket_fee = (event_data.referral_discount * holding_ticket_fee) / 100
         }
         if (Number(eth_balance) < Number(ticket_fee)) {
-            console.log(`User ethers balance not enough to buy the ${payload.type.name} ticket`);
+            throw new Error(`User ethers balance not enough to buy ${payload.type.name} ticket`);
         } else check = true;
 
         if (check) {

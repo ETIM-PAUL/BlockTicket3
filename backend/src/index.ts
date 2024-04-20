@@ -8,7 +8,6 @@ const { CheckActions } = require("./checks");
 const { Wallet } = require("cartesi-wallet");
 
 import { Event, EventPayload, EventStatus } from "./interface";
-import { ethers } from "ethers";
 
 const rollup_server =
   process.env.ROLLUP_HTTP_SERVER_URL ??
@@ -130,9 +129,13 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
           processed = true;
         }
       }
+
       if (eventPayload.action === "purchase_ticket") {
         const event = await db.get(
           `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
+        );
+        const event_participants = await db.get(
+          `SELECT * FROM event_tickets WHERE event_id = ${eventPayload.id} LIMIT 1;`
         );
         if (
           event.organizer === data.metadata.msg_sender.toLowerCase() ||
@@ -149,8 +152,8 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
             JSON.parse(event.tickets),
             data.metadata.msg_sender,
             event_referrals,
-            event.minReferrals,
-            event.referralDiscount
+            event,
+            event_participants
           );
           if (ticket_process) {
             const generatedCode = generate_code(referralCodes);
@@ -162,46 +165,68 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
               }
             );
 
-            if (
-              !event_referrals.find(
-                (referral: any) => referral.owner === msg_sender
-              )
-            ) {
-              db.run(
-                "INSERT INTO event_referrals VALUES (NULL, :code, :event_id, :owner, :count)",
-                {
-                  ":code": generatedCode,
-                  ":event_id": eventPayload.id,
-                  ":owner": msg_sender,
-                  ":count": 0,
-                }
-              );
+            if (event.referral) {
+              if (
+                !event_referrals.find(
+                  (referral: any) => referral.owner === msg_sender
+                )
+              ) {
+                db.run(
+                  "INSERT INTO event_referrals VALUES (NULL, :code, :event_id, :owner, :count)",
+                  {
+                    ":code": generatedCode,
+                    ":event_id": eventPayload.id,
+                    ":owner": msg_sender,
+                    ":count": 0,
+                  }
+                );
+              }
+
+              if (eventPayload.referral_code) {
+                const code_details = check_actions.get_referral_code_details(
+                  eventPayload.referral_code
+                );
+                //if there is a referral code, check if it exist and then increase the count
+                db.run(
+                  `UPDATE event_referrals SET count = ${code_details.code++}, WHERE code = ${
+                    code_details.id
+                  };`
+                );
+              }
             }
 
-            if (eventPayload.referral_code) {
-              const code_details = check_actions.get_referral_code_details(
-                eventPayload.referral_code
-              );
-              //if there is a referral code, check if it exist and then increase the count
-              db.run(
-                `UPDATE event_referrals SET count = ${code_details.code++}, WHERE code = ${
-                  code_details.id
-                };`
-              );
-            }
             processed = true;
           }
         }
       }
+
       if (eventPayload.action === "start_event") {
         const event = await db.get(
           `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
         );
         if (event.organizer === data.metadata.msg_sender.toLowerCase()) {
-          db.run(
-            `UPDATE events SET status = ${EventStatus?.Ongoing}, WHERE id = ${eventPayload.id};`
-          );
-          processed = true;
+          if (event.status === EventStatus.Pending) {
+            db.run(
+              `UPDATE events SET status = ${EventStatus?.Ongoing}, WHERE id = ${eventPayload.id};`
+            );
+            processed = true;
+          } else
+            throw new Error("Event has either ended, cancelled or ongoing");
+        } else throw new Error("Access Denied");
+      }
+
+      if (eventPayload.action === "cancel_event") {
+        const event = await db.get(
+          `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
+        );
+        if (event.organizer === data.metadata.msg_sender.toLowerCase()) {
+          if (event.status === EventStatus.Pending) {
+            db.run(
+              `UPDATE events SET status = ${EventStatus?.Cancelled}, WHERE id = ${eventPayload.id};`
+            );
+            processed = true;
+          } else
+            throw new Error("Event has either ended, cancelled or ongoing");
         } else throw new Error("Access Denied");
       }
 
