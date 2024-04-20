@@ -149,6 +149,7 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
           );
           const ticket_process = check_actions.buy_event_ticket(
             eventPayload.ticket,
+            DAPP_ADDRESS,
             JSON.parse(event.tickets),
             data.metadata.msg_sender,
             event_referrals,
@@ -219,11 +220,24 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
         const event = await db.get(
           `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
         );
+        const event_participants = await db.get(
+          `SELECT * FROM event_tickets WHERE event_id = ${eventPayload.id} LIMIT 1;`
+        );
         if (event.organizer === data.metadata.msg_sender.toLowerCase()) {
           if (event.status === EventStatus.Pending) {
             db.run(
               `UPDATE events SET status = ${EventStatus?.Cancelled}, WHERE id = ${eventPayload.id};`
             );
+
+            //refund ticket fees to all participants
+            for (let index = 0; index < event_participants.length; index++) {
+              const element = JSON.parse(event_participants[index].ticket_data);
+              wallet.ether_transfer(
+                DAPP_ADDRESS,
+                element.participant,
+                BigInt(element.type.amount)
+              );
+            }
             processed = true;
           } else
             throw new Error("Event has either ended, cancelled or ongoing");

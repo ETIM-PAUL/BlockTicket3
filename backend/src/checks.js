@@ -41,7 +41,7 @@ class CheckActions {
         }
     }
 
-    buy_event_ticket(payload, event_tickets, msg_sender, event_referrals, event_data, event_participants) {
+    buy_event_ticket(payload, dapp_address, event_tickets, msg_sender, event_referrals, event_data, event_participants) {
 
         if (event_data.status !== EventStatus.Pending) {
             throw new Error("Event has either ended, cancelled or ongoing");
@@ -54,6 +54,11 @@ class CheckActions {
         const eth_balance = balance.ether_get();
         let ticket_fee = event_tickets.find((event_ticket) => event_ticket.type.id === payload.type.id).type.amount;
         const user_referral = event_referrals.find((event_referral) => event_referral.owner === msg_sender)
+
+
+        if (!!ticket_fee) {
+            throw new Error(`Invalid Ticket`);
+        }
         if (user_referral.count >= event_data.min_referrals) {
             let holding_ticket_fee = ticket_fee;
             ticket_fee = (event_data.referral_discount * holding_ticket_fee) / 100
