@@ -23,8 +23,8 @@ const NewProposalModal = ({ isVisible, onClose }: Props) => {
                 id="wrapper"
                 onClick={handleClose}
             >
-                <div className="w-[600px]  bg-black flex flex-col relative ">
-                    <div className=" px-2 py-6 rounded">
+                <div className="w-[800px]  bg-gradient-to-l from-[#5522CC] to-[#ED4690] flex flex-col relative ">
+                    <div className=" p-14 rounded">
                         <button
                             className="text-white text-2xl absolute top-6 right-10   "
                             onClick={() => onClose()}
@@ -32,7 +32,7 @@ const NewProposalModal = ({ isVisible, onClose }: Props) => {
                             X
                         </button>
 
-                        <div className="bg-black  mx-auto flex flex-col mt-2  p-4  ">
+                        <div className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  mx-auto flex flex-col mt-2  p-4  ">
                             <NewProposalForm />
                         </div>
                         {/*  */}
