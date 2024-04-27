@@ -7,7 +7,6 @@ type Props = {
 };
 
 const BuyTicketModal = ({ isVisible, onClose }: Props) => {
-    const [showModal, setShowModal] = useState<boolean>(false);
     const [showTicketModal, setShowTicketModal] = useState<boolean>(false);
     if (!isVisible) return null;
 
@@ -24,8 +23,8 @@ const BuyTicketModal = ({ isVisible, onClose }: Props) => {
                 id="wrapper"
                 onClick={handleClose}
             >
-                <div className="w-[800px]  bg-black flex flex-col relative ">
-                    <div className=" p-2 rounded">
+                <div className="w-[800px]  bg-gradient-to-l from-[#5522CC] to-[#ED4690] flex flex-col relative ">
+                    <div className=" p-14 rounded">
                         <button
                             className="text-white text-2xl absolute top-6 right-10   "
                             onClick={() => onClose()}
@@ -33,19 +32,19 @@ const BuyTicketModal = ({ isVisible, onClose }: Props) => {
                             X
                         </button>
 
-                        <div className="bg-black  mx-auto flex flex-col mt-2  p-4  ">
+                        <div className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  mx-auto flex flex-col mt-2  p-4  ">
                             <h2 className="text-white font-bold text-2xl text-center font-nexa">
                                 Choose Ticket Type
                             </h2>
 
-                            <div className="flex flex-row mt-10 justify-between gap-4 py-6 ">
+                            <div className="flex flex-row mt-10 justify-between gap-4 py-6 text-white">
                                 {/* Regular */}
-                                <div className=" space-y-2 pt-2 text-center justify-center  flex flex-col w-full border border-[#292929]">
+                                <div className=" space-y-2 pt-2 text-center justify-center  flex flex-col w-full border shadow-2xl">
                                     <p className="text-2xl">Regular</p>
 
                                     <p>13ETH</p>
                                     <button
-                                        className="  text-lg font-semibold justify-center p-4 text-black bg-white w-full flex hover:bg-[#292929] hover:text-white"
+                                        className="  shadow-2xl text-lg font-semibold justify-center p-4 text-white  bg-gradient-to-l from-[#5522CC] to-[#ED4690]    hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                                         onClick={() => setShowTicketModal(true)}
                                     >
                                         Buy
@@ -53,12 +52,12 @@ const BuyTicketModal = ({ isVisible, onClose }: Props) => {
                                 </div>
 
                                 {/* VIP */}
-                                <div className=" space-y-2  pt-2   text-center justify-center  flex flex-col w-full border border-[#292929]">
+                                <div className=" space-y-2  pt-2   text-center justify-center  flex flex-col w-full border shadow-2xl">
                                     <p className="text-2xl">VIP</p>
 
                                     <p>20ETH</p>
                                     <button
-                                        className="text-lg font-semibold justify-center p-4 text-black bg-white w-full flex hover:bg-[#292929] hover:text-white"
+                                        className="text-lg font-semibold justify-center p-4 text-white  bg-gradient-to-r from-[#5522CC] to-[#8352f5]   hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                                         onClick={() => setShowTicketModal(true)}
                                     >
                                         Buy
@@ -66,12 +65,12 @@ const BuyTicketModal = ({ isVisible, onClose }: Props) => {
                                 </div>
 
                                 {/* V-VIP */}
-                                <div className=" space-y-2   pt-2  text-center justify-center  flex flex-col w-full border border-[#292929]">
+                                <div className=" space-y-2   pt-2  text-center justify-center  flex flex-col w-full border shadow-2xl">
                                     <p className="text-2xl">V-VIP</p>
 
                                     <p>13ETH</p>
                                     <button
-                                        className="text-lg font-semibold justify-center p-4 text-black bg-white w-full flex hover:bg-[#292929] hover:text-white"
+                                        className="text-lg font-semibold justify-center p-4   bg-gradient-to-r from-[#5522CC] to-[#8352f5]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                                         onClick={() => setShowTicketModal(true)}
                                     >
                                         Buy

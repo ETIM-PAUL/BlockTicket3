@@ -1,26 +1,38 @@
 import { useConnectWallet } from "@web3-onboard/react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Logo from "../components/Logo";
 import WalletConnect from "../components/WalletConnect";
 
 function TopNav() {
-  
     return (
         <nav className="bg-white border-gray-200 dark:bg-gray-900 py-2">
             <div className="max-w-screen-xl flex flex-wrap  justify-between mx-auto p-4">
-              <div className="-ml-8">
-              <Logo />
-              </div>
+                <div className="-ml-8">
+                    <Logo />
+                </div>
                 <div className=" -mr-8 flex md:order-2 md:space-x-0 rtl:space-x-reverse gap-6">
-                    <Link to="/" className="btn btn-ghost text-white font-medium text-lg">
+                    <Link
+                        to="/"
+                        className="btn btn-ghost text-white font-medium text-lg"
+                    >
                         About Us
                     </Link>
 
-                    <Link to="/" className="btn btn-ghost text-white font-medium text-lg ">
+                    <Link
+                        to="/"
+                        className="btn btn-ghost text-white font-medium text-lg "
+                    >
                         Contact Us
                     </Link>
-                    <WalletConnect />
-                 
+                    {/* <WalletConnect /> */}
+
+                    <Link
+                        to="/events"
+                        className=" font-medium  rounded-lg text-lg px-4 py-3 text-center bg-white text-black"
+                    >
+                        Launch App
+                    </Link>
+
                     <button
                         data-collapse-toggle="navbar-cta"
                         type="button"

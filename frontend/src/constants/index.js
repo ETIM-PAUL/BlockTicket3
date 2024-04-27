@@ -7,6 +7,12 @@ import {
     desertKing01,
     desertKing02,
     desertKing03,
+    event1,
+    event2,
+    event3,
+    event4,
+    event5,
+    event6,
 } from "../assets";
 
 export const socialMedia = [
@@ -194,6 +200,7 @@ export const ParticipantsData = [
         ticketType: "VIP",
         referalCount: "50",
         referalCode: "blt3qxyz01",
+        time: "2 minutes ago",
     },
     {
         id: "2",
@@ -201,6 +208,7 @@ export const ParticipantsData = [
         ticketType: "Regular",
         referalCount: "20",
         referalCode: "blt3qxyz02",
+        time: "5 minutes ago",
     },
     {
         id: "3",
@@ -208,6 +216,7 @@ export const ParticipantsData = [
         ticketType: "V-VIP",
         referalCount: "15",
         referalCode: "blt3qxyz03",
+        time: "10 minutes ago",
     },
     {
         id: "4",
@@ -215,6 +224,7 @@ export const ParticipantsData = [
         ticketType: "VIP",
         referalCount: "40",
         referalCode: "blt3qxyz04",
+        time: "15 minutes ago",
     },
     {
         id: "5",
@@ -222,6 +232,7 @@ export const ParticipantsData = [
         ticketType: "V-VIP",
         referalCount: "30",
         referalCode: "blt3qxyz05",
+        time: "20 minutes ago",
     },
     {
         id: "6",
@@ -229,5 +240,155 @@ export const ParticipantsData = [
         ticketType: "Regular",
         referalCount: "100",
         referalCode: "blt3qxyz06",
+        time: "22 minutes ago",
+    },
+    {
+        id: "7",
+        address: "0xa5FFf172361008408da8AcFaF4a9f32012314cA9",
+        ticketType: "VIP",
+        referalCount: "40",
+        referalCode: "blt3qxyz04",
+        time: "30 minutes ago",
+    },
+];
+
+export const UpcomingEventsData = [
+    {
+        id: "1",
+        flyer: event1,
+        title: "Wonder Girls 2010 Wonder Girls World Tour San Francisco",
+        description:
+            "We’ll get you directly seated and inside for you to enjoy the show.",
+        date: "14th May",
+        price: "$150",
+        location: "Kenya",
+    },
+    {
+        id: "2",
+        flyer: event2,
+        title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
+        description: "Directly seated and inside for you to enjoy the show.",
+        date: "20th June",
+        price: "$100",
+        location: "Nigeria",
+    },
+
+    {
+        id: "3",
+        flyer: event3,
+        title: "2011 Super Junior SM Town Live '10 World Tour New York City",
+        description: "Directly seated and inside for you to enjoy the show.",
+        date: "18th Sept",
+        price: "$200",
+        location: "Ghana",
+    },
+
+    {
+        id: "4",
+        flyer: event4,
+        title: " Wonder Girls 2010 Wonder Girls World Tour San Francisco",
+        description: "Directly seated and inside for you to enjoy the show.",
+        date: "20th June",
+        price: "$150",
+        location: "New York",
+    },
+
+    {
+        id: "5",
+        flyer: event5,
+        title: "2011 Super Junior SM Town Live '10 World Tour New York City",
+        description: "Directly seated and inside for you to enjoy the show.",
+        date: "25th May",
+        price: "$250",
+        location: "London",
+    },
+
+    {
+        id: "6",
+        flyer: event6,
+        title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
+        description: "Directly seated and inside for you to enjoy the show.",
+        date: " 18th July",
+        price: "$150",
+        location: "India",
+    },
+
+    {
+        id: "7",
+        flyer: event1,
+        title: "Wonder Girls 2010 Wonder Girls World Tour San Francisco",
+        description:
+            "We’ll get you directly seated and inside for you to enjoy the show.",
+        date: "14th May",
+        price: "$200",
+        location: "Dubai",
+    },
+    {
+        id: "7",
+        flyer: event2,
+        title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
+        description: "Directly seated and inside for you to enjoy the show.",
+        date: "20th June",
+        price: "$150",
+        location: "Canada",
+    },
+];
+
+export const MyEventsTicketData = [
+    {
+        id: "1",
+        title: "Wonder Girls 2010 Wonder Tour San Francisco",
+        ticketType: "VIP",
+        referalCount: "50",
+        referalCode: "blt3qxyz01",
+        status: "Upcoming",
+    },
+    {
+        id: "2",
+        title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
+        ticketType: "Regular",
+        referalCount: "20",
+        referalCode: "blt3qxyz02",
+        status: "Ended",
+    },
+    {
+        id: "3",
+        title: "Wonder Girls 2010 Wonder Tour San Francisco",
+        ticketType: "V-VIP",
+        referalCount: "15",
+        referalCode: "blt3qxyz03",
+        status: "Upcoming",
+    },
+    {
+        id: "4",
+        title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
+        ticketType: "VIP",
+        referalCount: "40",
+        referalCode: "blt3qxyz04",
+        status: "Live",
+    },
+    {
+        id: "5",
+        title: "2011 Super Junior SM Town Live Tour New York City",
+        ticketType: "V-VIP",
+        referalCount: "30",
+        referalCode: "blt3qxyz05",
+        status: "Ended",
+    },
+    {
+        id: "6",
+        title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
+        ticketType: "Regular",
+        referalCount: "100",
+        referalCode: "blt3qxyz06",
+        status: "Upcoming",
+    },
+    {
+        id: "7",
+        title: "2011 Super Junior SM Town Live Tour New York City",
+        ticketType: "VIP",
+        referalCount: "40",
+        referalCode: "blt3qxyz04",
+        status: "Live",
     },
 ];

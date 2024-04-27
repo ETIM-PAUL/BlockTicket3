@@ -28,6 +28,7 @@ import LiveEventsPage from "./pages/LiveEventsPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
 import Footer from "./components/Footer";
 import CreateEventPage from "./pages/CreateEventPage";
+import UserDashboardPage from "./pages/UserDashboardPage";
 const container = document.getElementById("root");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
 
@@ -64,11 +65,6 @@ const router = createBrowserRouter([
     },
 
     {
-        path: "/create-ticket",
-        element: <CreateTicketPage />,
-    },
-
-    {
         path: "/upcoming-events",
         element: <UpcomingEventsPage />,
     },
@@ -87,19 +83,19 @@ const router = createBrowserRouter([
         path: "/create-event",
         element: <CreateEventPage />,
     },
-]);
 
+    {
+        path: "/user-dashboard",
+        element: <UserDashboardPage />,
+    },
+]);
 root.render(
     <React.StrictMode>
         <Web3OnboardProvider web3Onboard={web3Onboard}>
             <RouterProvider router={router} />
             <ToastContainer />
         </Web3OnboardProvider>
-        <Footer />
     </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
