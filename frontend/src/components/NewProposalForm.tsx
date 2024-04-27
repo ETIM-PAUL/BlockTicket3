@@ -24,17 +24,17 @@ const NewProposalForm = (props: Props) => {
                     rows={3}
                     maxLength={100}
                     placeholder="Create your proposal about the events you registered for"
-                    className="text-center p-2 bg-[#292929] text-white"
+                    className="text-center p-2 bg-[#EEE1FF] text-black"
                 ></textarea>
             </div>
 
             <div className="flex  justify-between gap-8 mx-4">
-                <button className="text-lg font-semibold justify-center p-4 text-black bg-white w-full flex hover:bg-[#292929] hover:text-white">
+                <button className="text-lg font-semibold justify-center p-4 text-black bg-white w-full flex hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]">
                     Cancel
                 </button>
                 <button
                     type="submit"
-                    className="text-lg font-semibold text-center justify-center p-4 bg-[#292929] text-white w-full  flex hover:bg-white hover:text-black "
+                    className="text-lg font-semibold text-center justify-center p-4  w-full  flex bg-gradient-to-r from-[#5522CC] to-[#8352f5]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] "
                 >
                     Submit
                 </button>
