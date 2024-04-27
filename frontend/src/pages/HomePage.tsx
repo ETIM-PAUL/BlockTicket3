@@ -1,16 +1,17 @@
-import React from 'react'
-import Home from '../components/Home'
+import React from "react";
+import Home from "../components/Home";
+import LandingPage from "../components/LandingPage";
+import Footer from "../components/Footer";
 
-type Props = {}
+type Props = {};
 
 const HomePage = (props: Props) => {
-  return (
-    <div>
+    return (
+        <div className="">
+            <Home />
+            <Footer />
+        </div>
+    );
+};
 
-<Home/>
-
-    </div>
-  )
-}
-
-export default HomePage
+export default HomePage;
