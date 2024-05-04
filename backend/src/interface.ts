@@ -38,6 +38,7 @@ export interface Event {
   ether_amount: number;
   referral_code: number;
   ticket: EventParticipants;
+  proposal: string;
 }
 
 export interface EventPayload {

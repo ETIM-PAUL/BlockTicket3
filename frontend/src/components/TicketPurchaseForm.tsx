@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 type Props = {};
 
-const TicketPurchaseForm = (props: Props) => {
+const TicketPurchaseForm = ({ onClose }) => {
     const [referalCode, setReferalCode] = useState();
 
     const handleSubmit = (e) => {
@@ -21,19 +21,26 @@ const TicketPurchaseForm = (props: Props) => {
                 <input
                     value={referalCode}
                     onChange={(e: any) => setReferalCode(e.target.value)}
-                    className="bg-white outline-none px-4 py-2 text-black"
+                    className="bg-white outline-none px-4 py-2 text-black w-1/2"
                     type="text"
-                    placeholder="Your Referal Code"
+                    placeholder="Your Referal Code (Optional)"
                 />
             </div>
 
             <div className="flex  justify-between gap-8">
-                <button className="text-lg font-semibold justify-center p-4 text-black bg-white w-full flex hover:bg-[#292929] hover:text-white">
+                <button
+                    className="text-lg font-semibold justify-center p-4 
+                text-black bg-white w-full flex hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]
+                "
+                    onClick={onClose}
+                >
                     Cancel
                 </button>
                 <button
                     type="submit"
-                    className="text-lg font-semibold text-center justify-center p-4 bg-[#292929] text-white w-full  flex hover:bg-white hover:text-black "
+                    className="text-lg font-semibold text-center justify-center p-4
+                    
+                    w-full  flex  bg-gradient-to-r from-[#5522CC] to-[#8352f5]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                 >
                     Submit
                 </button>

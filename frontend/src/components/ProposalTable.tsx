@@ -10,7 +10,7 @@ const ProposalTable = (props: Props) => {
         <div className="mt-4">
             <div className="flex overflow-x-auto">
                 <table className=" flex table  text-white -space-y-4 ">
-                    <thead className="text-white font-semibold text-base bg-black ">
+                    <thead className="text-black font-semibold text-base bg-white">
                         <tr>
                             <th>Id</th>
                             <th>Proposal</th>
@@ -19,14 +19,14 @@ const ProposalTable = (props: Props) => {
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody className="">
+                    <tbody className="text-lg">
                         {ProposalData.map((proposalData: any) => (
                             <tr
                                 key={proposalData.id}
                                 className={
                                     proposalData.id % 2 === 0
-                                        ? "bg-[#292929]"
-                                        : "bg-[#343434]"
+                                        ? "bg-[#9b76f2]"
+                                        : "bg-[#8155ea]"
                                 }
                             >
                                 <td>{proposalData.id}</td>
@@ -35,7 +35,7 @@ const ProposalTable = (props: Props) => {
                                 <td>{proposalData.downvote}</td>
                                 <td>
                                     <button
-                                        className="bg-white px-4 text-black  py-1 text-lg hover:bg-black hover:text-white "
+                                        className=" bg-white text-black hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] px-4   py-1 text-xl hover:bg-black"
                                         onClick={() => setShowModal(true)}
                                     >
                                         Action
