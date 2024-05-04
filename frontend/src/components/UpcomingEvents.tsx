@@ -1,5 +1,8 @@
 import React from "react";
 import { UpcomingEventsData } from "../constants";
+import { CiLocationOn } from "react-icons/ci";
+import { CiCalendarDate } from "react-icons/ci";
+import { GiTakeMyMoney } from "react-icons/gi";
 
 type Props = {};
 
@@ -37,19 +40,20 @@ const UpcomingEvents = (props: Props) => {
                                             {upcomingEventData.description}
                                         </p>
 
-                                        <p className="font-normal  text-[#6A6A6A]">
+                                        <p className="font-normal flex flex-row gap-1 text-[#6A6A6A]">
+                                            <CiCalendarDate className="w-7 h-7" />
                                             {upcomingEventData.date}
                                         </p>
 
-                                        <p className="text-lg  text-[#6A6A6A]">
-                                            Location -{" "}
+                                        <p className="text-lg flex flex-row gap-1 text-[#6A6A6A]">
+                                            <CiLocationOn className="w-7 h-7" />
                                             <span>
                                                 {upcomingEventData.location}
                                             </span>
                                         </p>
 
-                                        <p className="text-lg  text-[#6A6A6A] pb-4">
-                                            Ticket fee -{" "}
+                                        <p className=" flex flex-row gap-1 text-lg  text-[#6A6A6A] pb-4">
+                                            <GiTakeMyMoney className="w-7 h-7" />
                                             <span>
                                                 {upcomingEventData.price}
                                             </span>{" "}
