@@ -21,7 +21,7 @@ import { Web3OnboardProvider, init } from "@web3-onboard/react";
 import injectedModule from "@web3-onboard/injected-wallets";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import CreateTicketPage from "./pages/CreateTicketPage";
+
 import AllEventsPage from "./pages/AllEventsPage";
 import UpcomingEventsPage from "./pages/UpcomingEventsPage";
 import LiveEventsPage from "./pages/LiveEventsPage";
