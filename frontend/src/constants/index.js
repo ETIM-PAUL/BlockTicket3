@@ -50,9 +50,9 @@ export const EventsData = [
 
     {
         id: "2",
-        eventLogo: desertKing01,
+        eventLogo: blockTicket3Logo,
         title: "The Clash titians",
-        price: "$100",
+        price: "0.1ETH",
         date: "10th June 2024",
         country: "Nigeria",
     },
@@ -61,16 +61,16 @@ export const EventsData = [
         id: "3",
         eventLogo: blockTicket3Logo,
         title: "The Clash titians",
-        price: "$150",
+        price: "0.05ETH",
         date: "10th July 2024",
         country: "Kenya",
     },
 
     {
         id: "4",
-        eventLogo: desertKing02,
+        eventLogo: blockTicket3Logo,
         title: "The Clash titians",
-        price: "$30",
+        price: "0.15ETH",
         date: "28th May 2024",
         country: "Ghana",
     },
@@ -79,16 +79,16 @@ export const EventsData = [
         id: "5",
         eventLogo: blockTicket3Logo,
         title: "The Clash titians",
-        price: "$120",
+        price: "0.2ETH",
         date: "15th June 2024",
         country: "Nigeria",
     },
 
     {
         id: "6",
-        eventLogo: desertKing03,
+        eventLogo: blockTicket3Logo,
         title: "The Clash titians",
-        price: "$200",
+        price: "0.02ETH",
         date: "30th July 2024",
         country: "Kenya",
     },
@@ -96,16 +96,16 @@ export const EventsData = [
         id: "7",
         eventLogo: blockTicket3Logo,
         title: "The Clash titians",
-        price: "$120",
+        price: "0.03ETH",
         date: "15th June 2024",
         country: "Nigeria",
     },
 
     {
         id: "8",
-        eventLogo: desertKing02,
+        eventLogo: blockTicket3Logo,
         title: "The Clash titians",
-        price: "$200",
+        price: "0.5ETH",
         date: "30th July 2024",
         country: "Kenya",
     },
@@ -260,7 +260,7 @@ export const UpcomingEventsData = [
         description:
             "We’ll get you directly seated and inside for you to enjoy the show.",
         date: "14th May",
-        price: "$150",
+        price: "0.002ETH",
         location: "Kenya",
     },
     {
@@ -269,7 +269,7 @@ export const UpcomingEventsData = [
         title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
         description: "Directly seated and inside for you to enjoy the show.",
         date: "20th June",
-        price: "$100",
+        price: "0.001ETH",
         location: "Nigeria",
     },
 
@@ -279,7 +279,7 @@ export const UpcomingEventsData = [
         title: "2011 Super Junior SM Town Live '10 World Tour New York City",
         description: "Directly seated and inside for you to enjoy the show.",
         date: "18th Sept",
-        price: "$200",
+        price: "0.2ETH",
         location: "Ghana",
     },
 
@@ -289,7 +289,7 @@ export const UpcomingEventsData = [
         title: " Wonder Girls 2010 Wonder Girls World Tour San Francisco",
         description: "Directly seated and inside for you to enjoy the show.",
         date: "20th June",
-        price: "$150",
+        price: "0.02ETH",
         location: "New York",
     },
 
@@ -299,7 +299,7 @@ export const UpcomingEventsData = [
         title: "2011 Super Junior SM Town Live '10 World Tour New York City",
         description: "Directly seated and inside for you to enjoy the show.",
         date: "25th May",
-        price: "$250",
+        price: "0.03ETH",
         location: "London",
     },
 
@@ -309,7 +309,7 @@ export const UpcomingEventsData = [
         title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
         description: "Directly seated and inside for you to enjoy the show.",
         date: " 18th July",
-        price: "$150",
+        price: "0.002ETH",
         location: "India",
     },
 
@@ -320,7 +320,7 @@ export const UpcomingEventsData = [
         description:
             "We’ll get you directly seated and inside for you to enjoy the show.",
         date: "14th May",
-        price: "$200",
+        price: "0.015ETH",
         location: "Dubai",
     },
     {
@@ -329,7 +329,7 @@ export const UpcomingEventsData = [
         title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
         description: "Directly seated and inside for you to enjoy the show.",
         date: "20th June",
-        price: "$150",
+        price: "0.001ETH",
         location: "Canada",
     },
 ];

@@ -1,6 +1,3 @@
-import { Link } from "react-router-dom";
-import { footerLinks, socialMedia } from "../constants";
-
 import { cartesi } from "../assets";
 
 const Footer = () => {
@@ -16,7 +13,7 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <img src={cartesi} alt="Cartesi Logo" width={70} />
+                    <img src={cartesi} alt="Cartesi Logo" width={50} />
                 </a>
                 <p className="text-xl text-white">
                     Powered by
@@ -27,7 +24,7 @@ const Footer = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            Cartesi
+                            Cartesi Machine
                         </a>
                     </span>
                 </p>

@@ -1,7 +1,5 @@
-import { useConnectWallet } from "@web3-onboard/react";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
-import WalletConnect from "../components/WalletConnect";
 
 function TopNav() {
     return (

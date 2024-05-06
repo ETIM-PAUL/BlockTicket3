@@ -10,11 +10,11 @@ const UpcomingEvents = (props: Props) => {
     return (
         <div className=" bg-white">
             <div className="">
-                <h1 className="flex justify-center text-center py-10 text-black font-medium text-3xl">
-                    Upcoming Events
+                <h1 className="flex justify-center text-center pt-10 text-black font-medium text-3xl">
+                    Past Events
                 </h1>
 
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-4  mt-4  mx-24  pb-20">
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-4  mt-4 mx-24  pb-20">
                     {UpcomingEventsData.map((upcomingEventData) => (
                         <div
                             key={upcomingEventData.id}
@@ -25,7 +25,7 @@ const UpcomingEvents = (props: Props) => {
                                     <img
                                         src={upcomingEventData.flyer}
                                         alt="Company-Logo"
-                                        className=" w-full rounded-lg "
+                                        className=" w-full rounded--t-lg "
                                     />
                                 </div>
 

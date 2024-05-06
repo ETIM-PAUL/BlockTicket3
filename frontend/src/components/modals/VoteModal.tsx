@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 type Props = {
     isVisible: boolean;
@@ -6,7 +6,6 @@ type Props = {
 };
 
 const VoteModal = ({ isVisible, onClose }: Props) => {
-    const [showModal, setShowModal] = useState<boolean>(false);
     if (!isVisible) return null;
 
     const handleClose = (e: any) => {
@@ -44,7 +43,6 @@ const VoteModal = ({ isVisible, onClose }: Props) => {
                                 <div className="flex w-full">
                                     <button
                                         className="text-lg font-semibold justify-center p-4 text-black  w-full flex bg-white  hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                                        onClick={() => setShowModal(true)}
                                     >
                                         Up Vote
                                     </button>

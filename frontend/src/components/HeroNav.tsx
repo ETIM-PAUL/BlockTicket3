@@ -2,8 +2,6 @@ import React from "react";
 import { bgImage, heroImage } from "../assets";
 import Logo from "./Logo";
 import { Link } from "react-router-dom";
-import TopNav from "../layout/TopNav";
-import UpcomingEvents from "./UpcomingEvents";
 
 type Props = {};
 
@@ -69,20 +67,18 @@ const HeroNav = (props: Props) => {
             </nav>
 
             <div
-                className="relative h-screen bg-cover bg-center"
+                className="relative h-[70vh] bg-cover bg-center"
                 style={{ backgroundImage: `url(${bgImage})` }}
             >
-                {/* <TopNav /> */}
 
                 <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-[#5522CC] to-[#ED4690] opacity-85"></div>
                 <div className=" relative z-10 flex items-center justify-center   h-full">
-                    <div className="flex flex-row">
-                        <div className="flex -ml-12">
+                    <div className="flex flex-row items-center">
+                        <div className="flex items-center">
                             <img
                                 src={heroImage}
-                                alt="Top Image"
-                                width={1000}
-                                className="  h-auto"
+                                alt="hero_banner"
+                                className="h-aut mt-20"
                             />
                         </div>
 
@@ -90,7 +86,7 @@ const HeroNav = (props: Props) => {
                             <p className="font-roboto font-medium text-4xl text-white sm:leading-[75px] leading-[55px] w-full text-center">
                                 On-Chain Tickets Gateway
                             </p>
-                            <p className="text-dimBlack text-xl mt-6 text-white">
+                            <p className="text-dimBlack text-justify text-xl text-white">
                                 On-Chain Event Ticketing, Management and DAO
                                 proposal, allowing user to make proposal by
                                 Upvoting or downvoting the events that they have
@@ -101,9 +97,9 @@ const HeroNav = (props: Props) => {
                             <div className="flex  ">
                                 <Link
                                     to="/events"
-                                    className="bg-[#F5167E]  text-center  mt-6 p-2  rounded-md  text-white text-xl hover:bg-[#5522CC] w-1/2"
+                                    className="bg-[#F5167E]  text-center  mt-6 px-2 py-3 rounded-md  text-white text-xl hover:bg-[#ED4690] w-1/2"
                                 >
-                                    Get Ticket
+                                    Create An Event
                                 </Link>
                             </div>
                         </div>

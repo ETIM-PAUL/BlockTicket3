@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import TicketPurchaseForm from "../TicketPurchaseForm";
 
 type Props = {
@@ -24,12 +24,6 @@ const TicketPurchaseModal = ({ isVisible, onClose }: Props) => {
             >
                 <div className="w-[800px]  flex flex-col relative">
                     <div className=" px-2  rounded">
-                        <button
-                            className="text-white text-2xl absolute top-6 right-20   "
-                            onClick={() => onClose()}
-                        >
-                            X
-                        </button>
 
                         <div className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]   mx-10 flex flex-col mt-2  px-8 py-16  ">
                             <TicketPurchaseForm onClose={onClose} />

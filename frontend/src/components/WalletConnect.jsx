@@ -15,7 +15,7 @@ const WalletConnect = () => {
                 </button>
             ) : (
                 <button
-                    onClick={() => disconnect()}
+                    onClick={disconnect}
                     type="button"
                     className="font-medium rounded-lg text-lg px-4 py-3 text-center bg-white text-black"
                 >

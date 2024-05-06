@@ -23,10 +23,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import AllEventsPage from "./pages/AllEventsPage";
-import UpcomingEventsPage from "./pages/UpcomingEventsPage";
-import LiveEventsPage from "./pages/LiveEventsPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
-import Footer from "./components/Footer";
 import CreateEventPage from "./pages/CreateEventPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
 const container = document.getElementById("root");
@@ -44,9 +41,9 @@ const web3Onboard = init({
         rpcUrl: v.rpcUrl,
     })),
     appMetadata: {
-        name: "Cartesi Rollups Test DApp",
+        name: "BlockTicket3",
         icon: "<svg><svg/>",
-        description: "Demo app for Cartesi Rollups",
+        description: "BlockTicket3An Event Ticket and DAO Application",
         recommendedInjectedWallets: [
             { name: "MetaMask", url: "https://metamask.io" },
         ],
@@ -62,16 +59,6 @@ const router = createBrowserRouter([
     {
         path: "/events",
         element: <AllEventsPage />,
-    },
-
-    {
-        path: "/upcoming-events",
-        element: <UpcomingEventsPage />,
-    },
-
-    {
-        path: "/live-events",
-        element: <LiveEventsPage />,
     },
 
     {

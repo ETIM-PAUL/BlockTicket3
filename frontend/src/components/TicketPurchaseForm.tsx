@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 
-type Props = {};
-
 const TicketPurchaseForm = ({ onClose }) => {
     const [referalCode, setReferalCode] = useState();
 
@@ -29,7 +27,7 @@ const TicketPurchaseForm = ({ onClose }) => {
 
             <div className="flex  justify-between gap-8">
                 <button
-                    className="text-lg font-semibold justify-center p-4 
+                    className="text-lg font-semibold justify-center p-3 
                 text-black bg-white w-full flex hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]
                 "
                     onClick={onClose}
@@ -38,7 +36,7 @@ const TicketPurchaseForm = ({ onClose }) => {
                 </button>
                 <button
                     type="submit"
-                    className="text-lg font-semibold text-center justify-center p-4
+                    className="text-lg font-semibold text-center justify-center p-3
                     
                     w-full  flex  bg-gradient-to-r from-[#5522CC] to-[#8352f5]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                 >

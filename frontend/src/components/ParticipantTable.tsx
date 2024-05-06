@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { ParticipantsData } from "../constants";
 import { shortenAddress } from "../utils";
 

@@ -1,6 +1,5 @@
 import React from "react";
 import Home from "../components/Home";
-import LandingPage from "../components/LandingPage";
 import Footer from "../components/Footer";
 
 type Props = {};

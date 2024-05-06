@@ -4,6 +4,8 @@ import WalletConnect from "./WalletConnect";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { bgImage } from "../assets";
+import TopNav from "./TopNav";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -14,37 +16,43 @@ const CreateEvent = (props: Props) => {
     const [capacity, setCapacity] = useState();
     const [minReferal, setMinReferal] = useState();
     const [referalDiscount, setReferalDiscount] = useState();
+    const [ticketType, setTicketType] = useState('');
+    const [price, setPrice] = useState('');
+    const [ticketTypes, setTicketTypes] = useState([]);
+    const [dao, setDao] = useState("");
+    const [referral, setReferral] = useState("");
 
-    const [fileUrl, updateFileUrl] = useState("");
-    const [newFile, updateNewFile] = useState("");
-    const [ipfsLoading, setIpfsLoading] = useState(false);
-    const [ipfsUpload, setIpfsUpload] = useState(false);
+    //Event Logo
+    const [logoUrl, updateLogoUrl] = useState("");
+    const [logoFile, updateLogoFile] = useState("");
+    const [logoIpfsLoading, setLogoIpfsLoading] = useState(false);
+    const [logoIpfsUpload, setLogoIpfsUpload] = useState(false);
+
+
+    //Event NFT
+    const [nftUrl, updateNftUrl] = useState("");
+    const [nftFile, updateNftFile] = useState("");
+    const [nftIpfsLoading, setNftIpfsLoading] = useState(false);
+    const [nftIpfsUpload, setNftIpfsUpload] = useState(false);
     const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
     async function uploadIPFS() {
-        const file = newFile;
+        const file = logoFile;
         try {
             if (file !== undefined) {
-                setIpfsLoading(true);
+                setLogoIpfsLoading(true);
                 const formData = new FormData();
                 formData.append("file", file);
                 const pinataBody = {
                     options: {
                         cidVersion: 1,
                     },
-                    // metadata: {
-                    //     name: file.name,
-                    // },
                 };
                 formData.append(
                     "pinataOptions",
                     JSON.stringify(pinataBody.options)
                 );
 
-                // formData.append(
-                //     "pinataMetadata",
-                //     JSON.stringify(pinataBody.metadata)
-                // );
                 const url = `${pinataConfig.root}/pinning/pinFileToIPFS`;
                 const response = await axios({
                     method: "post",
@@ -52,20 +60,40 @@ const CreateEvent = (props: Props) => {
                     data: formData,
                     headers: pinataConfig.headers,
                 });
-                updateFileUrl(`ipfs://${response.data.IpfsHash}/`);
-                setIpfsUpload(`ipfs://${response.data.IpfsHash}/`);
+                updateLogoUrl(`ipfs://${response.data.IpfsHash}/`);
+                setLogoIpfsUpload(false);
                 queryPinataFiles();
             } else {
                 // toast.error("Please upload a document detailing the project outlines, aims and objectives");
-                setIpfsLoading(false);
+                setLogoIpfsLoading(false);
                 return;
             }
-            setIpfsLoading(false);
+            setLogoIpfsLoading(false);
         } catch (error) {
-            setIpfsLoading(false);
+            setLogoIpfsLoading(false);
             console.log(error);
         }
     }
+
+    const updateTickets = () => {
+        if (!ticketType || !price) {
+            toast.error("No Ticket Data");
+            return;
+        }
+        if (ticketTypes.length === 3) {
+            toast.error("Maximum Ticket Types Reached");
+            return;
+        }
+        setTicketTypes([...ticketTypes, { ticketType, price }]);
+        setTicketType('');
+        setPrice('');
+    };
+
+    const handleRemove = (index) => {
+        const newItems = [...ticketTypes];
+        newItems.splice(index, 1);
+        setTicketTypes(newItems);
+    };
 
     const queryPinataFiles = async () => {
         try {
@@ -100,53 +128,32 @@ const CreateEvent = (props: Props) => {
 
     return (
         <>
-            <div
-                className="navbar bg-base-100 p-8 bg-gradient-to-r from-[#5522CC] to-[#ED4690]
-             "
-            >
-                <div className="flex-1 ml-16 ">
-                    <Logo />
-                </div>
-                <div className="flex mr-20 gap-10  ">
-                    <Link
-                        to="/events"
-                        className="font-medium rounded-lg text-lg px-4 py-3 text-center bg-white text-black"
-                    >
-                        All Events
-                    </Link>
+            <TopNav />
 
-                    <WalletConnect />
-                </div>
-            </div>
+            <div className="w-full bg-[#EEE1FF] h-2"></div>
 
-            <div className="w-full bg-[#EEE1FF] h-10"></div>
-
-            <div className="flex bg-white   flex-row">
-                <div
-                    className=" flex w-1/2 relative h-[1000px]  bg-center bg-cover"
+            <div className="bg-white flex md:grid  md:grid-cols-2 ">
+                <div className="md:col-span relative bg-center bg-cover"
                     style={{ backgroundImage: `url(${bgImage})` }}
                 >
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-[#5522CC] to-[#ED4690] opacity-85"></div>
 
-                    <div className="flex flex-row z-10 justify-center items-center  mt-24">
+                    <div className="flex flex-row h-full z-100 justify-center absolute items-center">
                         <div className="flex flex-col w-full">
-                            <p className="font-medium text-2xl text-white sm:leading-[50px] leading-[20px] w-full text-center">
+                            <p className="font-medium text-lg md:text-3xl text-white sm:leading-[50px] leading-[20px] w-full text-center">
                                 Ticketing and Event Management Made Easy{" "}
                             </p>
-                            <p className=" text-lg mt-6 text-white text-center mx-16">
-                                Create your event tickets, Manage your ticketing
-                                and allow user to Upvote their favourite event/s
-                                or Downvote event/s and give users referral
-                                bonus for inviting the friends and fans to your
-                                event.
+                            <p className="text-lg mt-3 text-white text-center mx-16">
+                                Create your event, manage your ticketing
+                                and allow user to create/vote for proposals there are participating and give users referral
+                                bonus for inviting the friends and fans to your event.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex flex-1   bg-gradient-to-r from-[#5522CC] to-[#ED4690] px-24">
-                    <form
-                        action=""
+                <div className="col-span bg-gradient-to-r from-[#5522CC] to-[#ED4690] px-24">
+                    <div
                         className=" w-full shadow-2xl  px-6 rounded-lg  my-6 "
                     >
                         <div className="flex flex-col space-y-3 py-6 text-white">
@@ -169,7 +176,7 @@ const CreateEvent = (props: Props) => {
                             </div>
                             {/*  */}
                             <div className="flex flex-col gap space-y-1 ">
-                                <label htmlFor="date">Date</label>
+                                <label htmlFor="date">Start Date</label>
                                 <input
                                     value={date}
                                     onChange={(e: any) =>
@@ -178,7 +185,7 @@ const CreateEvent = (props: Props) => {
                                     type="date"
                                     placeholder="Event Date"
                                     required
-                                    className="  h-[50px] bg-transparent border border-[#999999]  outline-none p-3 "
+                                    className="h-[50px] bg-transparent border border-[#999999]  outline-none p-3 "
                                 />
                             </div>
                             {/*  */}
@@ -212,25 +219,85 @@ const CreateEvent = (props: Props) => {
                                 />
                             </div>
 
-                            {/*  */}
+
+                            <div className="border p-2">
+                                <div className="flex space-x-2 w-full">
+                                    <input
+                                        type="text"
+                                        value={ticketType}
+                                        onChange={(e) => setTicketType(e.target.value)}
+                                        placeholder="Ticket Type"
+                                        className="  h-[50px] w-full bg-transparent border border-[#999999]  outline-none p-3"
+                                    />
+                                    <input
+                                        type="number"
+                                        value={price}
+                                        onChange={(e) => setPrice(e.target.value)}
+                                        placeholder="Ticket Price in ETH"
+                                        className="  h-[50px] w-full bg-transparent border border-[#999999]  outline-none p-3"
+                                    />
+                                </div>
+                                <button onClick={() => updateTickets()}
+                                    className=" w-full h-12 mt-2 disabled:cursor-not-allowed disabled:opacity-20  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold"
+                                >Add</button>
+                                <ul className="mt-2">
+                                    {ticketTypes.length > 0 && ticketTypes.map((item, index) => (
+                                        <li key={index} className="mb-2">
+                                            <span>{item.ticketType} - {item.price}ETH</span>
+                                            <button onClick={() => handleRemove(index)} className="ml-2 px-2 py-1 bg-red-500 text-white rounded">Remove</button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
                             <div className="flex flex-col gap space-y-1 ">
+                                <label htmlFor="capacity">
+                                    DAO Inclusive Event
+                                </label>
+                                <select
+                                    value={dao}
+                                    onChange={(e) => setDao(e.target.value)}
+                                    className="bg-transparent border border-[#999999]  outline-none p-3 "
+                                >
+                                    <option disabled>--Do want a DAO Inclusive Event--</option>
+                                    <option value={"true"}>True</option>
+                                    <option value={"false"}>False</option>
+                                </select>
+                            </div>
+
+                            <div className="flex flex-col gap space-y-1 ">
+                                <label htmlFor="capacity">
+                                    Referral Inclusive Event
+                                </label>
+                                <select
+                                    value={referral}
+                                    onChange={(e) => setReferral(e.target.value)}
+                                    required
+                                    className="bg-transparent border border-[#999999]  outline-none p-3 "
+                                >
+                                    <option disabled>--Do want a Referral Inclusive Event--</option>
+                                    <option value={"true"}>True</option>
+                                    <option value={"false"}>False</option>
+                                </select>
+                            </div>
+
+                            {/*  */}
+                            <div className={`flex-col gap space-y-1 ${referral === "true" ? "flex" : "hidden"}`}>
                                 <label htmlFor="minReferal">
                                     Minimum Referral
                                 </label>
                                 <input
                                     value={minReferal}
-                                    disabled
                                     onChange={(e: any) =>
                                         setMinReferal(e.target.value)
                                     }
                                     type="number"
                                     placeholder="Minimum referrals required to get a discount"
-                                    required
-                                    className=" disabled h-[50px] bg-transparent border border-[#999999]  outline-none p-3 cursor-not-allowed "
+                                    className="h-[50px] appearance-none bg-transparent border border-[#999999]  outline-none p-3"
                                 />
                             </div>
                             {/*  */}
-                            <div className="flex flex-col gap space-y-1 ">
+                            <div className={`flex-col gap space-y-1 ${referral === "true" ? "flex" : "hidden"}`}>
                                 <label htmlFor="refDiscount">
                                     Referral Discount
                                 </label>
@@ -240,44 +307,9 @@ const CreateEvent = (props: Props) => {
                                         setReferalDiscount(e.target.value)
                                     }
                                     type="number"
-                                    placeholder="Referal Discount (%)"
-                                    className="  h-[50px] bg-transparent border border-[#999999]  outline-none p-3 "
+                                    placeholder="Referral Discount (%)"
+                                    className="h-[50px] appearance-none bg-transparent border border-[#999999]  outline-none p-3 "
                                 />
-                            </div>
-
-                            {/*  */}
-
-                            <div className=" flex flex-row gap-20 px-2">
-                                <div className=" gap-2 flex flex-row items-center align-center form-control">
-                                    <span className="label-text">
-                                        {" "}
-                                        <input
-                                            type="checkbox"
-                                            defaultChecked
-                                            className="checkbox checkbox-secondary w-7 h-7"
-                                        />
-                                    </span>
-
-                                    <label className="cursor-pointer label -mt-2">
-                                        {" "}
-                                        DAO
-                                    </label>
-                                </div>
-
-                                <div className=" gap-2 flex flex-row items-center align-center form-control">
-                                    <span className="label-text">
-                                        {" "}
-                                        <input
-                                            type="checkbox"
-                                            defaultChecked
-                                            className="checkbox checkbox-secondary w-7 h-7"
-                                        />
-                                    </span>
-
-                                    <label className="cursor-pointer label -mt-2">
-                                        Referral
-                                    </label>
-                                </div>
                             </div>
 
                             {/*  */}
@@ -289,25 +321,36 @@ const CreateEvent = (props: Props) => {
                                 <div className="flex justify-center gap-3">
                                     <input
                                         onChange={(e: any) =>
-                                            updateNewFile(e.target.files[0])
+                                            updateLogoFile(e.target.files[0])
                                         }
                                         type="file"
                                         accept="image/x-png,image/gif,image/jpeg"
-                                        alt="Company Logo"
+                                        alt="Event Logo"
                                         className="w-full  border px-1 py-2"
-                                        placeholder="Upload Logo Company Logo to IPFS"
+                                        placeholder="Upload Event Logo to IPFS"
                                     />
                                     <button
-                                        disabled={ipfsLoading}
+                                        disabled={logoIpfsLoading || logoFile === ""}
                                         onClick={() => uploadIPFS()}
-                                        className=" w-full  bg-gradient-to-r from-[#5522CC] to-[#8352f5] rounded-md text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-lg font-semibold"
+                                        className="w-full disabled:cursor-not-allowed disabled:opacity-50  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold"
                                     >
-                                        {ipfsLoading
+                                        {logoIpfsLoading
                                             ? "Uploading"
-                                            : "IPFS Upload"}
+                                            : "Logo IPFS Upload"}
                                     </button>
                                 </div>
                             </div>
+                            {logoUrl !== "" && (
+                                <div className="grid space-y-2 mt-4">
+                                    <label>Uploaded Logo Link</label>
+                                    <input
+                                        value={logoUrl}
+                                        disabled
+                                        type="text"
+                                        className="h-[50px] bg-transparent border border-[#999999]  outline-none p-3 "
+                                    />
+                                </div>
+                            )}
 
                             <div className="flex flex-col space-y-1 mt-6">
                                 <label htmlFor="companyLogo">
@@ -316,7 +359,7 @@ const CreateEvent = (props: Props) => {
                                 <div className="flex justify-center gap-3">
                                     <input
                                         onChange={(e: any) =>
-                                            updateNewFile(e.target.files[0])
+                                            updateNftFile(e.target.files[0])
                                         }
                                         type="file"
                                         accept="image/x-png,image/gif,image/jpeg"
@@ -325,65 +368,46 @@ const CreateEvent = (props: Props) => {
                                         placeholder="Upload Logo Company Logo to IPFS"
                                     />
                                     <button
-                                        disabled={ipfsLoading}
+                                        disabled={nftIpfsLoading || nftFile === ""}
                                         onClick={() => uploadIPFS()}
-                                        className=" w-full bg-gradient-to-r from-[#5522CC] to-[#8352f5] rounded-md text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]   text-lg font-semibold"
+                                        className=" w-full disabled:cursor-not-allowed disabled:opacity-50  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold"
                                     >
-                                        {ipfsLoading
+                                        {nftIpfsLoading
                                             ? "Uploading"
-                                            : "IPFS Upload"}
+                                            : "NFT IPFS Upload"}
                                     </button>
                                 </div>
                             </div>
-
-                            {fileUrl !== "" && (
-                                <div className="grid space-y-2 mt-4">
-                                    <label>Uploaded Logo Link</label>
-                                    <input
-                                        value={fileUrl}
-                                        disabled
-                                        type="text"
-                                        className="input input-bordered text-black  border-[#696969] w-full max-w-full bg-white disabled:bg-white"
-                                    />
-                                </div>
-                            )}
-
-                            {fileUrl !== "" && (
+                            {nftUrl !== "" && (
                                 <div className="grid space-y-2 mt-4">
                                     <label>Uploaded NFT Link</label>
                                     <input
-                                        value={fileUrl}
+                                        value={nftUrl}
                                         disabled
                                         type="text"
-                                        className="input input-bordered text-black  border-[#696969] w-full max-w-full bg-white disabled:bg-white"
+                                        className="h-[50px] bg-transparent border border-[#999999]  outline-none p-3 "
                                     />
                                 </div>
                             )}
                         </div>
 
                         <div className="flex mt-4  w-full pb-10">
-                            {/* <button
-                            type="submit"
-                            disabled={!ipfsUpload || isSubmitLoading}
-                            className={`${
-                                ipfsUpload || !isSubmitLoading
-                                    ? "bg-white text-black"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            } justify-center text-2xl items-center mt-12 btn text-md font-semibold w-full py-3 -lg transition-colors duration-300 ease-in-out hover:bg-[#09143f] hover:text-white`}
-                        >
-                            {isSubmitLoading ? "Processing" : "Create Event"}
-                        </button> */}
-
-                            <button className="w-full  bg-gradient-to-r from-[#5522CC] to-[#8352f5] rounded-md text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]  text-2xl py-2 font-semibold hover:bg-[#09143f] ">
-                                {" "}
+                            <button
+                                type="submit"
+                                disabled={!logoIpfsUpload || isSubmitLoading || logoIpfsLoading}
+                                className={`${(logoIpfsUpload || !isSubmitLoading || !logoIpfsLoading)
+                                    ? " bg-gradient-to-r from-[#5522CC] to-[#8352f5]"
+                                    : "bg-gray-300 text-white cursor-not-allowed"
+                                    } py-3 w-full disabled:cursor-not-allowed disabled:opacity-50  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold`}
+                            >
                                 Create Event
                             </button>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
 
-            <div className="w-full bg-[#EEE1FF] h-10"></div>
+            <div className="w-full bg-[#EEE1FF] h-2"></div>
         </>
     );
 };
