@@ -4,6 +4,7 @@
     "private": true,
     "dependencies": {
         "@cartesi/rollups": "1.0.0",
+        "@chakra-ui/react": "^2.8.2",
         "@ethersproject/providers": "^5.6.0",
         "@hookform/resolvers": "^3.3.4",
         "@openzeppelin/contracts": "4.8.3",

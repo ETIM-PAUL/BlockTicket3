@@ -13,6 +13,18 @@
 import { ethers } from "ethers";
 import React from "react";
 import { useReportsQuery } from "./generated/graphql";
+import {
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
+    TableContainer,
+    Button
+} from '@chakra-ui/react'
 
 type Report = {
     id: string;
@@ -22,7 +34,7 @@ type Report = {
 };
 
 export const Reports: React.FC = () => {
-    const [result,reexecuteQuery] = useReportsQuery();
+    const [result, reexecuteQuery] = useReportsQuery();
     const { data, fetching, error } = result;
 
     if (fetching) return <p>Loading...</p>;
@@ -56,7 +68,7 @@ export const Reports: React.FC = () => {
             id: `${n?.id}`,
             index: parseInt(n?.index),
             payload: `${payload}`,
-            input: n ? {index:n.input.index,payload: inputPayload} : {},
+            input: n ? { index: n.input.index, payload: inputPayload } : {},
         };
     }).sort((b: any, a: any) => {
         if (a.input.index === b.input.index) {
@@ -69,34 +81,33 @@ export const Reports: React.FC = () => {
     // const forceUpdate = useForceUpdate();
     return (
         <div>
-            <button onClick={() => reexecuteQuery({ requestPolicy: 'network-only' })}>
-                Reload
-            </button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Input Index</th>
-                        <th>Notice Index</th>
+            <Table>
+                <Thead>
+                    <Tr>
+                        {/* <Th>Input Index</Th>
+                        <Th>Notice Index</Th> */}
                         {/* <th>Input Payload</th> */}
-                        <th>Payload</th>
-                    </tr>
-                </thead>
-                <tbody>
+                        <Th>Reports <Button size='xs' onClick={() => reexecuteQuery({ requestPolicy: 'network-only' })}>
+                            🔃                  </Button>
+                        </Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
                     {reports.length === 0 && (
-                        <tr>
-                            <td colSpan={4}>no reports</td>
-                        </tr>
+                        <Tr>
+                            <Td colSpan={4}>-</Td>
+                        </Tr>
                     )}
                     {reports.map((n: any) => (
-                        <tr key={`${n.input.index}-${n.index}`}>
-                            <td>{n.input.index}</td>
-                            <td>{n.index}</td>
+                        <Tr key={`${n.input.index}-${n.index}`}>
+                            {/* <Td>{n.input.index}</Td>
+                            <Td>{n.index}</Td> */}
                             {/* <td>{n.input.payload}</td> */}
-                            <td>{n.payload}</td>
-                        </tr>
+                            <Td color={'grey'}>{n.payload}</Td>
+                        </Tr>
                     ))}
-                </tbody>
-            </table>
+                </Tbody>
+            </Table>
 
         </div>
     );

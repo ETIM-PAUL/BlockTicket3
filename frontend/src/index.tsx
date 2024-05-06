@@ -26,6 +26,8 @@ import AllEventsPage from "./pages/AllEventsPage";
 import EventDetailsPage from "./pages/EventDetailsPage";
 import CreateEventPage from "./pages/CreateEventPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
+import { ChakraProvider } from "@chakra-ui/react";
+import Wallet from "./pages/Wallet";
 const container = document.getElementById("root");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
 
@@ -70,6 +72,10 @@ const router = createBrowserRouter([
         path: "/create-event",
         element: <CreateEventPage />,
     },
+    {
+        path: "/my-wallet",
+        element: <Wallet />,
+    },
 
     {
         path: "/user-dashboard",
@@ -79,7 +85,9 @@ const router = createBrowserRouter([
 root.render(
     <React.StrictMode>
         <Web3OnboardProvider web3Onboard={web3Onboard}>
-            <RouterProvider router={router} />
+            <ChakraProvider>
+                <RouterProvider router={router} />
+            </ChakraProvider>
             <ToastContainer />
         </Web3OnboardProvider>
     </React.StrictMode>

@@ -5,7 +5,7 @@ import WalletConnect from "./WalletConnect";
 import { useConnectWallet } from '@web3-onboard/react';
 
 const TopNav = () => {
-  const [{ wallet }, connect, disconnect] = useConnectWallet();
+  const [{ wallet }] = useConnectWallet();
 
   return (
     <div className="navbar flex bg-gradient-to-r from-[#5522CC] to-[#ED4690] py-8 px-6">
