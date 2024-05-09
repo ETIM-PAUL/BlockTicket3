@@ -83,7 +83,6 @@ export const Balance: React.FC = () => {
         const reportData = JSON.parse(decode)
         console.log("Report data: ", reportData)
         setDecodedReports(reportData)
-        console.log("Erc20 : ", decodedReports.erc20)
         //console.log(parseEther("1000000000000000000", "gwei"))
       });
   };

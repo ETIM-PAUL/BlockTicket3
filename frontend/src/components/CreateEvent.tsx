@@ -1,41 +1,87 @@
 import React, { useEffect, useState } from "react";
-import Logo from "./Logo";
-import WalletConnect from "./WalletConnect";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { bgImage } from "../assets";
 import TopNav from "./TopNav";
 import { toast } from "react-toastify";
+import { ethers } from "ethers";
+import { useRollups } from "../useRollups";
+import { DappAddress } from "../constants";
+import { useConnectWallet } from "@web3-onboard/react";
 
 type Props = {};
 
+interface TicketTypes {
+    ticketType: string;
+    price: number;
+}
+
 const CreateEvent = (props: Props) => {
-    const [title, setTitle] = useState();
-    const [date, setDate] = useState();
-    const [location, setLocation] = useState();
-    const [capacity, setCapacity] = useState();
-    const [minReferal, setMinReferal] = useState();
-    const [referalDiscount, setReferalDiscount] = useState();
+    const [title, setTitle] = useState('');
+    const [date, setDate] = useState('');
+    const [location, setLocation] = useState('');
+    const [capacity, setCapacity] = useState('');
+    const [minReferal, setMinReferal] = useState(0);
+    const [referalDiscount, setReferalDiscount] = useState(0);
     const [ticketType, setTicketType] = useState('');
-    const [price, setPrice] = useState('');
-    const [ticketTypes, setTicketTypes] = useState([]);
+    const [price, setPrice] = useState(0);
+    const [ticketTypes, setTicketTypes] = useState<Array<TicketTypes>>([]);
     const [dao, setDao] = useState("");
     const [referral, setReferral] = useState("");
+    const rollups = useRollups(DappAddress);
 
     //Event Logo
     const [logoUrl, updateLogoUrl] = useState("");
     const [logoFile, updateLogoFile] = useState("");
     const [logoIpfsLoading, setLogoIpfsLoading] = useState(false);
-    const [logoIpfsUpload, setLogoIpfsUpload] = useState(false);
+
+    const [{ wallet }] = useConnectWallet();
+    const navigate = useNavigate();
 
 
     //Event NFT
     const [nftUrl, updateNftUrl] = useState("");
     const [nftFile, updateNftFile] = useState("");
     const [nftIpfsLoading, setNftIpfsLoading] = useState(false);
-    const [nftIpfsUpload, setNftIpfsUpload] = useState(false);
     const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
+    async function uploadNftIPFS() {
+        const file = logoFile;
+        try {
+            if (file !== undefined) {
+                setNftIpfsLoading(true);
+                const formData = new FormData();
+                formData.append("file", file);
+                const pinataBody = {
+                    options: {
+                        cidVersion: 1,
+                    },
+                };
+                formData.append(
+                    "pinataOptions",
+                    JSON.stringify(pinataBody.options)
+                );
+
+                const url = `${pinataConfig.root}/pinning/pinFileToIPFS`;
+                const response = await axios({
+                    method: "post",
+                    url: url,
+                    data: formData,
+                    headers: pinataConfig.headers,
+                });
+                updateNftUrl(`ipfs://${response.data.IpfsHash}/`);
+                queryPinataFiles();
+                setNftIpfsLoading(false);
+            } else {
+                // toast.error("Please upload a document detailing the project outlines, aims and objectives");
+                setNftIpfsLoading(false);
+                return;
+            }
+        } catch (error) {
+            setNftIpfsLoading(false);
+            console.log(error);
+        }
+    }
     async function uploadIPFS() {
         const file = logoFile;
         try {
@@ -61,17 +107,79 @@ const CreateEvent = (props: Props) => {
                     headers: pinataConfig.headers,
                 });
                 updateLogoUrl(`ipfs://${response.data.IpfsHash}/`);
-                setLogoIpfsUpload(false);
                 queryPinataFiles();
+                setLogoIpfsLoading(false);
             } else {
                 // toast.error("Please upload a document detailing the project outlines, aims and objectives");
                 setLogoIpfsLoading(false);
                 return;
             }
-            setLogoIpfsLoading(false);
         } catch (error) {
             setLogoIpfsLoading(false);
             console.log(error);
+        }
+    }
+
+    async function createEvent() {
+        if (!title || !date || !location || !capacity) {
+            toast.error("Incomplete Form");
+            return;
+        }
+        if (ticketTypes.length === 0) {
+            toast.error("Incomplete Details (No Tickets)");
+            return;
+        }
+        if (referral === "true" && minReferal < 1) {
+            toast.error("Please add a minimum referral value greater than One(1)");
+            return;
+        }
+        if (referral === "true" && referalDiscount < 1) {
+            toast.error("Please add a referral discount value greater than One(1)");
+            return;
+        }
+        try {
+            if (rollups) {
+                try {
+                    const payload = {
+                        title,
+                        date,
+                        location,
+                        ticketTypes: ticketTypes,
+                        capacity: Number(capacity),
+                        dao: dao === "true" ? true : false,
+                        referral: referral === "true" ? true : false,
+                        minReferal: Number(minReferal),
+                        referalDiscount: Number(referalDiscount),
+                        nftUrl,
+                        logoUrl
+                    }
+
+                    setIsSubmitLoading(true)
+                    let str = `{"action": "create_event", "title": "${payload.title}", "date": "${payload.date}", "location": "${payload.location}", "tickets": ${JSON.stringify(ticketTypes)}, "capacity": ${payload.capacity}, "organizer": "${wallet?.accounts[0]?.address}", "dao": ${payload.dao}, "referral": ${payload.referral}, "minReferrals": ${payload.minReferal}, "referralDiscount": ${payload.referalDiscount}, "tokenUrl": "${payload.nftUrl}", "logoUrl": "${payload.logoUrl}"}`
+                    let data = ethers.utils.toUtf8Bytes(str);
+
+                    const result = await rollups.inputContract.addInput(DappAddress, data);
+                    const receipt = await result.wait(1);
+                    // Search for the InputAdded event
+                    const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+                    if (!event) {
+                        throw new Error(
+                            `Event Creation Failed, Insufficient ETH in your Wallet`
+                        );
+                    } else {
+                        toast("Event Created Successfully");
+                        navigate("/events");
+                    }
+                    setIsSubmitLoading(false)
+
+                }
+                catch (e) {
+                    console.log(`${e}`);
+                }
+            }
+        } catch (error) {
+            setIsSubmitLoading(false)
+            console.log("Error", error);
         }
     }
 
@@ -86,7 +194,7 @@ const CreateEvent = (props: Props) => {
         }
         setTicketTypes([...ticketTypes, { ticketType, price }]);
         setTicketType('');
-        setPrice('');
+        setPrice(0);
     };
 
     const handleRemove = (index) => {
@@ -129,11 +237,10 @@ const CreateEvent = (props: Props) => {
     return (
         <>
             <TopNav />
-
             <div className="w-full bg-[#EEE1FF] h-2"></div>
 
             <div className="bg-white flex md:grid  md:grid-cols-2 ">
-                <div className="md:col-span relative bg-center bg-cover"
+                <div className="hidden md:grid md:col-span relative bg-center bg-cover"
                     style={{ backgroundImage: `url(${bgImage})` }}
                 >
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-[#5522CC] to-[#ED4690] opacity-85"></div>
@@ -152,7 +259,7 @@ const CreateEvent = (props: Props) => {
                     </div>
                 </div>
 
-                <div className="col-span bg-gradient-to-r from-[#5522CC] to-[#ED4690] px-24">
+                <div className="col-spa bg-gradient-to-r from-[#5522CC] to-[#ED4690] md:px-6">
                     <div
                         className=" w-full shadow-2xl  px-6 rounded-lg  my-6 "
                     >
@@ -182,7 +289,7 @@ const CreateEvent = (props: Props) => {
                                     onChange={(e: any) =>
                                         setDate(e.target.value)
                                     }
-                                    type="date"
+                                    type="datetime-local"
                                     placeholder="Event Date"
                                     required
                                     className="h-[50px] bg-transparent border border-[#999999]  outline-none p-3 "
@@ -232,7 +339,7 @@ const CreateEvent = (props: Props) => {
                                     <input
                                         type="number"
                                         value={price}
-                                        onChange={(e) => setPrice(e.target.value)}
+                                        onChange={(e) => setPrice(Number(e.target.value))}
                                         placeholder="Ticket Price in ETH"
                                         className="  h-[50px] w-full bg-transparent border border-[#999999]  outline-none p-3"
                                     />
@@ -260,8 +367,8 @@ const CreateEvent = (props: Props) => {
                                     className="bg-transparent border border-[#999999]  outline-none p-3 "
                                 >
                                     <option disabled>--Do want a DAO Inclusive Event--</option>
-                                    <option value={"true"}>True</option>
                                     <option value={"false"}>False</option>
+                                    <option value={"true"}>True</option>
                                 </select>
                             </div>
 
@@ -276,8 +383,8 @@ const CreateEvent = (props: Props) => {
                                     className="bg-transparent border border-[#999999]  outline-none p-3 "
                                 >
                                     <option disabled>--Do want a Referral Inclusive Event--</option>
-                                    <option value={"true"}>True</option>
                                     <option value={"false"}>False</option>
+                                    <option value={"true"}>True</option>
                                 </select>
                             </div>
 
@@ -332,7 +439,7 @@ const CreateEvent = (props: Props) => {
                                     <button
                                         disabled={logoIpfsLoading || logoFile === ""}
                                         onClick={() => uploadIPFS()}
-                                        className="w-full disabled:cursor-not-allowed disabled:opacity-50  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold"
+                                        className="w-full disabled:cursor-not-allowed disabled:opacity-50 py-2 bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold"
                                     >
                                         {logoIpfsLoading
                                             ? "Uploading"
@@ -369,7 +476,7 @@ const CreateEvent = (props: Props) => {
                                     />
                                     <button
                                         disabled={nftIpfsLoading || nftFile === ""}
-                                        onClick={() => uploadIPFS()}
+                                        onClick={() => uploadNftIPFS()}
                                         className=" w-full disabled:cursor-not-allowed disabled:opacity-50  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold"
                                     >
                                         {nftIpfsLoading
@@ -393,9 +500,10 @@ const CreateEvent = (props: Props) => {
 
                         <div className="flex mt-4  w-full pb-10">
                             <button
+                                onClick={() => createEvent()}
                                 type="submit"
-                                disabled={!logoIpfsUpload || isSubmitLoading || logoIpfsLoading}
-                                className={`${(logoIpfsUpload || !isSubmitLoading || !logoIpfsLoading)
+                                // disabled={isSubmitLoading || logoIpfsLoading || nftIpfsLoading || !logoUrl || !nftUrl}
+                                className={`${(!isSubmitLoading || !logoIpfsLoading || !nftIpfsLoading)
                                     ? " bg-gradient-to-r from-[#5522CC] to-[#8352f5]"
                                     : "bg-gray-300 text-white cursor-not-allowed"
                                     } py-3 w-full disabled:cursor-not-allowed disabled:opacity-50  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold`}

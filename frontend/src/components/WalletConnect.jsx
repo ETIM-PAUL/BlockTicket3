@@ -9,7 +9,7 @@ const WalletConnect = () => {
                 <button
                     onClick={() => connect()}
                     type="button"
-                    className="font-medium rounded-lg text-xl px-4 py-3 text-center bg-white text-black"
+                    className="font-medium rounded-lg text-xl p-2 md:px-4 md:py-3 text-center bg-white text-black"
                 >
                     Connect Wallet
                 </button>
@@ -17,7 +17,7 @@ const WalletConnect = () => {
                 <button
                     onClick={() => disconnect(wallet)}
                     type="button"
-                    className="font-medium rounded-lg text-lg px-4 py-3 text-center bg-white text-black"
+                    className="font-medium rounded-lg text-lg p-2 md:px-4 md:py-3 text-center bg-white text-black"
                 >
                     ✂️ Disconnect Wallet
                 </button>

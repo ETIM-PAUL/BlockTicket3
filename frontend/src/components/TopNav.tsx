@@ -8,12 +8,12 @@ const TopNav = () => {
   const [{ wallet }] = useConnectWallet();
 
   return (
-    <div className="navbar flex bg-gradient-to-r from-[#5522CC] to-[#ED4690] py-8 px-6">
-      <div className="flex-1 ml-16 ">
+    <div className="navbar flex bg-gradient-to-r from-[#5522CC] to-[#ED4690] py-3 md:py-8 px-6 md:px-20">
+      <div className="flex-1 ">
         <Logo />
       </div>
 
-      <div className="flex mr-14 gap-10">
+      <div className="flex gap-3">
         {wallet &&
           <Link
             to="/user-dashboard"
@@ -30,8 +30,8 @@ const TopNav = () => {
             My Wallet
           </Link>
         }
-        <WalletConnect />
       </div>
+      <WalletConnect />
     </div>
   )
 }

@@ -10,10 +10,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { FC } from "react";
+import React, { FC } from "react";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import configFile from "./config.json";
-import { Button, Select, Box, Badge, Spacer, Heading, Text, Stack } from "@chakra-ui/react"
+import { Button, Select, Box, Spacer, Heading, Text, Stack } from "@chakra-ui/react"
 
 const config: any = configFile;
 

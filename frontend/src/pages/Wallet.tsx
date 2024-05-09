@@ -10,7 +10,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { useState } from "react";
 
 import { GraphQLProvider } from "../GraphQL";
@@ -26,25 +26,42 @@ import { Balance } from "../Balance";
 import { SimpleGrid } from "@chakra-ui/react"
 import TopNav from "../components/TopNav";
 import Footer from "../components/Footer";
+import { toast } from "react-toastify";
+import { useWallets } from "@web3-onboard/react";
+import { useNavigate } from "react-router";
 
 
 const Wallet: FC = () => {
     const [dappAddress, setDappAddress] = useState<string>("0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C");
+    const [connectedWallet] = useWallets();
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!connectedWallet) {
+            toast.error("Wallet not connected");
+            navigate("/")
+        }
+    }, [])
 
     return (
         <>
             <TopNav />
-            <div className="w-full bg-[#EEE1FF] h-2"></div>
-            <SimpleGrid columns={1} marginLeft={'25%'} marginRight={'25%'}>
-                {/* <Network /> */}
-                <br />
-                <Balance />
-                <br /> <br />
-                <Transfers dappAddress={dappAddress} />
-                <br /> <br />
-            </SimpleGrid>
+            <div className=" bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
 
-            <div className="w-full bg-[#EEE1FF] h-2"></div>
+                <div className="w-full bg-[#EEE1FF] h-2"></div>
+                {connectedWallet &&
+                    <GraphQLProvider>
+                        <SimpleGrid className="bg-white border my-4" columns={1} marginLeft={'25%'} marginRight={'25%'}>
+                            {/* <Network /> */}
+                            <br />
+                            <Balance />
+                            <br /> <br />
+                            <Transfers dappAddress={dappAddress} />
+                            <br /> <br />
+                        </SimpleGrid>
+                    </GraphQLProvider>
+                }
+                <div className="w-full bg-[#EEE1FF] h-2"></div>
+            </div>
             <Footer />
         </>
     );

@@ -10,14 +10,14 @@ const Logo = (props: Props) => {
                 to="/"
                 className=""
             >
-              <div className="text-4xl font-semibold">
-              <h2 className="   whitespace-nowrap dark:text-white">
-                    Block<span className=" font-semibold">Ticket3</span>
-                </h2>
-              </div>
+                <div className="text-2xl md:text-4xl font-semibold">
+                    <h2 className="   whitespace-nowrap dark:text-white">
+                        Block<span className=" font-semibold">Ticket3</span>
+                    </h2>
+                </div>
 
 
-               
+
             </Link>
         </div>
     );

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { EventsData } from "../constants";
 import { CiLocationOn } from "react-icons/ci";
 import { CiCalendarDate } from "react-icons/ci";
 import { GiTakeMyMoney } from "react-icons/gi";
 import TopNav from "./TopNav";
+import { toast } from "react-toastify";
+import { useConnectWallet } from "@web3-onboard/react";
 
 type Props = {};
 
@@ -12,6 +14,8 @@ const AllEvents = (props: Props) => {
     const [activeButton, setActiveButton] = useState("LiveEvent");
     const [loading, setLoading] = useState(false);
     const [allEvents, setAllEvents] = useState([]);
+    const navigate = useNavigate();
+    const [{ wallet }] = useConnectWallet();
 
     const handleButtonClick = (button) => {
         setActiveButton(button);
@@ -24,14 +28,21 @@ const AllEvents = (props: Props) => {
         }, 1000);
     }, [])
 
-
+    const createEvent = () => {
+        if (!wallet?.accounts) {
+            toast.error("Please Connect Your Wallet")
+            return;
+        } else {
+            navigate("/create-event")
+        }
+    }
     return (
         <div className="h-full">
             <TopNav />
 
             <div className="w-full bg-[#EEE1FF] h-2"></div>
             <div className="bg-base-100 p-8 bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
-                <div className="  flex flex-row gap-4 justify-end mr-20 mt-6 ">
+                <div className="flex items-center mx-14 flex-row gap-4 justify-end mt-6 ">
                     <button
                         className={`py-2 px-4 rounded-md border border-bg-[#EEE1FF] w-fit items-center text-center flex  justify-center font-medium text-lg ${activeButton === "LiveEvent"
                             ? "bg-white text-black"
@@ -52,19 +63,18 @@ const AllEvents = (props: Props) => {
                         Upcoming Events
                     </button>
 
-                    <Link
-                        to="/create-event"
-                        className={`py-2 px-4 rounded-md border border-bg-[#EEE1FF] items-center text-center flex w-fit justify-center font-medium text-lg ${activeButton === "CreateEvent"
+                    <button
+                        className={`py-2 px-4 h-[45px] rounded-md border border-bg-[#EEE1FF] items-center text-center flex w-fit justify-center font-medium text-lg ${activeButton === "CreateEvent"
                             ? "bg-white"
                             : "bg-gradient-to-r from-[#5522CC] to-[#ED4690] rounded-md text-white w-fit hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                             }`}
-                        onClick={() => handleButtonClick("CreateEvent")}
+                        onClick={() => createEvent()}
                     >
                         Create Event
-                    </Link>
+                    </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-0  mt-4  mx-14 pb-20">
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-4  mx-14 pb-20">
                     {allEvents.length === 0 && !loading &&
                         <div
                             className="text-white font-medium text-lg md:text-3xl mt-10 "
@@ -91,7 +101,6 @@ const AllEvents = (props: Props) => {
                                         src={eventData.eventLogo}
                                         alt="Company-Logo"
                                         className="rounded-t-lg "
-                                        width={300}
                                     />
                                 </div>
 

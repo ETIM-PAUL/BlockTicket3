@@ -21,7 +21,6 @@ import {
 } from "./generated/rollups";
 import { Tabs, TabList, TabPanels, TabPanel, Tab } from "@chakra-ui/react";
 import { Divider } from "@chakra-ui/react";
-import { useToast } from "@chakra-ui/react";
 import { Button, Box } from "@chakra-ui/react";
 import {
   NumberInput,
@@ -47,12 +46,19 @@ interface IInputPropos {
   dappAddress: string;
 }
 
+
 export const Transfers: React.FC<IInputPropos> = (propos) => {
   const rollups = useRollups(propos.dappAddress);
   const [connectedWallet] = useWallets();
+  const [input, setInput] = useState<string>("");
+  const [dappRelayedAddress, setDappRelayedAddress] = useState<boolean>(false)
+  const [hexInput, setHexInput] = useState<boolean>(false);
+  const [erc20Amount, setErc20Amount] = useState<number>(0);
+  const [erc20Token, setErc20Token] = useState<string>("");
+  const [erc721Id, setErc721Id] = useState<number>(0);
+  const [erc721, setErc721] = useState<string>("");
+  const [etherAmount, setEtherAmount] = useState<string>("0");
   const provider = new ethers.providers.Web3Provider(connectedWallet.provider);
-  const toast = useToast();
-
   const sendAddress = async (str: string) => {
     if (rollups) {
       try {
@@ -249,15 +255,6 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
     }
   };
 
-  const [input, setInput] = useState<string>("");
-  const [dappRelayedAddress, setDappRelayedAddress] = useState<boolean>(false)
-  const [hexInput, setHexInput] = useState<boolean>(false);
-  const [erc20Amount, setErc20Amount] = useState<number>(0);
-  const [erc20Token, setErc20Token] = useState<string>("");
-  const [erc721Id, setErc721Id] = useState<number>(0);
-  const [erc721, setErc721] = useState<string>("");
-  const [etherAmount, setEtherAmount] = useState<number>(0);
-
   return (
     <Tabs variant="enclosed" size="lg" align="center">
       <TabList>
@@ -284,9 +281,8 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                 <AccordionPanel>
                   <Stack>
                     <NumberInput
-                      defaultValue={0}
-                      min={0}
-                      onChange={(value) => setEtherAmount(Number(value))}
+                      defaultValue={0.01}
+                      onChange={(value) => setEtherAmount(value)}
                       value={etherAmount}
                     >
                       <NumberInputField />
@@ -299,7 +295,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                       colorScheme="blue"
                       size="sm"
                       onClick={() => {
-                        depositEtherToPortal(etherAmount);
+                        depositEtherToPortal(Number(etherAmount));
                       }}
                       disabled={!rollups}
                     >
@@ -308,7 +304,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                     <Button
                       size="sm"
                       onClick={() => {
-                        withdrawEther(etherAmount);
+                        withdrawEther(Number(etherAmount));
                       }}
                       disabled={!rollups}
                     >

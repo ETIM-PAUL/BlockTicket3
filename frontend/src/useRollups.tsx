@@ -57,7 +57,6 @@ export const useRollups = (dAddress: string): RollupsContracts | undefined => {
     const [{ connectedChain }] = useSetChain();
     const [connectedWallet] = useWallets();
     const [dappAddress] = useState<string>(dAddress);
-
     useEffect(() => {
         const connect = async (
             chain: ConnectedChain
@@ -66,7 +65,7 @@ export const useRollups = (dAddress: string): RollupsContracts | undefined => {
                 connectedWallet.provider
             );
             const signer = provider.getSigner();
-
+            console.log(chain)
             let dappRelayAddress = "";
             if (config[chain.id]?.DAppRelayAddress) {
                 dappRelayAddress = config[chain.id].DAppRelayAddress;
@@ -151,6 +150,7 @@ export const useRollups = (dAddress: string): RollupsContracts | undefined => {
                 erc1155BatchPortalContract,
             };
         };
+
         if (connectedWallet?.provider && connectedChain) {
             connect(connectedChain).then((contracts) => {
                 setContracts(contracts);

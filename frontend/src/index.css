@@ -40,11 +40,6 @@ body {
     color: transparent;
 }
 
-body {
-    background-color: rgb(225, 224, 224);
-    font-family: monospace
-}
-
 .main-container {
     margin-left: 20%;
     margin-right: 20%;
