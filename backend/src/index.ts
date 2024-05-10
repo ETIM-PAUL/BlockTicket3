@@ -117,7 +117,6 @@ const handleAdvance: any = async (data: any) => {
           data.metadata.msg_sender,
           DAPP_ADDRESS
         );
-        console.log("eventPayload", eventPayload);
         if (create_process) {
           db.run(
             "INSERT INTO events VALUES (NULL, :t, :d, :l, :tickets, :c, :o, :dao, :r, :s, :minR, :discount, :url, :logo)",

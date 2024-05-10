@@ -167,10 +167,10 @@ const CreateEvent = (props: Props) => {
                             `Event Creation Failed, Insufficient ETH in your Wallet`
                         );
                     } else {
+                        setIsSubmitLoading(false)
                         toast("Event Created Successfully");
                         navigate("/events");
                     }
-                    setIsSubmitLoading(false)
 
                 }
                 catch (e) {
@@ -502,13 +502,15 @@ const CreateEvent = (props: Props) => {
                             <button
                                 onClick={() => createEvent()}
                                 type="submit"
-                                // disabled={isSubmitLoading || logoIpfsLoading || nftIpfsLoading || !logoUrl || !nftUrl}
+                                disabled={isSubmitLoading || logoIpfsLoading || nftIpfsLoading || !logoUrl || !nftUrl}
                                 className={`${(!isSubmitLoading || !logoIpfsLoading || !nftIpfsLoading)
                                     ? " bg-gradient-to-r from-[#5522CC] to-[#8352f5]"
                                     : "bg-gray-300 text-white cursor-not-allowed"
                                     } py-3 w-full disabled:cursor-not-allowed disabled:opacity-50  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold`}
                             >
-                                Create Event
+                                {isSubmitLoading ? "Processing" :
+                                    "Create Event"
+                                }
                             </button>
                         </div>
                     </div>

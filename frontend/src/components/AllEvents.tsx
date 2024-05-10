@@ -1,19 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { EventsData } from "../constants";
+import { EventsData, formatDate, formatIPFS } from "../constants";
 import { CiLocationOn } from "react-icons/ci";
 import { CiCalendarDate } from "react-icons/ci";
 import { GiTakeMyMoney } from "react-icons/gi";
 import TopNav from "./TopNav";
 import { toast } from "react-toastify";
-import { useConnectWallet } from "@web3-onboard/react";
+import { useConnectWallet, useSetChain } from "@web3-onboard/react";
+import configFile from "../config.json";
+import { ethers } from "ethers";
 
 type Props = {};
+
+const config: any = configFile;
+interface Report {
+    payload: string;
+}
 
 const AllEvents = (props: Props) => {
     const [activeButton, setActiveButton] = useState("LiveEvent");
     const [loading, setLoading] = useState(false);
-    const [allEvents, setAllEvents] = useState([]);
+    const [allEvents, setAllEvents] = useState<any>([]);
+    const [{ connectedChain }] = useSetChain();
+    const [reports, setReports] = useState<string[]>([]);
+    const [decodedReports, setDecodedReports] = useState<any>({});
+    const [metadata, setMetadata] = useState<any>({});
+    const [hexData, setHexData] = useState<boolean>(false);
+    const [postData, setPostData] = useState<boolean>(false);
+
     const navigate = useNavigate();
     const [{ wallet }] = useConnectWallet();
 
@@ -21,11 +35,53 @@ const AllEvents = (props: Props) => {
         setActiveButton(button);
     };
 
-    useEffect(() => {
+    const fetchEvents = async (str: string) => {
         setLoading(true);
-        setTimeout(() => {
-            setAllEvents(EventsData)
-        }, 1000);
+        let payload = str;
+        // if (hexData) {
+        //   const uint8array = ethers.utils.arrayify(payload);
+        //   payload = new TextDecoder().decode(uint8array);
+        // }
+        if (!connectedChain) {
+            return;
+        }
+
+        let apiURL = ""
+
+        if (config[connectedChain.id]?.inspectAPIURL) {
+            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+        } else {
+            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+            return;
+        }
+
+        let fetchData: Promise<Response>;
+        if (postData) {
+            const payloadBlob = new TextEncoder().encode(payload);
+            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+        } else {
+            fetchData = fetch(`${apiURL}/${payload}`);
+        }
+        fetchData
+            .then(response => response.json())
+            .then(data => {
+                setReports(data.reports);
+                setMetadata({ status: data.status, exception_payload: data.exception_payload });
+
+                // Decode payload from each report
+                const decode = data.reports.map((report: Report) => {
+                    return ethers.utils.toUtf8String(report.payload);
+                });
+                const reportData = JSON.parse(decode)
+                console.log("parsed Reports:", reportData);
+                setAllEvents(reportData)
+                setLoading(true);
+                //console.log(parseEther("1000000000000000000", "gwei"))
+            });
+    }
+
+    useEffect(() => {
+        fetchEvents("get_all/")
     }, [])
 
     const createEvent = () => {
@@ -74,7 +130,7 @@ const AllEvents = (props: Props) => {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-4  mx-14 pb-20">
+                <div className="flex flex-wrap justify-start gap-4 mt-4 mx-1 pb-20">
                     {allEvents.length === 0 && !loading &&
                         <div
                             className="text-white font-medium text-lg md:text-3xl mt-10 "
@@ -90,17 +146,17 @@ const AllEvents = (props: Props) => {
                         </div>
                     }
 
-                    {allEvents.length > 0 && EventsData.map((eventData) => (
+                    {allEvents.length > 0 && allEvents.map((eventData) => (
                         <div
-                            key={eventData.id}
-                            className="flex flex-col items-center mx-auto border-2 rounded-xl rounded-b-none pb- shadow-md mt-10 "
+                            key={eventData?.name}
+                            className="flex flex-col w-full md:max-w-[350px] items-center rounded-xl rounded-b-none shadow-md mt-10 "
                         >
-                            <div className="fle">
+                            <div className="fle w-full">
                                 <div className="">
                                     <img
-                                        src={eventData.eventLogo}
+                                        src={`https://ipfs.io/ipfs/${formatIPFS(eventData?.logoUrl)}`}
                                         alt="Company-Logo"
-                                        className="rounded-t-lg "
+                                        className="rounded-t-lg w-full h-[200px] object-cover"
                                     />
                                 </div>
 
@@ -113,20 +169,20 @@ const AllEvents = (props: Props) => {
                                         </h2>
                                         <p className="font-normal flex flex-row gap-1 text-[#6A6A6A]">
                                             <CiCalendarDate className="w-7 h-7" />
-                                            {eventData.date}
+                                            {formatDate(eventData.date)}
                                         </p>
 
                                         <p className="text-lg flex flex-row gap-1 text-[#6A6A6A]">
                                             <CiLocationOn className="w-7 h-7" />
                                             <span>
-                                                {eventData.country}
+                                                {eventData.location}
                                             </span>
                                         </p>
 
                                         <p className=" flex flex-row gap-1 text-lg  text-[#6A6A6A] pb-4">
                                             <GiTakeMyMoney className="w-7 h-7" />
                                             <span>
-                                                {eventData.price}
+                                                {eventData.tickets && JSON.parse(eventData.tickets)[0].price}ETH
                                             </span>{" "}
                                         </p>
                                     </div>

@@ -394,3 +394,51 @@ export const MyEventsTicketData = [
 ];
 
 export const DappAddress = "0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C";
+
+export function formatDate(inputDate) {
+    const date = new Date(inputDate);
+
+    // Define the months array
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    // Get the day, month, and year
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+
+    // Define the suffix for the day
+    let daySuffix;
+    switch (day) {
+        case 1:
+        case 21:
+        case 31:
+            daySuffix = 'st';
+            break;
+        case 2:
+        case 22:
+            daySuffix = 'nd';
+            break;
+        case 3:
+        case 23:
+            daySuffix = 'rd';
+            break;
+        default:
+            daySuffix = 'th';
+    }
+
+    // Construct the formatted date string
+    const formattedDate = `${day}${daySuffix} ${months[monthIndex]}, ${year}`;
+
+    return formattedDate;
+}
+
+export function formatIPFS(ipfsURL) {
+    // Regular expression pattern to match the CID in an IPFS URL
+    const pattern = /ipfs:\/\/(.*?)(\/|$)/;
+
+    // Extract the CID using the pattern
+    const match = ipfsURL.match(pattern);
+
+    // If a match is found, return the CID, else return null
+    return match ? match[1] : null;
+}

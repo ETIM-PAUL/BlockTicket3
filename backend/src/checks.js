@@ -16,9 +16,6 @@ class CheckActions {
         let event_price = 0;
         let check;
 
-        console.log("my bal", Number(eth_balance))
-        console.log("my bal", Number(event_types[0]?.price))
-
         if (!event_data?.dao && !event_data?.referral) {
             if (Number(eth_balance) < Number(event_types[0]?.price)) {
                 console.log("User balance not enough to create a basic event");
