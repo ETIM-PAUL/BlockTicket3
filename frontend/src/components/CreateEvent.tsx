@@ -174,7 +174,7 @@ const CreateEvent = (props: Props) => {
 
                 }
                 catch (e) {
-                    console.log(`${e}`);
+                    console.log(e);
                 }
             }
         } catch (error) {

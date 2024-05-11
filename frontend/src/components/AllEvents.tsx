@@ -38,10 +38,6 @@ const AllEvents = (props: Props) => {
     const fetchEvents = async (str: string) => {
         setLoading(true);
         let payload = str;
-        // if (hexData) {
-        //   const uint8array = ethers.utils.arrayify(payload);
-        //   payload = new TextDecoder().decode(uint8array);
-        // }
         if (!connectedChain) {
             return;
         }
@@ -75,7 +71,7 @@ const AllEvents = (props: Props) => {
                 const reportData = JSON.parse(decode)
                 console.log("parsed Reports:", reportData);
                 setAllEvents(reportData)
-                setLoading(true);
+                setLoading(false);
                 //console.log(parseEther("1000000000000000000", "gwei"))
             });
     }
@@ -148,7 +144,7 @@ const AllEvents = (props: Props) => {
 
                     {allEvents.length > 0 && allEvents.map((eventData) => (
                         <div
-                            key={eventData?.name}
+                            key={eventData?.id}
                             className="flex flex-col w-full md:max-w-[350px] items-center rounded-xl rounded-b-none shadow-md mt-10 "
                         >
                             <div className="fle w-full">

@@ -23,6 +23,8 @@ const SYSTEM_ADMINS = ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"];
 const wallet = new Wallet(new Map());
 const check_actions = new CheckActions(wallet);
 const router = new Router(wallet);
+let event_id: number = 0;
+let ticket_id: number = 0;
 // Instatiate Database
 const db = new Database("database.db");
 db.run(
@@ -39,7 +41,7 @@ db.run(
 );
 //create event_proposals table
 db.run(
-  "CREATE TABLE IF NOT EXISTS event_tickets (id INTEGER AUTO_INCREMENT PRIMARY KEY, event_id INTEGER, ticket_data text  )"
+  "CREATE TABLE IF NOT EXISTS event_proposals (id INTEGER AUTO_INCREMENT PRIMARY KEY, event_id INTEGER, metadata text  )"
 );
 //create event_creation_prices table
 db.run(
@@ -118,9 +120,11 @@ const handleAdvance: any = async (data: any) => {
           DAPP_ADDRESS
         );
         if (create_process) {
+          event_id++;
           db.run(
-            "INSERT INTO events VALUES (NULL, :t, :d, :l, :tickets, :c, :o, :dao, :r, :s, :minR, :discount, :url, :logo)",
+            "INSERT INTO events VALUES (:id, :t, :d, :l, :tickets, :c, :o, :dao, :r, :s, :minR, :discount, :url, :logo)",
             {
+              ":id": event_id,
               ":t": eventPayload?.title,
               ":d": eventPayload?.date,
               ":l": eventPayload?.location,
@@ -170,9 +174,11 @@ const handleAdvance: any = async (data: any) => {
           );
           if (ticket_process) {
             const generatedCode = generate_code(referralCodes);
+            ticket_id++;
             db.run(
-              "INSERT INTO event_tickets VALUES (NULL, :event_id, :ticket_data)",
+              "INSERT INTO event_tickets VALUES (:id, :event_id, :ticket_data)",
               {
+                ":id": ticket_id,
                 ":event_id": eventPayload.id,
                 ":ticket_data": JSON.stringify(eventPayload.ticket),
               }
@@ -220,7 +226,7 @@ const handleAdvance: any = async (data: any) => {
         if (event?.organizer === data.metadata.msg_sender.toLowerCase()) {
           if (event?.status === EventStatus.Pending) {
             db.run(
-              `UPDATE events SET status = ${EventStatus?.Ongoing}, WHERE id = ${eventPayload.id};`
+              `UPDATE events SET status = ${EventStatus?.Ongoing} WHERE id = ${eventPayload.id};`
             );
             processed = true;
           } else
@@ -232,26 +238,11 @@ const handleAdvance: any = async (data: any) => {
         const event = await db.get(
           `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
         );
-        const event_participants: any = await db.get(
-          `SELECT * FROM event_tickets WHERE event_id = ${eventPayload.id} LIMIT 1;`
-        );
         if (event?.organizer === data.metadata.msg_sender.toLowerCase()) {
           if (event?.status === EventStatus.Pending) {
             db.run(
-              `UPDATE events SET status = ${EventStatus?.Cancelled}, WHERE id = ${eventPayload.id};`
+              `UPDATE events SET status = ${EventStatus?.Cancelled} WHERE id = ${eventPayload.id};`
             );
-
-            //refund ticket fees to all participants
-            for (let index = 0; index < event_participants?.length; index++) {
-              const element = JSON.parse(
-                event_participants[index]?.ticket_data
-              );
-              wallet.ether_transfer(
-                DAPP_ADDRESS,
-                element.participant,
-                BigInt(element.type.amount)
-              );
-            }
             processed = true;
           } else
             throw new Error("Event has either ended, cancelled or ongoing");
@@ -329,7 +320,10 @@ const handleInspect: InspectRequestHandler = async (data) => {
       const event = await db.get(
         `SELECT * FROM events WHERE id = ${eventPayload[1]} LIMIT 1;`
       );
-      const payload = toHex(JSON.stringify(event));
+      const event_tickets = await db.get(
+        `SELECT * FROM event_tickets WHERE id = ${eventPayload[1]} LIMIT 1;`
+      );
+      const payload = toHex(JSON.stringify({ event, event_tickets }));
       const inspect_req = await fetch(rollup_server + "/report", {
         method: "POST",
         headers: {

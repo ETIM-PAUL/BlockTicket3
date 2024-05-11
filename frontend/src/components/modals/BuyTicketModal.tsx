@@ -1,17 +1,45 @@
 import React, { useState } from "react";
 import TicketPurchaseModal from "./TicketPurchaseModal";
+import { useRollups } from "../../useRollups";
+import { DappAddress } from "../../constants";
+import { ethers } from "ethers";
+import { toast } from "react-toastify";
 
 type Props = {
     isVisible: boolean;
+    id;
     onClose: boolean | void | string | any;
+    tickets: any;
 };
 
-const BuyTicketModal = ({ isVisible, onClose }: Props) => {
+const BuyTicketModal = ({ isVisible, onClose, tickets, id }: Props) => {
     const [showTicketModal, setShowTicketModal] = useState<boolean>(false);
     if (!isVisible) return null;
+    const [processing, setProcessing] = useState<boolean>(false)
+    const rollups = useRollups(DappAddress);
 
-    const handleClose = (e: any) => {
-        if (e.target.id === "wrapper") onClose();
+    if (!isVisible) return null;
+
+    const purchaseTicket = async (e: any) => {
+        if (rollups) {
+
+            try {
+                setProcessing(true);
+                let str = `{"action": "start_event", "id": "${id}"}`
+                let data = ethers.utils.toUtf8Bytes(str);
+
+                const result = await rollups.inputContract.addInput(DappAddress, data);
+                const receipt = await result.wait(1);
+                // Search for the InputAdded event
+                const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+                toast.error("Event ticker purchased successfully")
+                setProcessing(false);
+                onClose();
+            } catch (error) {
+                console.log("error", error)
+                setProcessing(false)
+            }
+        }
     };
 
     return (
@@ -21,61 +49,37 @@ const BuyTicketModal = ({ isVisible, onClose }: Props) => {
             <div
                 className="fixed inset-0 flex justify-center items-center z-50"
                 id="wrapper"
-                onClick={handleClose}
             >
-                <div className="w-[800px]  bg-gradient-to-l from-[#5522CC] to-[#ED4690] flex flex-col relative ">
-                    <div className=" p-8 rounded">
+                <div className="md:w-[650px] backdrop-blur-none z-50 flex flex-col relative ">
+                    <div className=" p-6 rounded relative">
                         <button
-                            className="text-black bg-white text-2xl b-white border rounded-[50%] w-8 h-8 absolute top-6 right-10   "
+                            className="text-black bg-white text-2xl b-white border rounded-[50%] w-8 h-8 absolute top-16 right-10"
                             onClick={() => onClose()}
                         >
                             X
                         </button>
-
-                        <div className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  mx-auto flex flex-col mt-10  px-4 py-6 ">
-                            <h2 className="text-white font-bold text-2xl text-center font-nexa">
-                                Choose Ticket Type
+                        <div className="bg-gradient-to-r from-[#5522CC] to-[#ED4690] z-50 mx-auto flex flex-col mt-10 px-10 pt-16">
+                            <h2 className="text-white font-bold text-xl text-center font-nexa">
+                                Select Your Preferred Ticket Type
                             </h2>
 
                             <div className="flex flex-row mt-1 justify-between gap-4 py-6 text-white">
-                                {/* Regular */}
-                                <div className=" space-y-2 pt-2 text-center justify-center  flex flex-col w-full border shadow-2xl">
-                                    <p className="text-2xl">Regular</p>
+                                {tickets.length > 0 && tickets.map((item: any) => (
+                                    <div key={item.name} className="pt-2 text-center justify-center space-y-4 flex flex-col w-full border shadow-2xl">
+                                        <p className="text-2xl">{item.ticketType}</p>
+                                        <p className="text-xs font-black mb-2 block">{item.price}ETH</p>
+                                        <button
+                                            disabled={processing}
+                                            className="disabled:cursor-not-allowed shadow-2xl text-lg m-0 font-semibold justify-center p-2 text-white  bg-gradient-to-l from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                                            onClick={() => purchaseTicket(true)}
+                                        >
+                                            Purchase
+                                        </button>
+                                    </div>
+                                ))
 
-                                    <p>13ETH</p>
-                                    <button
-                                        className="  shadow-2xl text-lg font-semibold justify-center p-2 text-white  bg-gradient-to-l from-[#5522CC] to-[#ED4690]    hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                                        onClick={() => setShowTicketModal(true)}
-                                    >
-                                        Buy
-                                    </button>
-                                </div>
+                                }
 
-                                {/* VIP */}
-                                <div className=" space-y-2  pt-2   text-center justify-center  flex flex-col w-full border shadow-2xl">
-                                    <p className="text-2xl">VIP</p>
-
-                                    <p>20ETH</p>
-                                    <button
-                                        className="text-lg font-semibold justify-center p-2 text-white  bg-gradient-to-r from-[#5522CC] to-[#8352f5]   hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                                        onClick={() => setShowTicketModal(true)}
-                                    >
-                                        Buy
-                                    </button>
-                                </div>
-
-                                {/* V-VIP */}
-                                <div className=" space-y-2   pt-2  text-center justify-center  flex flex-col w-full border shadow-2xl">
-                                    <p className="text-2xl">V-VIP</p>
-
-                                    <p>13ETH</p>
-                                    <button
-                                        className="text-lg font-semibold justify-center p-2   bg-gradient-to-r from-[#5522CC] to-[#8352f5]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                                        onClick={() => setShowTicketModal(true)}
-                                    >
-                                        Buy
-                                    </button>
-                                </div>
                             </div>
                         </div>
                         {/*  */}

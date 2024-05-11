@@ -3,3 +3,8 @@ export const shortenAddress = (address) => {
   const end = address.slice(-6);
   return `${start}...${end}`;
 };
+
+export function minimumPrice(data) {
+  const val = data.reduce((minAge, obj) => Math.min(minAge, obj.price), Infinity);
+  return val;
+}
