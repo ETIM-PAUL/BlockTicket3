@@ -11,7 +11,7 @@
 // under the License.
 
 import React, { useState } from "react";
-import { useSetChain } from "@web3-onboard/react";
+import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import { ethers } from "ethers";
 // import { useRollups } from "./useRollups";
 
@@ -42,6 +42,7 @@ interface Report {
 export const Balance: React.FC = () => {
   // const rollups = useRollups();
   const [{ connectedChain }] = useSetChain();
+  const [{ wallet }] = useConnectWallet();
   const inspectCall = async (str: string) => {
     let payload = str;
     if (hexData) {
@@ -128,7 +129,7 @@ export const Balance: React.FC = () => {
               </Tr>}
             </Tbody>
           </Table>
-          <Button onClick={() => inspectCall("balance/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266")}>Get Balance</Button>
+          <Button onClick={() => inspectCall(`balance/${wallet?.accounts[0]?.address}`)}>Get Balance</Button>
         </Stack>
       </TableContainer>
     </Box>

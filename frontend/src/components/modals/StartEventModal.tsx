@@ -10,9 +10,10 @@ type Props = {
     onClose: boolean | void | string | any;
     eventDetails: any
     setEventDetails: any
+    fetchEventDetails: any
 };
 
-const StartEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails }: Props) => {
+const StartEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails, fetchEventDetails }: Props) => {
     const [processing, setProcessing] = useState<boolean>(false)
     const rollups = useRollups(DappAddress);
 
@@ -33,6 +34,7 @@ const StartEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails
                 setEventDetails({ ...eventDetails, status: 1 })
                 toast.error("Event status has been changed successfully")
                 setProcessing(false);
+                fetchEventDetails();
                 onClose();
             } catch (error) {
                 console.log("error", error)

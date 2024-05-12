@@ -35,6 +35,7 @@ const EventDetails = () => {
     const [{ connectedChain }] = useSetChain();
     const [showModal, setShowModal] = useState<boolean>(false);
     const [eventDetails, setEventDetails] = useState<any>();
+    const [eventParticipants, setEventParticipants] = useState<any>([]);
     const [showStartEventModal, setShowStartEventModal] =
         useState<boolean>(false);
     const [showEndEventModal, setShowEndEventModal] = useState<boolean>(false);
@@ -44,7 +45,6 @@ const EventDetails = () => {
     const [postData, setPostData] = useState<boolean>(false);
 
     const [{ wallet }] = useConnectWallet();
-    const navigate = useNavigate();
 
     // Function to toggle between showing the proposal table and the participant table
 
@@ -129,8 +129,8 @@ const EventDetails = () => {
                 const reportData = JSON.parse(decode)
                 console.log("parsed Reports:", reportData);
                 setEventDetails(reportData.event)
+                setEventParticipants(reportData.event_tickets ?? [])
                 setLoading(false);
-                //console.log(parseEther("1000000000000000000", "gwei"))
             });
     }
 
@@ -241,13 +241,11 @@ const EventDetails = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="self-start mt-12 text-md md:text-xl font-bold text-white max-md:mt-10">
-                                    Event Proposals
-                                </div>
-                                <div className="flex text-lg font-normal gap-4 ">
+
+                                <div className="flex text-lg font-normal gap-2 mt-10">
                                     <button
-                                        className={`flex justify-center mt-4 py-2 max-w-full text-black ${!showParticipantTable
-                                            ? "bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                                        className={`flex justify-center mt-4 py-2 max-w-full ${!showParticipantTable
+                                            ? "bg-gradient-to-r text-white from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                                             : "bg-white text-black hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                                             } w-[130px] text-lg font-medium`}
                                         onClick={showProposalTable}
@@ -255,8 +253,8 @@ const EventDetails = () => {
                                         Proposals
                                     </button>
                                     <button
-                                        className={`flex justify-center mt-4 py-2 max-w-full text-black ${showParticipantTable
-                                            ? "bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                                        className={`flex justify-center mt-4 py-2 max-w-full ${showParticipantTable
+                                            ? "bg-gradient-to-r text-white from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                                             : "bg-white text-black hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                                             } w-[130px] text-lg font-medium`}
                                         onClick={showParticipant}
@@ -264,8 +262,8 @@ const EventDetails = () => {
                                         Participants{" "}
                                     </button>
                                 </div>
-                                <div className="flex flex-row justify-between mt-6 mx-2 text-white ">
-                                    {!showParticipantTable && wallet?.accounts &&
+                                {!showParticipantTable && wallet?.accounts && eventDetails?.dao &&
+                                    <div className="flex flex-row justify-between mt-6 mx-2 text-white ">
                                         <div className="w-full flex justify-end">
                                             <button
                                                 className="w-fit bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] px-6 py-2 text-lg mb-4 font-medium"
@@ -276,60 +274,70 @@ const EventDetails = () => {
                                                 Add Proposal
                                             </button>
                                         </div>
-                                    }
+                                    </div>
+                                }
 
-                                    {/* Modals */}
-                                    {/*  */}
-                                    <BuyTicketModal
+                                {/* Modals */}
+                                {/*  */}
+                                <BuyTicketModal
+                                    id={Number(id)}
+                                    isVisible={showModal}
+                                    organizer={eventDetails.organizer}
+                                    tickets={JSON.parse(eventDetails.tickets)}
+                                    onClose={() => setShowModal(false)}
+                                    fetchEventDetails={() =>
+                                        fetchEventDetails(`get/${Number(id)}`)
+                                    }
+                                />
+
+                                {/*  */}
+
+                                <div className="">
+                                    <StartEventModal
+                                        isVisible={
+                                            showStartEventModal
+                                        }
                                         id={Number(id)}
-                                        isVisible={showModal}
-                                        tickets={JSON.parse(eventDetails.tickets)}
-                                        onClose={() => setShowModal(false)}
+                                        onClose={() =>
+                                            setShowStartEventModal(
+                                                false
+                                            )
+                                        }
+                                        eventDetails={eventDetails}
+                                        setEventDetails={setEventDetails}
+                                        fetchEventDetails={() =>
+                                            fetchEventDetails(`get/${Number(id)}`)
+                                        }
+
                                     />
 
-                                    {/*  */}
-
-                                    <div className="">
-                                        <StartEventModal
-                                            isVisible={
-                                                showStartEventModal
-                                            }
-                                            id={Number(id)}
-                                            onClose={() =>
-                                                setShowStartEventModal(
-                                                    false
-                                                )
-                                            }
-                                            eventDetails={eventDetails}
-                                            setEventDetails={setEventDetails}
-
-                                        />
-
-                                        <EndEventModal
-                                            isVisible={
-                                                showEndEventModal
-                                            }
-                                            id={Number(id)}
-                                            onClose={() =>
-                                                setShowEndEventModal(
-                                                    false
-                                                )
-                                            }
-                                            eventDetails={eventDetails}
-                                            setEventDetails={setEventDetails}
-                                        />
-                                    </div>
-
-                                    <NewProposalModal
-                                        isVisible={showNewProposalModal}
+                                    <EndEventModal
+                                        isVisible={
+                                            showEndEventModal
+                                        }
+                                        id={Number(id)}
                                         onClose={() =>
-                                            setShowNewProposalModal(false)
+                                            setShowEndEventModal(
+                                                false
+                                            )
+                                        }
+                                        eventDetails={eventDetails}
+                                        setEventDetails={setEventDetails}
+                                        fetchEventDetails={() =>
+                                            fetchEventDetails(`get/${Number(id)}`)
                                         }
                                     />
                                 </div>
 
+                                <NewProposalModal
+                                    isVisible={showNewProposalModal}
+                                    onClose={() =>
+                                        setShowNewProposalModal(false)
+                                    }
+                                />
+
                                 {showParticipantTable ? (
-                                    <ParticipantTable />
+                                    <ParticipantTable eventParticipants={eventParticipants} />
                                 ) : (
                                     <ProposalTable />
                                 )}

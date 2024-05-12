@@ -44,7 +44,7 @@ const UserDashboard = (props: Props) => {
                             } w-[130px] text-lg font-medium`}
                         onClick={showParticipant}
                     >
-                        Events Ticket
+                        Tickets Purchased
                     </button>
                 </div>
 

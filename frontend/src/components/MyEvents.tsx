@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { UpcomingEventsData } from "../constants";
 import { CiCalendarDate, CiLocationOn } from "react-icons/ci";
 import { GiTakeMyMoney } from "react-icons/gi";
+import { Link } from "react-router-dom";
 
 type Props = {};
 
@@ -18,7 +19,7 @@ const MyEvents = (props: Props) => {
 
     return (
         <div>
-            <div className="grid grid-cols-3 md:grid-cols-4 gap-4   mt-4    pb-20">
+            <div className="flex flex-wrap justify-start gap-4 mt-4 mx-1 pb-20">
                 {allEvents.length === 0 && !loading &&
                     <div
                         className="text-white font-medium text-lg md:text-3xl mt-10 "
@@ -35,16 +36,16 @@ const MyEvents = (props: Props) => {
                     </div>
                 }
 
-                {allEvents.length > 0 && allEvents.map((eventData) => (
+                {allEvents.length > 0 && allEvents.map((eventData: any) => (
                     <div
                         key={eventData?.id}
-                        className="flex flex-col items-center mx-auto border-2 rounded-xl rounded-b-none pb- shadow-md mt-10 "
+                        className="flex grow flex-col w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-10 "
                     >
                         <div className="fle">
                             <div className="">
                                 <img
                                     src={eventData.flyer}
-                                    alt="Company-Logo"
+                                    alt="Event-Logo"
                                     className=" w-full rounded-t-lg"
                                 />
                             </div>
@@ -77,6 +78,13 @@ const MyEvents = (props: Props) => {
                                 </div>
                             </div>
                         </div>
+
+                        <Link
+                            to={`/event-details/${eventData?.id}`}
+                            className="text-center bg-gradient-to-r from-[#5522CC] to-[#ED4690] w-full shadow-md border-t py-3 font-bold  text-white text-lg  hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                        >
+                            View More
+                        </Link>
                     </div>
                 ))}
             </div>

@@ -7,11 +7,12 @@ import { toast } from "react-toastify";
 import { ethers } from "ethers";
 import { useRollups } from "../useRollups";
 import { DappAddress } from "../constants";
-import { useConnectWallet } from "@web3-onboard/react";
+import { useConnectWallet, useWallets } from "@web3-onboard/react";
 
 type Props = {};
 
 interface TicketTypes {
+    id: number;
     ticketType: string;
     price: number;
 }
@@ -29,6 +30,7 @@ const CreateEvent = (props: Props) => {
     const [dao, setDao] = useState("");
     const [referral, setReferral] = useState("");
     const rollups = useRollups(DappAddress);
+    const [connectedWallet] = useWallets();
 
     //Event Logo
     const [logoUrl, updateLogoUrl] = useState("");
@@ -192,15 +194,15 @@ const CreateEvent = (props: Props) => {
             toast.error("Maximum Ticket Types Reached");
             return;
         }
-        setTicketTypes([...ticketTypes, { ticketType, price }]);
+        setTicketTypes([...ticketTypes, { id: ticketTypes.length + 1, ticketType, price }]);
         setTicketType('');
         setPrice(0);
     };
 
-    const handleRemove = (index) => {
-        const newItems = [...ticketTypes];
-        newItems.splice(index, 1);
-        setTicketTypes(newItems);
+    const handleRemove = (id: number) => {
+        setTicketTypes(ticketTypes.filter(item => item.id !== id));
+        // Adjust ids of remaining items
+        setTicketTypes(ticketTypes.map((item, index) => ({ ...item, id: index + 1 })));
     };
 
     const queryPinataFiles = async () => {
@@ -351,7 +353,7 @@ const CreateEvent = (props: Props) => {
                                     {ticketTypes.length > 0 && ticketTypes.map((item, index) => (
                                         <li key={index} className="mb-2">
                                             <span>{item.ticketType} - {item.price}ETH</span>
-                                            <button onClick={() => handleRemove(index)} className="ml-2 px-2 py-1 bg-red-500 text-white rounded">Remove</button>
+                                            <button onClick={() => handleRemove(item.id)} className="ml-2 px-2 py-1 bg-red-500 text-white rounded">Remove</button>
                                         </li>
                                     ))}
                                 </ul>
@@ -509,7 +511,7 @@ const CreateEvent = (props: Props) => {
                                     } py-3 w-full disabled:cursor-not-allowed disabled:opacity-50  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold`}
                             >
                                 {isSubmitLoading ? "Processing" :
-                                    "Create Event"
+                                    connectedWallet ? "Create Event" : "Connect Wallet"
                                 }
                             </button>
                         </div>

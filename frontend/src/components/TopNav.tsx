@@ -13,25 +13,32 @@ const TopNav = () => {
         <Logo />
       </div>
 
-      <div className="flex gap-3">
-        {wallet &&
-          <Link
-            to="/user-dashboard"
-            className="font-medium rounded-md text-xl px-4 py-3 text-center bg-white text-black"
-          >
-            Dashboard
-          </Link>
-        }
-        {wallet &&
-          <Link
-            to="/my-wallet"
-            className="font-medium rounded-md text-xl px-4 py-3 text-center bg-white text-black"
-          >
-            My Wallet
-          </Link>
-        }
+      <div className='hidden md:flex'>
+        <div className="flex gap-3">
+          {wallet &&
+            <Link
+              to="/user-dashboard"
+              className="font-medium rounded-md text-xl px-4 py-3 text-center bg-white text-black"
+            >
+              Dashboard
+            </Link>
+          }
+          {wallet &&
+            <Link
+              to="/my-wallet"
+              className="font-medium rounded-md text-xl px-4 py-3 text-center bg-white text-black"
+            >
+              My Wallet
+            </Link>
+          }
+        </div>
+        <WalletConnect />
       </div>
-      <WalletConnect />
+
+      {/* mobile nav */}
+      <div className='block md:hidden'>
+        <span>Mobile</span>
+      </div>
     </div>
   )
 }

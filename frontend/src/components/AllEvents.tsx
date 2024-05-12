@@ -94,7 +94,7 @@ const AllEvents = (props: Props) => {
 
             <div className="w-full bg-[#EEE1FF] h-2"></div>
             <div className="bg-base-100 p-8 bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
-                <div className="flex items-center mx-14 flex-row gap-4 justify-end mt-6 ">
+                <div className="flex items-center md:mx-14 flex-row gap-2 md:gap-4 justify-start md:justify-end md:mt-6 ">
                     <button
                         className={`py-2 px-4 rounded-md border border-bg-[#EEE1FF] w-fit items-center text-center flex  justify-center font-medium text-lg ${activeButton === "LiveEvent"
                             ? "bg-white text-black"
@@ -102,7 +102,7 @@ const AllEvents = (props: Props) => {
                             }`}
                         onClick={() => handleButtonClick("LiveEvent")}
                     >
-                        Live Events
+                        Live
                     </button>
 
                     <button
@@ -112,31 +112,31 @@ const AllEvents = (props: Props) => {
                             }`}
                         onClick={() => handleButtonClick("UpcomingEvent")}
                     >
-                        Upcoming Events
+                        Upcoming
                     </button>
 
                     <button
-                        className={`py-2 px-4 h-[45px] rounded-md border border-bg-[#EEE1FF] items-center text-center flex w-fit justify-center font-medium text-lg ${activeButton === "CreateEvent"
+                        className={`py-2 px-4 w-[200px] rounded-md border border-bg-[#EEE1FF] items-center text-center flex justify-center font-medium text-lg ${activeButton === "CreateEvent"
                             ? "bg-white"
                             : "bg-gradient-to-r from-[#5522CC] to-[#ED4690] rounded-md text-white w-fit hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
                             }`}
                         onClick={() => createEvent()}
                     >
-                        Create Event
+                        Create
                     </button>
                 </div>
 
                 <div className="flex flex-wrap justify-start gap-4 mt-4 mx-1 pb-20">
                     {allEvents.length === 0 && !loading &&
                         <div
-                            className="text-white font-medium text-lg md:text-3xl mt-10 "
+                            className="text-white font-medium text-lg md:text-3xl mt-4 md:mt-10 "
                         >
                             <h3>No Events</h3>
                         </div>
                     }
                     {allEvents.length === 0 && loading &&
                         <div
-                            className="text-white font-medium text-lg md:text-3xl mt-10 "
+                            className="text-white font-medium text-lg md:text-3xl mt-4 md:mt-10 "
                         >
                             <h3>Fetching Events</h3>
                         </div>
@@ -145,13 +145,13 @@ const AllEvents = (props: Props) => {
                     {allEvents.length > 0 && allEvents.map((eventData) => (
                         <div
                             key={eventData?.id}
-                            className="flex flex-col w-full md:max-w-[350px] items-center rounded-xl rounded-b-none shadow-md mt-10 "
+                            className="flex flex-col w-full md:max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-4md:mt-10 "
                         >
                             <div className="fle w-full">
                                 <div className="">
                                     <img
                                         src={`https://ipfs.io/ipfs/${formatIPFS(eventData?.logoUrl)}`}
-                                        alt="Company-Logo"
+                                        alt="Event-Logo"
                                         className="rounded-t-lg w-full h-[200px] object-cover"
                                     />
                                 </div>

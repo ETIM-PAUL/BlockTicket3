@@ -86,7 +86,7 @@ const HeroNav = (props: Props) => {
                             <p className="font-roboto font-medium text-4xl text-white sm:leading-[75px] leading-[55px] w-full text-center">
                                 On-Chain Tickets Gateway
                             </p>
-                            <p className="text-dimBlack text-justify text-xl text-white">
+                            <p className="text-dimBlack text-justify leading-8 text-xl text-white">
                                 On-Chain Event Ticketing, Management and DAO
                                 proposal, allowing user to make proposal by
                                 Upvoting or downvoting the events that they have
@@ -97,9 +97,9 @@ const HeroNav = (props: Props) => {
                             <div className="flex  ">
                                 <Link
                                     to="/events"
-                                    className="bg-[#F5167E]  text-center  mt-6 px-2 py-3 rounded-md  text-white text-xl hover:bg-[#ED4690] w-1/2"
+                                    className="bg-[#F5167E]  text-center  mt-6 px-2 py-3 rounded-md  text-white text-xl hover:bg-[#ED4690] w-full"
                                 >
-                                    Create An Event
+                                    Explore Events
                                 </Link>
                             </div>
                         </div>

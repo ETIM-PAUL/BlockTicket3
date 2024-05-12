@@ -10,7 +10,7 @@ const EventDetailsPage = (props: Props) => {
     const [connectedWallet] = useWallets();
 
     return (
-        <div className="bg-white flex flex-col justify-between">
+        <div className={`bg-white flex flex-col justify-between ${!connectedWallet && 'h-screen'}`}>
             {connectedWallet ?
                 <EventDetails />
                 :
