@@ -1,7 +1,7 @@
 import createClient from "openapi-fetch";
 import { components, paths } from "./schema";
 import { generate_code } from "./utils";
-import { fromHex, hexToString, toHex } from "viem";
+import { fromHex, getAddress, hexToString, parseEther, toHex } from "viem";
 import { Router } from "cartesi-router";
 // Importing and initializing DB
 import { Database } from "node-sqlite3-wasm";
@@ -9,10 +9,10 @@ import { Database } from "node-sqlite3-wasm";
 import { CheckActions } from "./checks";
 import { Wallet, Error_out } from "cartesi-wallet";
 
-// @ts-ignore
-import { initialize, protocolVersion } from "@dao-library/core/dao";
-// @ts-ignore
-import { createProposal, getActionObject } from "@dao-library/core/proposal";
+// // @ts-ignore
+// import { initialize, protocolVersion } from "@dao-library/core/dao";
+// // @ts-ignore
+// import { createProposal, getActionObject } from "@dao-library/core/proposal";
 
 import { Event, EventPayload, EventStatus } from "./interface";
 
@@ -21,27 +21,29 @@ const rollup_server =
   "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE";
 const SYSTEM_ADMINS = ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"];
 const wallet = new Wallet(new Map());
-const check_actions = new CheckActions(wallet);
+const db = new Database("database.db");
+
+const check_actions = new CheckActions(wallet, db);
 const router = new Router(wallet);
 let event_id: number = 0;
 let ticket_id: number = 0;
+let proposal_id: number = 0;
 // Instatiate Database
-const db = new Database("database.db");
 db.run(
-  "CREATE TABLE IF NOT EXISTS events (id INTEGER AUTO_INCREMENT PRIMARY KEY, title TEXT, date TEXT, location TEXT, tickets TEXT, capacity INTEGER, organizer TEXT, dao BOOLEAN, referral BOOLEAN, status INTEGER, minReferrals INTEGER, referralDiscount INTEGER, tokenUrl TEXT, logoUrl TEXT  )"
+  "CREATE TABLE IF NOT EXISTS events (id INTEGER AUTO_INCREMENT PRIMARY KEY, title TEXT, date TEXT, location TEXT, tickets TEXT, capacity INTEGER, organizer TEXT, dao BOOLEAN, referral BOOLEAN, status INTEGER, minReferrals INTEGER, referralDiscount INTEGER, tokenUrl TEXT, logoUrl TEXT, totalETHBal INTEGER  )"
 );
 
 //create event_tickets table
 db.run(
-  "CREATE TABLE IF NOT EXISTS event_tickets (id INTEGER AUTO_INCREMENT PRIMARY KEY, event_id INTEGER, ticket_data text  )"
+  "CREATE TABLE IF NOT EXISTS event_tickets (id INTEGER AUTO_INCREMENT PRIMARY KEY, event_id INTEGER, ticket_type_id INTEGER, purchased_time TEXT, ticket_type TEXT, address TEXT, refunded BOOLEAN  )"
 );
 //create event_referrals table
 db.run(
-  "CREATE TABLE IF NOT EXISTS event_referrals (id INTEGER AUTO_INCREMENT PRIMARY KEY, code INTEGER, event_id INTEGER, owner text, count INTEGER  )"
+  "CREATE TABLE IF NOT EXISTS event_referrals (id INTEGER AUTO_INCREMENT PRIMARY KEY, code INTEGER, event_id INTEGER, owner TEXT, ticket_id INTEGER, count INTEGER  )"
 );
 //create event_proposals table
 db.run(
-  "CREATE TABLE IF NOT EXISTS event_proposals (id INTEGER AUTO_INCREMENT PRIMARY KEY, event_id INTEGER, metadata text  )"
+  "CREATE TABLE IF NOT EXISTS event_proposals (id INTEGER AUTO_INCREMENT PRIMARY KEY, event_id INTEGER, proposal TEXT, upvotes INTEGER, downvotes INTEGER  )"
 );
 //create event_creation_prices table
 db.run(
@@ -97,22 +99,11 @@ const handleAdvance: any = async (data: any) => {
       eventPayload = JSON.parse(fromHex(payload, "string")) as Event;
 
       if (!eventPayload.action) throw new Error("No action provided");
+
       if (eventPayload.action === "create_event") {
         const listOfEventTypes = await db.all(
           `SELECT * FROM event_creation_prices`
         );
-
-        // // const tx = await ...
-        // // rollups.etherPortalContract.depositEther(propos.dappAddress,data,txOverrides);
-        // const amount = BigInt(eventPayload.ether_amount);
-        // const hexString = amount.toString(16).padStart(64, "0");
-        // const result = wallet.ether_deposit_process(
-        //   `${DAPP_ADDRESS}${hexString}`
-        // );
-        // const balance = wallet.balance_get(DAPP_ADDRESS);
-        // console.log("eth_balance", balance);
-        // console.log("eth_deposit_balance", result);
-
         const create_process = check_actions.create_event(
           eventPayload,
           listOfEventTypes,
@@ -122,7 +113,7 @@ const handleAdvance: any = async (data: any) => {
         if (create_process) {
           event_id++;
           db.run(
-            "INSERT INTO events VALUES (:id, :t, :d, :l, :tickets, :c, :o, :dao, :r, :s, :minR, :discount, :url, :logo)",
+            "INSERT INTO events VALUES (:id, :t, :d, :l, :tickets, :c, :o, :dao, :r, :s, :minR, :discount, :url, :logo, :totalETHBal)",
             {
               ":id": event_id,
               ":t": eventPayload?.title,
@@ -138,6 +129,7 @@ const handleAdvance: any = async (data: any) => {
               ":discount": eventPayload?.referralDiscount,
               ":url": eventPayload?.tokenUrl,
               ":logo": eventPayload?.logoUrl,
+              ":totalETHBal": 0,
             }
           );
           processed = true;
@@ -158,7 +150,8 @@ const handleAdvance: any = async (data: any) => {
           throw new Error("Access Denied");
         } else {
           const referralCodes: any = await db.all(
-            `SELECT * FROM event_referrals`
+            "SELECT * FROM event_referrals WHERE event_id = ?",
+            `${eventPayload?.id}`
           );
           const event_referrals = referralCodes.filter(
             (referral_code: any) => referral_code.event_id === event?.id
@@ -176,41 +169,42 @@ const handleAdvance: any = async (data: any) => {
             const generatedCode = generate_code(referralCodes);
             ticket_id++;
             db.run(
-              "INSERT INTO event_tickets VALUES (:id, :event_id, :ticket_data)",
+              "INSERT INTO event_tickets VALUES (:id, :event_id, :ticket_type_id, :purchased_time, :ticket_type, :address)",
               {
                 ":id": ticket_id,
                 ":event_id": eventPayload.id,
-                ":ticket_data": JSON.stringify(eventPayload.ticket),
+                ":ticket_type_id": eventPayload.ticket,
+                ":purchased_time": eventPayload.purchased_time,
+                ":ticket_type": eventPayload.ticket_type,
+                ":address": msg_sender,
+                ":refunded": false,
               }
             );
 
             if (event?.referral) {
-              if (
-                !event_referrals.find(
-                  (referral: any) => referral.owner === msg_sender
-                )
-              ) {
-                db.run(
-                  "INSERT INTO event_referrals VALUES (NULL, :code, :event_id, :owner, :count)",
-                  {
-                    ":code": generatedCode,
-                    ":event_id": eventPayload.id,
-                    ":owner": msg_sender,
-                    ":count": 0,
-                  }
-                );
-              }
+              db.run(
+                "INSERT INTO event_referrals VALUES (NULL, :code, :event_id, :owner, :ticket_id, :count)",
+                {
+                  ":code": generatedCode,
+                  ":event_id": eventPayload.id,
+                  ":owner": msg_sender,
+                  ":ticket_id": ticket_id,
+                  ":count": 0,
+                }
+              );
 
-              if (eventPayload.referral_code) {
+              if (eventPayload?.referral_code) {
+                //if there is a referral code, check if it exist and then increase the count
                 const code_details = check_actions.get_referral_code_details(
+                  referralCodes,
                   eventPayload.referral_code
                 );
-                //if there is a referral code, check if it exist and then increase the count
-                db.run(
-                  `UPDATE event_referrals SET count = ${code_details.code++}, WHERE code = ${
-                    code_details.id
-                  };`
-                );
+                if (code_details) {
+                  let increase_count = code_details.count + 1;
+                  db.run(
+                    `UPDATE event_referrals SET count = ${increase_count} WHERE code = ${code_details.code};`
+                  );
+                }
               }
             }
 
@@ -229,8 +223,26 @@ const handleAdvance: any = async (data: any) => {
               `UPDATE events SET status = ${EventStatus?.Ongoing} WHERE id = ${eventPayload.id};`
             );
             processed = true;
-          } else
-            throw new Error("Event has either ended, cancelled or ongoing");
+          } else throw new Error("Event is either ended, cancelled or ongoing");
+        } else throw new Error("Access Denied");
+      }
+
+      if (eventPayload.action === "end_event") {
+        const event: any = await db.get(
+          `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
+        );
+        if (event?.organizer === data.metadata.msg_sender.toLowerCase()) {
+          if (event && event?.status === EventStatus.Ongoing) {
+            db.run(
+              `UPDATE events SET status = ${EventStatus?.Ended} WHERE id = ${eventPayload.id};`
+            );
+            await wallet.ether_transfer(
+              getAddress(DAPP_ADDRESS),
+              getAddress(msg_sender),
+              parseEther((event?.totalETHBal).toString())
+            );
+            processed = true;
+          } else throw new Error("Event is either pending or cancelled");
         } else throw new Error("Access Denied");
       }
 
@@ -244,39 +256,94 @@ const handleAdvance: any = async (data: any) => {
               `UPDATE events SET status = ${EventStatus?.Cancelled} WHERE id = ${eventPayload.id};`
             );
             processed = true;
-          } else
-            throw new Error("Event has either ended, cancelled or ongoing");
+          } else throw new Error("Event is either ended or ongoing");
         } else throw new Error("Access Denied");
       }
 
-      // if (eventPayload.action === "create_proposal") {
-      //   const event = await db.get(
-      //     `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
-      //   );
-      //   const event_participants = await db.get(
-      //     `SELECT * FROM event_tickets WHERE event_id = ${eventPayload.id} LIMIT 1;`
-      //   );
-      //   if (
-      //     event?.organizer !== data.metadata.msg_sender.toLowerCase() &&
-      //     check_actions.isParticipant(msg_sender, event_participants)
-      //   ) {
-      //     await createProposal(
-      //       msg_sender,
-      //       { eventId: eventPayload.id, proposal: eventPayload.proposal },
-      //       null,
-      //       null,
-      //       null
-      //     );
-      //     processed = true;
-      //   } else throw new Error("Access Denied");
-      // }
+      if (eventPayload.action === "withdraw_cancelled_ticket") {
+        const event: any = await db.get(
+          `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
+        );
 
-      if (eventPayload.action === "delete_proposal") {
-        if (SYSTEM_ADMINS.includes(data.metadata.msg_sender.toLowerCase())) {
-          db.run("DELETE FROM events WHERE id = ?", [eventPayload.id]);
+        const event_participant = await db.get(
+          `SELECT * FROM event_tickets WHERE id = ${eventPayload.ticket_id} AND address = ${msg_sender} LIMIT 1;`
+        );
+        if (event_participant && event?.status === EventStatus.Cancelled) {
+          const data = await wallet.ether_transfer(
+            getAddress(DAPP_ADDRESS),
+            getAddress(msg_sender),
+            parseEther((0.001).toString())
+          );
+          if (data?.payload) {
+            db.run(
+              `UPDATE event_tickets SET refunded = true WHERE id = ${eventPayload.id};`
+            );
+          }
+          processed = true;
+        } else throw new Error("Access Denied, Not Participant");
+      }
+
+      if (eventPayload.action === "create_proposal") {
+        const event = await db.get(
+          `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
+        );
+        const event_participants = await db.all(
+          `SELECT * FROM event_tickets WHERE event_id = ${eventPayload.id} LIMIT 1;`
+        );
+        if (
+          event?.organizer !== data.metadata.msg_sender.toLowerCase() &&
+          check_actions.isParticipant(msg_sender, event_participants)
+        ) {
+          proposal_id++;
+          db.run(
+            "INSERT INTO event_proposals VALUES (:id, :code, :event_id, :owner, :ticket_id, :count)",
+            {
+              ":id": proposal_id,
+              ":event_id": eventPayload.id,
+              ":proposal": eventPayload.proposal,
+              ":upvotes": 0,
+              ":downvotes": 0,
+            }
+          );
           processed = true;
         } else throw new Error("Access Denied");
       }
+
+      if (eventPayload.action === "action_proposal") {
+        const event = await db.get(
+          `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
+        );
+        const event_proposal: any = await db.get(
+          `SELECT * FROM _proposals WHERE id = ${eventPayload.proposal_id} LIMIT 1;`
+        );
+        const event_participants = await db.all(
+          `SELECT * FROM event_tickets WHERE event_id = ${eventPayload.id} LIMIT 1;`
+        );
+        if (
+          event?.organizer !== data.metadata.msg_sender.toLowerCase() &&
+          check_actions.isParticipant(msg_sender, event_participants)
+        ) {
+          if (eventPayload?.upvote) {
+            let increase_votes = event_proposal.upvotes + 1;
+            db.run(
+              `UPDATE event_proposals SET upvotes = ${increase_votes} WHERE id = ${eventPayload.proposal_id};`
+            );
+          } else {
+            let increase_votes = event_proposal.downvotes + 1;
+            db.run(
+              `UPDATE event_proposals SET downvotes = ${increase_votes} WHERE id = ${eventPayload.proposal_id};`
+            );
+          }
+          processed = true;
+        } else throw new Error("Access Denied");
+      }
+
+      // if (eventPayload.action === "delete_proposal") {
+      //   if (SYSTEM_ADMINS.includes(data.metadata.msg_sender.toLowerCase())) {
+      //     db.run("DELETE FROM events WHERE id = ?", [eventPayload.id]);
+      //     processed = true;
+      //   } else throw new Error("Access Denied");
+      // }
     } else {
       try {
         const deposit: any = router.process("ether_deposit", payload);
@@ -309,8 +376,6 @@ const handleInspect: InspectRequestHandler = async (data) => {
   const payload = data.payload;
   console.log("Received inspect request data " + data);
   const eventPayload: any = hexToString(data.payload).split("/");
-  // console.log("url is ", url);
-  // const eventPayload = JSON.parse(fromHex(payload, "string")) as EventPayload;
   console.log(eventPayload);
 
   try {
@@ -320,10 +385,85 @@ const handleInspect: InspectRequestHandler = async (data) => {
       const event = await db.get(
         `SELECT * FROM events WHERE id = ${eventPayload[1]} LIMIT 1;`
       );
-      const event_tickets = await db.get(
-        `SELECT * FROM event_tickets WHERE id = ${eventPayload[1]} LIMIT 1;`
+      const event_tickets = await db.all(
+        "SELECT * FROM event_tickets WHERE event_id = ?",
+        `${eventPayload[1]}`
       );
-      const payload = toHex(JSON.stringify({ event, event_tickets }));
+      const event_proposals = await db.all(
+        "SELECT * FROM event_proposals WHERE event_id = ?",
+        `${eventPayload[1]}`
+      );
+
+      const payload = toHex(
+        JSON.stringify({ event, event_tickets, event_proposals })
+      );
+      const inspect_req = await fetch(rollup_server + "/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ payload }),
+      });
+      console.log("Received report status " + inspect_req.status);
+      return "accept";
+    }
+    if (eventPayload[0] == "get_event_participants") {
+      const event_participants = await db.all(
+        "SELECT * FROM event_tickets WHERE event_id = ?",
+        `${eventPayload[1]}`
+      );
+
+      const payload = toHex(JSON.stringify(event_participants));
+      const inspect_req = await fetch(rollup_server + "/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ payload }),
+      });
+      console.log("Received report status " + inspect_req.status);
+      return "accept";
+    }
+    if (eventPayload[0] == "get_event_referrals") {
+      const event_referrals = await db.all(
+        "SELECT * FROM event_referrals WHERE event_id = ?",
+        `${eventPayload[1]}`
+      );
+
+      const payload = toHex(JSON.stringify(event_referrals));
+      const inspect_req = await fetch(rollup_server + "/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ payload }),
+      });
+      console.log("Received report status " + inspect_req.status);
+      return "accept";
+    }
+    if (eventPayload[0] == "get_user_data") {
+      const user_events = await db.all(
+        "SELECT * FROM events WHERE organizer = ?",
+        `${eventPayload[1]}`
+      );
+
+      const user_event_referrals = await db.all(
+        "SELECT * FROM event_referrals WHERE owner = ?",
+        `${eventPayload[1]}`
+      );
+
+      const user_event_tickets = await db.all(
+        "SELECT * FROM event_tickets WHERE address = ?",
+        `${eventPayload[1]}`
+      );
+
+      const payload = toHex(
+        JSON.stringify({
+          user_events,
+          user_event_referrals,
+          user_event_tickets,
+        })
+      );
       const inspect_req = await fetch(rollup_server + "/report", {
         method: "POST",
         headers: {
@@ -396,4 +536,3 @@ main().catch((e) => {
   console.log(e);
   process.exit(1);
 });
-100000000000000000;

@@ -39,6 +39,8 @@ export interface Event {
   referral_code: number;
   ticket: EventParticipants;
   proposal: string;
+  purchased_time: string;
+  ticket_type: string;
 }
 
 export interface EventPayload {
