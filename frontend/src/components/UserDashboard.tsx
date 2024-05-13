@@ -26,22 +26,50 @@ const UserDashboard = (props: Props) => {
             <div className="w-full bg-[#EEE1FF] h-2"></div>
 
             <div className=" bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
-                <div className="flex  justify-end  text-lg font-normal gap-6  mr-24 pt-4  ">
+                <div className=" hidden md:flex  justify-end  text-lg font-normal gap-6  mr-24 pt-4  ">
                     <button
-                        className={`flex justify-center border border-bg-[#EEE1FF]  mt-4 py-2 px-4 w-fit text-black ${!showEventTicketTable
-                            ? "bg-white text-black"
-                            : "bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                            } w-[130px] text-lg font-medium`}
+                        className={`flex justify-center border border-bg-[#EEE1FF]  mt-4 py-2 px-4 w-fit text-black ${
+                            !showEventTicketTable
+                                ? "bg-white text-black"
+                                : "bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                        } w-[130px] text-lg font-medium`}
                         onClick={showProposalTable}
                     >
                         My Events
                     </button>
 
                     <button
-                        className={`flex justify-center border border-bg-[#EEE1FF]  mt-4 py-2 px-4 w-fit text-black ${showEventTicketTable
-                            ? "bg-white "
-                            : "bg-gradient-to-r from-[#5522CC] to-[#ED4690] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                            } w-[130px] text-lg font-medium`}
+                        className={`flex justify-center border border-bg-[#EEE1FF]  mt-4 py-2 px-4 w-fit text-black ${
+                            showEventTicketTable
+                                ? "bg-white "
+                                : "bg-gradient-to-r from-[#5522CC] to-[#ED4690] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                        } w-[130px] text-lg font-medium`}
+                        onClick={showParticipant}
+                    >
+                        Tickets Purchased
+                    </button>
+                </div>
+
+                {/* Mobile View  */}
+
+                <div className=" md:hidden flex    text-lg font-normal  pt-4 justify-center items-center ">
+                    <button
+                        className={` md:hidden  flex justify-center border border-bg-[#EEE1FF]  mt-4 py-2 px-4 w-fit text-black ${
+                            !showEventTicketTable
+                                ? "bg-white text-black"
+                                : "bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                        } w-[130px] text-lg font-medium`}
+                        onClick={showProposalTable}
+                    >
+                        My Events
+                    </button>
+
+                    <button
+                        className={`flex justify-center border border-bg-[#EEE1FF]  mt-4 py-2 px-4 w-fit text-black ${
+                            showEventTicketTable
+                                ? "bg-white "
+                                : "bg-gradient-to-r from-[#5522CC] to-[#ED4690] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                        } w-[130px] text-lg font-medium`}
                         onClick={showParticipant}
                     >
                         Tickets Purchased
