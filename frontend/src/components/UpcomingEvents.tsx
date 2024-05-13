@@ -9,16 +9,16 @@ type Props = {};
 const UpcomingEvents = (props: Props) => {
     return (
         <div className=" bg-white">
-            <div className="">
+            <div className="px-6 md:px-24">
                 <h1 className="flex justify-center text-center pt-10 text-black font-medium text-3xl">
                     Past Events
                 </h1>
 
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-4  mt-4 mx-24  pb-20">
+                <div className="flex flex-wrap md:gap-4 gap-0  mt-4 pb-20">
                     {UpcomingEventsData.map((upcomingEventData) => (
                         <div
                             key={upcomingEventData.id}
-                            className=" items-center mx-auto border-2 rounded-2xl shadow-md mt-10 "
+                            className="grow items-center mx-auto border-2 rounded-2xl shadow-md mt-10 w-[300px]"
                         >
                             <div className="flex flex-col">
                                 <div className="">
