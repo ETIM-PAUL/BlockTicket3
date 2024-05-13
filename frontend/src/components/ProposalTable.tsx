@@ -19,7 +19,7 @@ const ProposalTable = (props: Props) => {
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody className="text-lg">
+                    <tbody className="text-base">
                         {ProposalData.map((proposalData: any) => (
                             <tr
                                 key={proposalData.id}
@@ -35,7 +35,7 @@ const ProposalTable = (props: Props) => {
                                 <td>{proposalData.downvote}</td>
                                 <td>
                                     <button
-                                        className=" bg-white text-black hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] px-4   py-1 text-xl hover:bg-black"
+                                        className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1"
                                         onClick={() => setShowModal(true)}
                                     >
                                         Action

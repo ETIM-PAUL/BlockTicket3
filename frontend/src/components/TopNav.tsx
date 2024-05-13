@@ -8,7 +8,7 @@ const TopNav = () => {
   const [{ wallet }] = useConnectWallet();
 
   return (
-    <div className="navbar flex bg-gradient-to-r from-[#5522CC] to-[#ED4690] py-3 md:py-8 px-6 md:px-20">
+    <div className="navbar h-fit flex bg-gradient-to-r from-[#5522CC] to-[#ED4690] py-3 md:py-8 px-6 md:px-20">
       <div className="flex-1 ">
         <Logo />
       </div>

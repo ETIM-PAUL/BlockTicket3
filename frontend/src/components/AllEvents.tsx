@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import configFile from "../config.json";
 import { ethers } from "ethers";
+import Footer from "./Footer";
 
 type Props = {};
 
@@ -22,10 +23,6 @@ const AllEvents = (props: Props) => {
     const [loading, setLoading] = useState(false);
     const [allEvents, setAllEvents] = useState<any>([]);
     const [{ connectedChain }] = useSetChain();
-    const [reports, setReports] = useState<string[]>([]);
-    const [decodedReports, setDecodedReports] = useState<any>({});
-    const [metadata, setMetadata] = useState<any>({});
-    const [hexData, setHexData] = useState<boolean>(false);
     const [postData, setPostData] = useState<boolean>(false);
 
     const navigate = useNavigate();
@@ -61,9 +58,6 @@ const AllEvents = (props: Props) => {
         fetchData
             .then(response => response.json())
             .then(data => {
-                setReports(data.reports);
-                setMetadata({ status: data.status, exception_payload: data.exception_payload });
-
                 // Decode payload from each report
                 const decode = data.reports.map((report: Report) => {
                     return ethers.utils.toUtf8String(report.payload);
@@ -89,9 +83,7 @@ const AllEvents = (props: Props) => {
         }
     }
     return (
-        <div className="h-full">
-            <TopNav />
-
+        <div className="h-full flex flex-col">
             <div className="w-full bg-[#EEE1FF] h-2"></div>
             <div className="bg-base-100 p-8 bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
                 <div className="flex items-center md:mx-14 flex-row gap-2 md:gap-4 justify-start md:justify-end md:mt-6 ">
@@ -196,6 +188,7 @@ const AllEvents = (props: Props) => {
             </div>
 
             <div className="w-full bg-[#EEE1FF] h-2"></div>
+            <Footer />
         </div>
     );
 };

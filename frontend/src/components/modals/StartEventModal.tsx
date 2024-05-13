@@ -32,7 +32,7 @@ const StartEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails
                 // Search for the InputAdded event
                 const event = receipt.events?.find((e: any) => e.event === "InputAdded");
                 setEventDetails({ ...eventDetails, status: 1 })
-                toast.error("Event status has been changed successfully")
+                toast.success("Event status has been changed successfully")
                 setProcessing(false);
                 fetchEventDetails();
                 onClose();

@@ -2,7 +2,7 @@ import { cartesi } from "../assets";
 
 const Footer = () => {
     return (
-        <div className="w-[100%] rounded- flex  justify-between items-center md:flex-row flex-col px-20 py-10 bg-[#5522CC]">
+        <div className="w-[100%] rounded- flex  justify-between items-center md:flex-row flex-col px-20 py-[26.5px] bg-[#5522CC]">
             <p className="font-poppins font-normal text-lg text-center text-[#FFFFFF] leading-[27px] ml-1 ">
                 Copyright Ⓒ 2024 BlockTicket3. All Rights Reserved
             </p>

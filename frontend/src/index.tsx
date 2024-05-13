@@ -28,6 +28,7 @@ import CreateEventPage from "./pages/CreateEventPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
 import { ChakraProvider } from "@chakra-ui/react";
 import Wallet from "./pages/Wallet";
+import Footer from "./components/Footer";
 const container = document.getElementById("root");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
 
@@ -86,7 +87,9 @@ root.render(
     <React.StrictMode>
         <Web3OnboardProvider web3Onboard={web3Onboard}>
             <ChakraProvider>
-                <RouterProvider router={router} />
+                <div className="">
+                    <RouterProvider router={router} />
+                </div>
             </ChakraProvider>
             <ToastContainer />
         </Web3OnboardProvider>

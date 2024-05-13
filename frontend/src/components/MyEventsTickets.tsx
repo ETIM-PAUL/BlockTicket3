@@ -1,9 +1,75 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MyEventsTicketData } from "../constants";
+import { useNavigate } from "react-router";
+import { ethers } from "ethers";
+import configFile from "../config.json";
+import { useSetChain } from "@web3-onboard/react";
 
-type Props = {};
+type Props = {
+    tickets: any;
+    referrals: any;
+};
+const config: any = configFile;
+interface Report {
+    payload: string;
+}
 
-const MyEventsTickets = (props: Props) => {
+const MyEventsTickets = ({ tickets, referrals }: Props) => {
+    const navigate = useNavigate();
+    const [{ connectedChain }] = useSetChain();
+    const [postData, setPostData] = useState<boolean>(false);
+    const [allEvents, setAllEvents] = useState<any>([]);
+    const fetchEvents = async (str: string) => {
+        let payload = str;
+        if (!connectedChain) {
+            return;
+        }
+
+        let apiURL = ""
+
+        if (config[connectedChain.id]?.inspectAPIURL) {
+            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+        } else {
+            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+            return;
+        }
+
+        let fetchData: Promise<Response>;
+        if (postData) {
+            const payloadBlob = new TextEncoder().encode(payload);
+            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+        } else {
+            fetchData = fetch(`${apiURL}/${payload}`);
+        }
+        fetchData
+            .then(response => response.json())
+            .then(data => {
+                // Decode payload from each report
+                const decode = data.reports.map((report: Report) => {
+                    return ethers.utils.toUtf8String(report.payload);
+                });
+                const reportData = JSON.parse(decode)
+                setAllEvents(reportData)
+            });
+    }
+
+    useEffect(() => {
+        fetchEvents("get_all/")
+    }, [])
+
+    function getEventDetails(id: number, type: string) {
+        const eventDetails = allEvents.find((event: any) => event.id === id);
+        if (type === "title") {
+            return eventDetails?.title;
+        }
+        if (type === "status") {
+            return (eventDetails?.status === 1 ? "Ongoing" : eventDetails?.status === 0 ? "Pending" : eventDetails?.status === 3 ? "Ended" : "Cancelled");
+        }
+        if (type === "title") {
+            return eventDetails?.title;
+        }
+    }
+
     return (
         <div className="mt-10 pb-12">
             <div className="flex overflow-x-auto">
@@ -16,24 +82,26 @@ const MyEventsTickets = (props: Props) => {
                             <th>Status</th>
                             <th>Referral Count</th>
                             <th>Referral Code</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody className="text-lg">
-                        {MyEventsTicketData.map((myEventTicketData: any) => (
+                    <tbody className="text-base">
+                        {tickets && tickets?.length > 0 && tickets.map((ticket: any) => (
                             <tr
-                                key={myEventTicketData.id}
+                                key={ticket.id}
                                 className={
-                                    myEventTicketData.id % 2 === 0
+                                    ticket.id % 2 === 0
                                         ? "bg-[#9b76f2]"
                                         : "bg-[#8155ea]"
                                 }
                             >
-                                <td>{myEventTicketData.id}</td>
-                                <td>{myEventTicketData.title}</td>
-                                <td>{myEventTicketData.ticketType}</td>
-                                <td>{myEventTicketData.status}</td>
-                                <td>{myEventTicketData.referalCount}</td>
-                                <td>{myEventTicketData.referalCode}</td>
+                                <td>{ticket.id}</td>
+                                <td>{getEventDetails(ticket.event_id, "title")}</td>
+                                <td>{ticket.ticket_type}</td>
+                                <td>{getEventDetails(ticket.event_id, "status")}</td>
+                                <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.count ?? "N/A"}</td>
+                                <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.code ?? "N/A"}</td>
+                                <td><button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button></td>
                             </tr>
                         ))}
                     </tbody>
@@ -42,5 +110,5 @@ const MyEventsTickets = (props: Props) => {
         </div>
     );
 };
-
+// 300501
 export default MyEventsTickets;

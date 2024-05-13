@@ -1,26 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { UpcomingEventsData } from "../constants";
+import React, { useState } from "react";
 import { CiCalendarDate, CiLocationOn } from "react-icons/ci";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { Link } from "react-router-dom";
+import { formatDate, formatIPFS } from "../constants";
 
-type Props = {};
+type Props = {
+    events: any;
+};
+interface Report {
+    payload: string;
+}
 
-const MyEvents = (props: Props) => {
+const MyEvents = ({ events }: Props) => {
     const [loading, setLoading] = useState(false);
-    const [allEvents, setAllEvents] = useState([]);
-
-    useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
-            setAllEvents(UpcomingEventsData)
-        }, 1000);
-    }, [])
 
     return (
         <div>
             <div className="flex flex-wrap justify-start gap-4 mt-4 mx-1 pb-20">
-                {allEvents.length === 0 && !loading &&
+                {events && events?.length === 0 && !loading &&
                     <div
                         className="text-white font-medium text-lg md:text-3xl mt-10 "
                     >
@@ -28,7 +25,7 @@ const MyEvents = (props: Props) => {
                     </div>
                 }
 
-                {allEvents.length === 0 && loading &&
+                {events && events?.length === 0 && loading &&
                     <div
                         className="text-white font-medium text-lg md:text-3xl mt-10 "
                     >
@@ -36,17 +33,18 @@ const MyEvents = (props: Props) => {
                     </div>
                 }
 
-                {allEvents.length > 0 && allEvents.map((eventData: any) => (
+                {events && events?.length > 0 && events.map((eventData: any) => (
                     <div
                         key={eventData?.id}
-                        className="flex grow flex-col w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-10 "
+                        className="flex grow flex-col max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-10 "
                     >
                         <div className="fle">
                             <div className="">
                                 <img
-                                    src={eventData.flyer}
+                                    src={`https://ipfs.io/ipfs/${formatIPFS(eventData?.logoUrl)}`}
                                     alt="Event-Logo"
                                     className=" w-full rounded-t-lg"
+                                    width={300}
                                 />
                             </div>
 
@@ -59,7 +57,7 @@ const MyEvents = (props: Props) => {
                                     </h2>
                                     <p className="font-normal flex flex-row gap-1 text-[#6A6A6A]">
                                         <CiCalendarDate className="w-7 h-7" />
-                                        {eventData.date}
+                                        {formatDate(eventData.date)}
                                     </p>
 
                                     <p className="text-lg flex flex-row gap-1 text-[#6A6A6A]">
@@ -72,7 +70,7 @@ const MyEvents = (props: Props) => {
                                     <p className=" flex flex-row gap-1 text-lg  text-[#6A6A6A] pb-4">
                                         <GiTakeMyMoney className="w-7 h-7" />
                                         <span>
-                                            {eventData.price}
+                                            {eventData.tickets && JSON.parse(eventData.tickets)[0].price}ETH
                                         </span>{" "}
                                     </p>
                                 </div>

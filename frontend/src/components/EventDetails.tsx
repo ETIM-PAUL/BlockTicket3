@@ -22,6 +22,7 @@ import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import { toast } from "react-toastify";
 import configFile from "../config.json";
 import { ethers } from "ethers";
+import Footer from "./Footer";
 
 const config: any = configFile;
 interface Report {
@@ -36,6 +37,7 @@ const EventDetails = () => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [eventDetails, setEventDetails] = useState<any>();
     const [eventParticipants, setEventParticipants] = useState<any>([]);
+    const [eventReferrals, setEventReferrals] = useState<any>([]);
     const [showStartEventModal, setShowStartEventModal] =
         useState<boolean>(false);
     const [showEndEventModal, setShowEndEventModal] = useState<boolean>(false);
@@ -127,21 +129,67 @@ const EventDetails = () => {
                     return ethers.utils.toUtf8String(report.payload);
                 });
                 const reportData = JSON.parse(decode)
-                console.log("parsed Reports:", reportData);
                 setEventDetails(reportData.event)
                 setEventParticipants(reportData.event_tickets ?? [])
                 setLoading(false);
             });
     }
 
+    const fetchReferralCodes = async (str: string) => {
+        let payload = str;
+        if (!connectedChain) {
+            return;
+        }
+
+        let apiURL = ""
+
+        if (config[connectedChain.id]?.inspectAPIURL) {
+            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+        } else {
+            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+            return;
+        }
+
+        let fetchData: Promise<Response>;
+        fetchData = fetch(`${apiURL}/${payload}`);
+
+        fetchData
+            .then(response => response.json())
+            .then(data => {
+                // Decode payload from each report
+                const decode = data.reports.map((report: Report) => {
+                    return ethers.utils.toUtf8String(report.payload);
+                });
+                const reportData = JSON.parse(decode)
+                setEventReferrals(reportData);
+            });
+    }
+
+    const showProposalModal = () => {
+        const participants = JSON.parse(eventDetails.tickets)
+        console.log(participants)
+        if (wallet?.accounts[0]?.address === eventDetails?.organizer) {
+            toast.error("Unauthorized access. You'are Event Organizer");
+            return;
+        }
+        if (!participants?.find((participant: any) => participant.address === wallet?.accounts[0]?.address)) {
+            toast.error("Not Event Participant");
+            return;
+        } else {
+            setShowNewProposalModal(
+                true
+            )
+        }
+    }
+
     useEffect(() => {
         fetchEventDetails(`get/${Number(id)}`)
+        fetchReferralCodes(`get_event_referrals/${Number(id)}`)
         // If no eventData was found, show a message
     }, [])
 
     return (
         <>
-            <TopNav />
             {eventDetails?.id &&
                 <main className="min-h-screen bg-white">
                     <div className="bg-white px-3 py-4 md:px-20 md:py-10 flex flex-col items-stretch">
@@ -268,7 +316,7 @@ const EventDetails = () => {
                                             <button
                                                 className="w-fit bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] px-6 py-2 text-lg mb-4 font-medium"
                                                 onClick={() =>
-                                                    setShowNewProposalModal(true)
+                                                    showProposalModal()
                                                 }
                                             >
                                                 Add Proposal
@@ -283,6 +331,8 @@ const EventDetails = () => {
                                     id={Number(id)}
                                     isVisible={showModal}
                                     organizer={eventDetails.organizer}
+                                    referral={eventDetails.referral}
+                                    eventReferrals={eventReferrals}
                                     tickets={JSON.parse(eventDetails.tickets)}
                                     onClose={() => setShowModal(false)}
                                     fetchEventDetails={() =>
@@ -330,6 +380,7 @@ const EventDetails = () => {
                                 </div>
 
                                 <NewProposalModal
+                                    tickets={JSON.parse(eventDetails.tickets)}
                                     isVisible={showNewProposalModal}
                                     onClose={() =>
                                         setShowNewProposalModal(false)
@@ -344,6 +395,8 @@ const EventDetails = () => {
                             </div>
                         </div>
                     </div>
+
+                    <Footer />
                 </main>
             }
         </>

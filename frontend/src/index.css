@@ -1,10 +1,12 @@
+body {
+    background: #fff !important;
+    margin: 0 auto;
+    height: 100%;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-    background: #fff !important;
-}
 
 @keyframes colorChange {
     0% {
@@ -53,8 +55,6 @@ button {
     background-color: rgb(212, 223, 223);
     border: none;
     border-radius: 3px;
-    padding: 0.5em;
-    margin: 0.5em;
 }
 
 .deposit-balance {}
