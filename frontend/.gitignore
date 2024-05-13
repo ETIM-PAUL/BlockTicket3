@@ -2,3 +2,17 @@ dist
 generated-src
 node_modules
 .vscode
+
+
+
+
+
+src/assets/happyPeople.png
+src/assets/scrollLogo.png
+src/assets/scrollLogo.png:Zone.Identifier
+src/components/LandingPage/
+src/components/UpcomingEvents2.tsx
+src/pages/HomePage2.tsx
+src/assets/index.js
+src/layout/TopNav.jsx
+
