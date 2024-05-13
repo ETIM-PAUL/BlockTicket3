@@ -1,46 +1,111 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from "react";
+import { bgImage, heroImage } from "../assets";
 import Logo from "./Logo";
+import { Link } from "react-router-dom";
+
 import WalletConnect from "./WalletConnect";
-import { useConnectWallet } from '@web3-onboard/react';
+import { useConnectWallet } from "@web3-onboard/react";
 
-const TopNav = () => {
-  const [{ wallet }] = useConnectWallet();
+type Props = {};
 
-  return (
-    <div className="navbar flex bg-gradient-to-r from-[#5522CC] to-[#ED4690] py-3 md:py-8 px-6 md:px-20">
-      <div className="flex-1 ">
-        <Logo />
-      </div>
+const TopNav = (props: Props) => {
+    const [{ wallet }] = useConnectWallet();
+    const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-      <div className='hidden md:flex'>
-        <div className="flex gap-3">
-          {wallet &&
-            <Link
-              to="/user-dashboard"
-              className="font-medium rounded-md text-xl px-4 py-3 text-center bg-white text-black"
-            >
-              Dashboard
-            </Link>
-          }
-          {wallet &&
-            <Link
-              to="/my-wallet"
-              className="font-medium rounded-md text-xl px-4 py-3 text-center bg-white text-black"
-            >
-              My Wallet
-            </Link>
-          }
-        </div>
-        <WalletConnect />
-      </div>
+    const toggleMobileNav = () => {
+        setMobileNavOpen(!mobileNavOpen);
+    };
 
-      {/* mobile nav */}
-      <div className='block md:hidden'>
-        <span>Mobile</span>
-      </div>
-    </div>
-  )
-}
+    return (
+        <>
+            {/* Background Image and Hero */}
+            <nav className="bg-white border-gray-200 px-3 py-3 md:py-2 md:px-24  bg-gradient-to-r from-[#5522CC] to-[#ED4690]">
+                <div className="flex items-center  justify-between">
+                    <div className="w-full flex flex-wrap  justify-between md:mx-auto  md:p-4 mx-10">
+                        <div className="md:-ml-8 mt- md:mt-0 ">
+                            <Logo />
+                        </div>
+                        <div className=" hidden md:flex  -mr-8  md:order-2 md:space-x-0 rtl:space-x-reverse gap-6">
+                            {wallet && (
+                                <button>
+                                    <Link
+                                        to="/user-dashboard"
+                                        className="font-medium  rounded-lg text-base md:text-lg p-2 md:px-4 md:py-3 text-center bg-white text-black"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                </button>
+                            )}
+                            {wallet && (
+                                <button>
+                                    <Link
+                                        to="/my-wallet"
+                                        className="font-medium rounded-lg text-base md:text-lg p-2 md:px-4 md:py-3 text-center bg-white text-black"
+                                    >
+                                        My Wallet
+                                    </Link>
+                                </button>
+                            )}
 
-export default TopNav
+                            <WalletConnect />
+                        </div>
+                    </div>
+
+                    {/* Mobile Nav */}
+
+                    <button
+                        className="w-16 block md:hidden"
+                        onClick={toggleMobileNav}
+                    >
+                        <svg
+                            className="w-7 h-7 "
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 17 14"
+                        >
+                            <path
+                                stroke="white"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M1 1h15M1 7h15M1 13h15"
+                            />
+                        </svg>
+                    </button>
+                </div>
+
+                {mobileNavOpen && (
+                    <div className="w-full px-">
+                        <div className="flex md:hidden flex-col items-end absolute top-14 menu menu-sm dropdown-content mt-3 z-40 py-2 px-8 shadow-xl bg-base-100 w-full rounded-sm space-y-5 ">
+                            <li>
+                                {wallet && (
+                                    <Link
+                                        to="/user-dashboard"
+                                        className="font-medium rounded-md  text-base md:text-xl px-4 py-3 text-center bg-white text-black"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                )}
+                            </li>
+                            <li>
+                                {wallet && (
+                                    <Link
+                                        to="/my-wallet"
+                                        className="font-medium rounded-md  text-base md:text-xl px-4 py-3 text-center bg-white text-black"
+                                    >
+                                        My Wallet
+                                    </Link>
+                                )}
+                            </li>
+                            <li>
+                                <WalletConnect />
+                            </li>
+                        </div>
+                    </div>
+                )}
+            </nav>
+        </>
+    );
+};
+export default TopNav;
