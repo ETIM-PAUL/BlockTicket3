@@ -8,6 +8,7 @@ const HomePage = (props: Props) => {
     return (
         <div className="">
             <Home />
+
             <Footer />
         </div>
     );
