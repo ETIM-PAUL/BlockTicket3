@@ -29,10 +29,10 @@ import Footer from "../components/Footer";
 import { toast } from "react-toastify";
 import { useWallets } from "@web3-onboard/react";
 import { useNavigate } from "react-router";
+import { DappAddress } from "../constants";
 
 
 const Wallet: FC = () => {
-    const [dappAddress, setDappAddress] = useState<string>("0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C");
     const [connectedWallet] = useWallets();
     const navigate = useNavigate();
     useEffect(() => {
@@ -55,7 +55,7 @@ const Wallet: FC = () => {
                             <br />
                             <Balance />
                             <br /> <br />
-                            <Transfers dappAddress={dappAddress} />
+                            <Transfers dappAddress={DappAddress} />
                             <br /> <br />
                         </SimpleGrid>
                     </GraphQLProvider>

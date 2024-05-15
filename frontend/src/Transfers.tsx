@@ -41,6 +41,8 @@ import { Text } from "@chakra-ui/react";
 import { Vouchers } from "./Vouchers";
 import { Notices } from "./Notices";
 import { Reports } from "./Reports";
+import { toast } from "react-toastify";
+import { DappAddress } from "./constants";
 
 interface IInputPropos {
   dappAddress: string;
@@ -52,13 +54,11 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
   const [connectedWallet] = useWallets();
   const [input, setInput] = useState<string>("");
   const [dappRelayedAddress, setDappRelayedAddress] = useState<boolean>(false)
-  const [hexInput, setHexInput] = useState<boolean>(false);
-  const [erc20Amount, setErc20Amount] = useState<number>(0);
-  const [erc20Token, setErc20Token] = useState<string>("");
-  const [erc721Id, setErc721Id] = useState<number>(0);
-  const [erc721, setErc721] = useState<string>("");
   const [etherAmount, setEtherAmount] = useState<string>("0");
+  const [processing, setProcessing] = useState<boolean>(false)
+
   const provider = new ethers.providers.Web3Provider(connectedWallet.provider);
+
   const sendAddress = async (str: string) => {
     if (rollups) {
       try {
@@ -67,58 +67,6 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
       } catch (e) {
         console.log(`${e}`);
       }
-    }
-  };
-
-  const depositErc20ToPortal = async (token: string, amount: number) => {
-    try {
-      if (rollups && provider) {
-        const data = ethers.utils.toUtf8Bytes(
-          `Deposited (${amount}) of ERC20 (${token}).`
-        );
-        //const data = `Deposited ${args.amount} tokens (${args.token}) for DAppERC20Portal(${portalAddress}) (signer: ${address})`;
-        const signer = provider.getSigner();
-        const signerAddress = await signer.getAddress();
-
-        const erc20PortalAddress = rollups.erc20PortalContract.address;
-        const tokenContract = signer
-          ? IERC20__factory.connect(token, signer)
-          : IERC20__factory.connect(token, provider);
-
-        // query current allowance
-        const currentAllowance = await tokenContract.allowance(
-          signerAddress,
-          erc20PortalAddress
-        );
-        if (ethers.utils.parseEther(`${amount}`) > currentAllowance) {
-          // Allow portal to withdraw `amount` tokens from signer
-          const tx = await tokenContract.approve(
-            erc20PortalAddress,
-            ethers.utils.parseEther(`${amount}`)
-          );
-          const receipt = await tx.wait(1);
-          const event = (
-            await tokenContract.queryFilter(
-              tokenContract.filters.Approval(),
-              receipt.blockHash
-            )
-          ).pop();
-          if (!event) {
-            throw Error(
-              `could not approve ${amount} tokens for DAppERC20Portal(${erc20PortalAddress})  (signer: ${signerAddress}, tx: ${tx.hash})`
-            );
-          }
-        }
-
-        await rollups.erc20PortalContract.depositERC20Tokens(
-          token,
-          propos.dappAddress,
-          ethers.utils.parseEther(`${amount}`),
-          data
-        );
-      }
-    } catch (e) {
-      console.log(`${e}`);
     }
   };
 
@@ -144,40 +92,26 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
   const withdrawEther = async (amount: number) => {
     try {
       if (rollups && provider) {
+        setProcessing(true);
         let ether_amount = ethers.utils.parseEther(String(amount)).toString();
-        console.log("ether after parsing: ", ether_amount);
         const input_obj = {
-          method: "ether_withdraw",
+          action: "ether_withdraw",
           args: {
             amount: ether_amount,
           },
         };
         const data = JSON.stringify(input_obj);
         let payload = ethers.utils.toUtf8Bytes(data);
-        await rollups.inputContract.addInput(propos.dappAddress, payload);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
 
-  const withdrawErc20 = async (amount: number, address: String) => {
-    try {
-      if (rollups && provider) {
-        let erc20_amount = ethers.utils.parseEther(String(amount)).toString();
-        console.log("erc20 after parsing: ", erc20_amount);
-        const input_obj = {
-          method: "erc20_withdraw",
-          args: {
-            erc20: address,
-            amount: erc20_amount,
-          },
-        };
-        const data = JSON.stringify(input_obj);
-        let payload = ethers.utils.toUtf8Bytes(data);
-        await rollups.inputContract.addInput(propos.dappAddress, payload);
+        const result = await rollups.inputContract.addInput(DappAddress, payload);
+        const receipt = await result.wait(1);
+        // Search for the InputAdded event
+        const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+        toast.success("Ethers withdraw voucher created successfully")
+        setProcessing(false);
       }
     } catch (e) {
+      setProcessing(false);
       console.log(e);
     }
   };
@@ -305,9 +239,9 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                       onClick={() => {
                         withdrawEther(Number(etherAmount));
                       }}
-                      disabled={!rollups}
+                      disabled={!rollups || processing}
                     >
-                      Withdraw
+                      {processing ? "Processing" : "Withdraw"}
                     </Button>
                   </Stack>
                   <br />

@@ -74,14 +74,13 @@ export const Balance: React.FC = () => {
       .then(data => {
         setReports(data.reports);
         setMetadata({ status: data.status, exception_payload: data.exception_payload });
-        console.log("Metadata:", data.reports);
 
         // Decode payload from each report
         const decode = data.reports.map((report: Report) => {
           return ethers.utils.toUtf8String(report.payload);
         });
         const reportData = JSON.parse(decode)
-        console.log("Report data: ", reportData)
+
         setDecodedReports(reportData)
         //console.log(parseEther("1000000000000000000", "gwei"))
       });

@@ -65,7 +65,7 @@ export const useRollups = (dAddress: string): RollupsContracts | undefined => {
                 connectedWallet.provider
             );
             const signer = provider.getSigner();
-            console.log(chain)
+            // console.log(chain)
             let dappRelayAddress = "";
             if (config[chain.id]?.DAppRelayAddress) {
                 dappRelayAddress = config[chain.id].DAppRelayAddress;
