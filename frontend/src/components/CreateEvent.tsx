@@ -7,10 +7,14 @@ import { toast } from "react-toastify";
 import { ethers } from "ethers";
 import { useRollups } from "../useRollups";
 import { DappAddress } from "../constants";
-import { useConnectWallet, useWallets } from "@web3-onboard/react";
+import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
+import configFile from "../config.json";
 
 type Props = {};
-
+interface Report {
+    payload: string;
+}
+const config: any = configFile;
 interface TicketTypes {
     id: number;
     ticketType: string;
@@ -27,10 +31,12 @@ const CreateEvent = (props: Props) => {
     const [ticketType, setTicketType] = useState('');
     const [price, setPrice] = useState(0);
     const [ticketTypes, setTicketTypes] = useState<Array<TicketTypes>>([]);
-    const [dao, setDao] = useState("");
-    const [referral, setReferral] = useState("");
+    const [dao, setDao] = useState("false");
+    const [referral, setReferral] = useState("false");
     const rollups = useRollups(DappAddress);
     const [connectedWallet] = useWallets();
+    const [{ connectedChain }] = useSetChain();
+    const [postData, setPostData] = useState<boolean>(false);
 
     //Event Logo
     const [logoUrl, updateLogoUrl] = useState("");
@@ -38,6 +44,7 @@ const CreateEvent = (props: Props) => {
     const [logoIpfsLoading, setLogoIpfsLoading] = useState(false);
 
     const [{ wallet }] = useConnectWallet();
+    const [balance, setBalance] = useState<string>()
     const navigate = useNavigate();
 
 
@@ -47,8 +54,43 @@ const CreateEvent = (props: Props) => {
     const [nftIpfsLoading, setNftIpfsLoading] = useState(false);
     const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
+    const getBalance = async (str: string) => {
+        let payload = str;
+
+        if (!connectedChain) {
+            return;
+        }
+
+        let apiURL = ""
+
+        if (config[connectedChain.id]?.inspectAPIURL) {
+            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+        } else {
+            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+            return;
+        }
+
+        let fetchData: Promise<Response>;
+        if (postData) {
+            const payloadBlob = new TextEncoder().encode(payload);
+            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+        } else {
+            fetchData = fetch(`${apiURL}/${payload}`);
+        }
+        fetchData
+            .then(response => response.json())
+            .then(data => {
+                // Decode payload from each report
+                const decode = data.reports.map((report: Report) => {
+                    return ethers.utils.toUtf8String(report.payload);
+                });
+                const reportData: any = JSON.parse(decode)
+                setBalance(ethers.utils.formatEther(reportData?.ether))
+            });
+    };
+
     async function uploadNftIPFS() {
-        const file = logoFile;
+        const file = nftFile;
         try {
             if (file !== undefined) {
                 setNftIpfsLoading(true);
@@ -74,6 +116,7 @@ const CreateEvent = (props: Props) => {
                 updateNftUrl(`ipfs://${response.data.IpfsHash}/`);
                 queryPinataFiles();
                 setNftIpfsLoading(false);
+                return true;
             } else {
                 // toast.error("Please upload a document detailing the project outlines, aims and objectives");
                 setNftIpfsLoading(false);
@@ -111,6 +154,7 @@ const CreateEvent = (props: Props) => {
                 updateLogoUrl(`ipfs://${response.data.IpfsHash}/`);
                 queryPinataFiles();
                 setLogoIpfsLoading(false);
+                return true;
             } else {
                 // toast.error("Please upload a document detailing the project outlines, aims and objectives");
                 setLogoIpfsLoading(false);
@@ -123,8 +167,25 @@ const CreateEvent = (props: Props) => {
     }
 
     async function createEvent() {
+        console.log(referral)
+        if (Number(balance) < 0.06 && referral === "true") {
+            toast.error("Insufficient Funds for Referral based Event. Please Deposit into the DAPP")
+            return;
+        }
+        if (Number(balance) < 0.04 && dao === "true") {
+            toast.error("Insufficient Funds for DAO based Event. Please Deposit into the DAPP")
+            return;
+        }
+        if (Number(balance) < 0.02 && dao === "false" && referral === "false") {
+            toast.error("Insufficient Funds for Normal Event. Please Deposit into the DAPP")
+            return;
+        }
+        if (Number(balance) < 0.1 && dao === "false" && referral === "false") {
+            toast.error("Insufficient Funds for Full-Packaged Event. Please Deposit into the DAPP")
+            return;
+        }
         if (!title || !date || !location || !capacity) {
-            toast.error("Incomplete Form");
+            toast.error("Incomplete Event Details");
             return;
         }
         if (ticketTypes.length === 0) {
@@ -141,7 +202,10 @@ const CreateEvent = (props: Props) => {
         }
         try {
             if (rollups) {
+                setIsSubmitLoading(true)
                 try {
+                    await uploadIPFS();
+                    await uploadNftIPFS();
                     const payload = {
                         title,
                         date,
@@ -155,8 +219,7 @@ const CreateEvent = (props: Props) => {
                         nftUrl,
                         logoUrl
                     }
-
-                    setIsSubmitLoading(true)
+                    console.log(payload)
                     let str = `{"action": "create_event", "title": "${payload.title}", "date": "${payload.date}", "location": "${payload.location}", "tickets": ${JSON.stringify(ticketTypes)}, "capacity": ${payload.capacity}, "organizer": "${wallet?.accounts[0]?.address}", "dao": ${payload.dao}, "referral": ${payload.referral}, "minReferrals": ${payload.minReferal}, "referralDiscount": ${payload.referalDiscount}, "tokenUrl": "${payload.nftUrl}", "logoUrl": "${payload.logoUrl}"}`
                     let data = ethers.utils.toUtf8Bytes(str);
 
@@ -176,9 +239,11 @@ const CreateEvent = (props: Props) => {
 
                 }
                 catch (e) {
+                    setIsSubmitLoading(false)
                     console.log(e);
                 }
             }
+            setIsSubmitLoading(false)
         } catch (error) {
             setIsSubmitLoading(false)
             console.log("Error", error);
@@ -234,6 +299,7 @@ const CreateEvent = (props: Props) => {
 
     useEffect(() => {
         testPinataConnection();
+        getBalance(`balance/${wallet?.accounts[0]?.address}`)
     });
 
     return (
@@ -247,14 +313,13 @@ const CreateEvent = (props: Props) => {
                 >
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-[#5522CC] to-[#ED4690] opacity-85"></div>
 
-                    <div className="flex flex-row h-full z-100 justify-center absolute items-center">
+                    <div className="flex flex-row h-full z-100 justify-center mx-16 absolute items-center">
                         <div className="flex flex-col w-full">
-                            <p className="font-medium text-lg md:text-3xl text-white sm:leading-[50px] leading-[20px] w-full text-center">
+                            <p className="font-bold text-lg md:text-3xl text-white sm:leading-[50px] leading-[20px] w-full text-center">
                                 Ticketing and Event Management Made Easy{" "}
                             </p>
-                            <p className="text-lg mt-3 text-white text-center mx-16">
-                                Create your event, manage your ticketing
-                                and allow user to create/vote for proposals there are participating and give users referral
+                            <p className="text-lg mt-3 text-white text-center">
+                                Create your event, manage your ticketing, allow participants to create/vote proposals and give users referral
                                 bonus for inviting the friends and fans to your event.
                             </p>
                         </div>
@@ -269,6 +334,15 @@ const CreateEvent = (props: Props) => {
                             <h2 className="text-2xl font-semibold  justify-center flex">
                                 Create Event
                             </h2>
+
+                            <div>
+                                <ul className="text-red-500 text-[14px] font-bold">
+                                    <li>Normal Event - 0.02ETH</li>
+                                    <li>DAO Event - 0.04ETH</li>
+                                    <li>Referral Event - 0.06ETH</li>
+                                    <li>Full-Package Event - 0.1ETH</li>
+                                </ul>
+                            </div>
 
                             <div className="flex flex-col gap space-y-1 w-full ">
                                 <label htmlFor="title">Title</label>
@@ -361,7 +435,7 @@ const CreateEvent = (props: Props) => {
 
                             <div className="flex flex-col gap space-y-1 ">
                                 <label htmlFor="capacity">
-                                    DAO Inclusive Event
+                                    DAO Inclusive Event (Optional)
                                 </label>
                                 <select
                                     value={dao}
@@ -376,7 +450,7 @@ const CreateEvent = (props: Props) => {
 
                             <div className="flex flex-col gap space-y-1 ">
                                 <label htmlFor="capacity">
-                                    Referral Inclusive Event
+                                    Referral Inclusive Event (Optional)
                                 </label>
                                 <select
                                     value={referral}
@@ -425,7 +499,7 @@ const CreateEvent = (props: Props) => {
 
                             <div className="flex flex-col space-y-1 mt-6">
                                 <label htmlFor="companyLogo">
-                                    Upload Event Logo/Flyer to IPFS
+                                    Upload Event Logo/Flyer
                                 </label>
                                 <div className="flex justify-center gap-3">
                                     <input
@@ -438,7 +512,7 @@ const CreateEvent = (props: Props) => {
                                         className="w-full  border px-1 py-2"
                                         placeholder="Upload Event Logo to IPFS"
                                     />
-                                    <button
+                                    {/* <button
                                         disabled={logoIpfsLoading || logoFile === ""}
                                         onClick={() => uploadIPFS()}
                                         className="w-full disabled:cursor-not-allowed disabled:opacity-50 py-2 bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold"
@@ -446,10 +520,10 @@ const CreateEvent = (props: Props) => {
                                         {logoIpfsLoading
                                             ? "Uploading"
                                             : "Logo IPFS Upload"}
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
-                            {logoUrl !== "" && (
+                            {/* {logoUrl !== "" && (
                                 <div className="grid space-y-2 mt-4">
                                     <label>Uploaded Logo Link</label>
                                     <input
@@ -459,11 +533,11 @@ const CreateEvent = (props: Props) => {
                                         className="h-[50px] bg-transparent border border-[#999999]  outline-none p-3 "
                                     />
                                 </div>
-                            )}
+                            )} */}
 
                             <div className="flex flex-col space-y-1 mt-6">
                                 <label htmlFor="companyLogo">
-                                    Upload Event NFT to IPFS
+                                    Upload Event NFT (POAP)
                                 </label>
                                 <div className="flex justify-center gap-3">
                                     <input
@@ -476,7 +550,7 @@ const CreateEvent = (props: Props) => {
                                         className="w-full  border px-1 py-2"
                                         placeholder="Upload Logo Company Logo to IPFS"
                                     />
-                                    <button
+                                    {/* <button
                                         disabled={nftIpfsLoading || nftFile === ""}
                                         onClick={() => uploadNftIPFS()}
                                         className=" w-full disabled:cursor-not-allowed disabled:opacity-50  bg-gradient-to-r from-[#5522CC] to-[#8352f5] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-md font-semibold"
@@ -484,10 +558,10 @@ const CreateEvent = (props: Props) => {
                                         {nftIpfsLoading
                                             ? "Uploading"
                                             : "NFT IPFS Upload"}
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
-                            {nftUrl !== "" && (
+                            {/* {nftUrl !== "" && (
                                 <div className="grid space-y-2 mt-4">
                                     <label>Uploaded NFT Link</label>
                                     <input
@@ -497,14 +571,14 @@ const CreateEvent = (props: Props) => {
                                         className="h-[50px] bg-transparent border border-[#999999]  outline-none p-3 "
                                     />
                                 </div>
-                            )}
+                            )} */}
                         </div>
 
                         <div className="flex mt-4  w-full pb-10">
                             <button
                                 onClick={() => createEvent()}
                                 type="submit"
-                                disabled={isSubmitLoading || logoIpfsLoading || nftIpfsLoading || !logoUrl || !nftUrl}
+                                disabled={isSubmitLoading || logoIpfsLoading || nftIpfsLoading}
                                 className={`${(!isSubmitLoading || !logoIpfsLoading || !nftIpfsLoading)
                                     ? " bg-gradient-to-r from-[#5522CC] to-[#8352f5]"
                                     : "bg-gray-300 text-white cursor-not-allowed"

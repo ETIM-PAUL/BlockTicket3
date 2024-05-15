@@ -18,8 +18,8 @@ const ParticipantTable = ({ eventParticipants }: Props) => {
                     </div>
 
                     :
-                    <table className=" flex table  text-white -space-y-4 h-[100px] ">
-                        <thead className="text-black font-semibold text-lg bg-white">
+                    <table className=" flex table  text-white -space-y-4 ">
+                        <thead className="text-black font-semibold text-base bg-white">
                             <tr>
                                 <th>Id</th>
                                 <th>Participant</th>

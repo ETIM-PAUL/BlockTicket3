@@ -80,7 +80,6 @@ export const Balance: React.FC = () => {
         const decode = data.reports.map((report: Report) => {
           return ethers.utils.toUtf8String(report.payload);
         });
-        console.log("Decoded Reports:", decode);
         const reportData = JSON.parse(decode)
         console.log("Report data: ", reportData)
         setDecodedReports(reportData)

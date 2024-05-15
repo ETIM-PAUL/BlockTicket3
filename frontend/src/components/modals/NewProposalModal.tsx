@@ -1,17 +1,58 @@
 import React, { useState } from "react";
 
-import NewProposalForm from "../NewProposalForm";
+import { toast } from "react-toastify";
+import { useRollups } from "../../useRollups";
+import { DappAddress } from "../../constants";
+import { ethers } from "ethers";
 
 type Props = {
-    tickets: any;
+    id: number;
+    fetchEventDetails: any;
     isVisible: boolean;
     onClose: boolean | void | string | any;
 };
 
-const NewProposalModal = ({ isVisible, onClose, tickets }: Props) => {
-    const [proposal, setProposal] = useState();
+const NewProposalModal = ({ isVisible, onClose, fetchEventDetails, id }: Props) => {
+    const [proposal, setProposal] = useState("");
+    const [processing, setProcessing] = useState<boolean>(false)
+    const rollups = useRollups(DappAddress);
+
     if (!isVisible) return null;
 
+    const createProposal = async () => {
+        if (proposal.length > 100) {
+            toast.error("Proposal can't exceed 100 characters");
+            return;
+        }
+        if (proposal.length <= 5) {
+            toast.error("Proposal too short. At least 5 characters");
+            return;
+        }
+        try {
+            if (rollups) {
+                try {
+                    setProcessing(true);
+                    let str = `{"action": "create_proposal", "id": ${id}, "proposal":"${proposal}"}`
+                    let data = ethers.utils.toUtf8Bytes(str);
+
+                    const result = await rollups.inputContract.addInput(DappAddress, data);
+                    const receipt = await result.wait(1);
+                    // Search for the InputAdded event
+                    const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+                    setProposal("");
+                    toast.success("Proposal created successfully")
+                    setProcessing(false);
+                    fetchEventDetails();
+                    onClose();
+                } catch (error) {
+                    console.log("error", error)
+                    setProcessing(false)
+                }
+            }
+        } catch (error) {
+            setProcessing(true)
+        }
+    };
     const handleClose = (e: any) => {
         onClose();
     };
@@ -23,7 +64,6 @@ const NewProposalModal = ({ isVisible, onClose, tickets }: Props) => {
             <div
                 className="fixed inset-0 flex justify-center px-8 items-center z-50"
                 id="wrapper"
-                onClick={handleClose}
             >
                 <div className="w-full md:max-w-[800px]  bg-gradient-to-l from-[#5522CC] to-[#ED4690] flex flex-col relative ">
                     <div className=" md:p-14 rounded">
@@ -47,15 +87,23 @@ const NewProposalModal = ({ isVisible, onClose, tickets }: Props) => {
                                     ></textarea>
                                 </div>
 
-                                <div className="flex  justify-between gap-8 mx-4">
-                                    <button onClick={handleClose} className="text-lg font-semibold justify-center p-4 text-black bg-white w-full flex hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]">
+                                <div className="flex  justify-between gap-2 md:gap-8 md:mx-6">
+                                    <button
+                                        disabled={processing}
+                                        onClick={handleClose} className="text-lg disabled:cursor-not-allowed font-semibold justify-center p-2 text-black bg-white w-full flex hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]">
                                         Cancel
                                     </button>
                                     <button
+                                        onClick={() => createProposal()}
+                                        disabled={processing}
                                         type="submit"
-                                        className="text-lg font-semibold text-center justify-center p-4  w-full  flex bg-gradient-to-r from-[#5522CC] to-[#8352f5]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] "
+                                        className="text-lg disabled:cursor-not-allowed disabled:opacity-50 font-semibold text-center justify-center p-2  w-full  flex bg-gradient-to-r from-[#5522CC] to-[#8352f5]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] "
                                     >
-                                        Submit
+                                        {(!processing) ?
+                                            "Submit"
+                                            :
+                                            "Processing"
+                                        }
                                     </button>
                                 </div>
                             </div>

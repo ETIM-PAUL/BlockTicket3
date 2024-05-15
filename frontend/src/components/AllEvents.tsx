@@ -33,41 +33,44 @@ const AllEvents = (props: Props) => {
     };
 
     const fetchEvents = async (str: string) => {
-        setLoading(true);
-        let payload = str;
-        if (!connectedChain) {
-            return;
-        }
+        try {
+            setLoading(true);
+            let payload = str;
+            if (!connectedChain) {
+                return;
+            }
 
-        let apiURL = ""
+            let apiURL = ""
 
-        if (config[connectedChain.id]?.inspectAPIURL) {
-            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
-        } else {
-            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
-            return;
-        }
+            if (config[connectedChain.id]?.inspectAPIURL) {
+                apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+            } else {
+                console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+                return;
+            }
 
-        let fetchData: Promise<Response>;
-        if (postData) {
-            const payloadBlob = new TextEncoder().encode(payload);
-            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
-        } else {
-            fetchData = fetch(`${apiURL}/${payload}`);
-        }
-        fetchData
-            .then(response => response.json())
-            .then(data => {
-                // Decode payload from each report
-                const decode = data.reports.map((report: Report) => {
-                    return ethers.utils.toUtf8String(report.payload);
+            let fetchData: Promise<Response>;
+            if (postData) {
+                const payloadBlob = new TextEncoder().encode(payload);
+                fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+            } else {
+                fetchData = fetch(`${apiURL}/${payload}`);
+            }
+            fetchData
+                .then(response => response.json())
+                .then(data => {
+                    // Decode payload from each report
+                    const decode = data.reports.map((report: Report) => {
+                        return ethers.utils.toUtf8String(report.payload);
+                    });
+                    const reportData = JSON.parse(decode)
+                    setAllEvents(reportData)
+                    setLoading(false);
                 });
-                const reportData = JSON.parse(decode)
-                console.log("parsed Reports:", reportData);
-                setAllEvents(reportData)
-                setLoading(false);
-                //console.log(parseEther("1000000000000000000", "gwei"))
-            });
+        } catch (error) {
+            console.log(error)
+            setAllEvents([])
+        }
     }
 
     useEffect(() => {

@@ -37,6 +37,7 @@ const EventDetails = () => {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [eventDetails, setEventDetails] = useState<any>();
     const [eventParticipants, setEventParticipants] = useState<any>([]);
+    const [eventProposals, setEventProposals] = useState<any>([]);
     const [eventReferrals, setEventReferrals] = useState<any>([]);
     const [showStartEventModal, setShowStartEventModal] =
         useState<boolean>(false);
@@ -131,6 +132,7 @@ const EventDetails = () => {
                 const reportData = JSON.parse(decode)
                 setEventDetails(reportData.event)
                 setEventParticipants(reportData.event_tickets ?? [])
+                setEventProposals(reportData.event_proposals ?? [])
                 setLoading(false);
             });
     }
@@ -166,13 +168,11 @@ const EventDetails = () => {
     }
 
     const showProposalModal = () => {
-        const participants = JSON.parse(eventDetails.tickets)
-        console.log(participants)
-        if (wallet?.accounts[0]?.address === eventDetails?.organizer) {
+        if (eventParticipants?.length > 0 && eventParticipants.finwallet?.accounts[0]?.address === eventDetails?.organizer) {
             toast.error("Unauthorized access. You'are Event Organizer");
             return;
         }
-        if (!participants?.find((participant: any) => participant.address === wallet?.accounts[0]?.address)) {
+        if (!eventParticipants?.find((participant: any) => participant.address === wallet?.accounts[0]?.address)) {
             toast.error("Not Event Participant");
             return;
         } else {
@@ -198,17 +198,17 @@ const EventDetails = () => {
                                 <div className="w-full max-md:max-w-full">
                                     <div className="flex gap-5 max-md:flex-col max-md:gap-0 w-full">
                                         <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
-                                            <div className="flex flex-col grow justify-center py-4 md:py-10 md:px-5  text-white bg-gradient-to-l from-blue-500 to-purple-600">
+                                            <div className="flex flex-col grow justify-center md:py-10 md:px-5  text-white bg-gradient-to-l from-blue-500 to-purple-600">
                                                 <div className="flex justify-center items-center">
                                                     <img
                                                         alt="event_logo"
                                                         src={`https://ipfs.io/ipfs/${formatIPFS(eventDetails?.logoUrl)}`}
-                                                        className="w-1/2"
+                                                        className="object-cover"
                                                     />
                                                 </div>
 
                                                 {wallet?.accounts[0]?.address === eventDetails?.organizer &&
-                                                    <div className="flex gap-3 md:gap-5 justify-center mx-6 mt-10 text-base font-bold text-center max-md:flex-wrap max-md:mr-2.5 max-md:max-w-full">
+                                                    <div className="flex gap-2 md:gap-5 justify-center mx-2 md:mx-6 mt-10 text-base font-bold text-center max-md:max-w-full">
                                                         <button
                                                             className=" w-1/2 bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] px-6 py-3 "
                                                             onClick={() => startEvent()}
@@ -226,18 +226,18 @@ const EventDetails = () => {
                                                     </div>
                                                 }
 
-                                                <div className=" mx-6 flex flex-col justify-center p-3 mt-0 md:mt-6 bg-white text-black max-md:px-5">
+                                                <div className="mx-2 md:mx-6 flex flex-col justify-center p-3 mt-3 md:mt-6 bg-white text-black max-md:px-5">
                                                     <div className="flex flex-col gap-3 md:gap-5 justify-between max-md:max-w-full">
-                                                        <p className="flex justify-center items-center mx-auto gap-4 text-xl">
+                                                        <p className="flex justify-center items-center mx-auto gap-2 text-base">
                                                             {" "}
-                                                            Minimum Ticket Price{" "}
+                                                            Minimum Ticket Price:{" "}
                                                             <span>
                                                                 {minimumPrice(JSON.parse(eventDetails.tickets))}ETH
                                                             </span>{" "}
                                                         </p>
 
                                                         <button
-                                                            className="bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-white text-xl font-bold flex items-center justify-center h-12 p-4 shadow-lg cursor-pointer"
+                                                            className="bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-white font-bold flex items-center justify-center h-12 p-4 shadow-lg cursor-pointer"
                                                             onClick={() => buyTicket()}
 
                                                         >
@@ -251,40 +251,9 @@ const EventDetails = () => {
                                         <div className="flex flex-col w-full max-md:ml-0 max-md:w-full bg-gradient-to-l from-blue-500 to-purple-600  ">
                                             <div className="flex flex-col justify-center  w-full text-base  max-md:mt-8 max-md:max-w-full ">
                                                 <div className="justify-center px-8 py-6  text-md md:text-xl font-bold text-white   max-md:px-5 max-md:max-w-full bg-gradient-to-r from-[#5522CC] to-[#ED4690] ">
-                                                    Purchase History
+                                                    Event Details
                                                 </div>
-                                                {PurchaseHistory.length > 0 &&
-                                                    <span className="text-white text-lg md:text-xl px-8 mt-3">No Ticket has been Purchased Yet.</span>
-                                                }
-                                                {PurchaseHistory.length === 0 && PurchaseHistory.slice(-5).map(
-                                                    (purchase, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className={`flex flex-col justify-center px-8 py-6 border-b border-solid bg-gradient-to-l from-blue-500 to-purple-600  max-md:max-w-full ${index === 4
-                                                                ? "border-b-0"
-                                                                : ""
-                                                                }`}
-                                                        >
-                                                            <div className="flex flex-row space-x-2 text-white text-lg">
-                                                                <p>
-                                                                    {shortenAddress(
-                                                                        purchase.address
-                                                                    )}
-                                                                </p>
-                                                                <p>Purchased</p>
-                                                                <span>
-                                                                    {
-                                                                        purchase.ticketType
-                                                                    }{" "}
-                                                                    Ticket
-                                                                </span>
-                                                            </div>
-                                                            <span>
-                                                                {purchase.time}
-                                                            </span>
-                                                        </div>
-                                                    )
-                                                )}
+
                                             </div>
                                         </div>
                                     </div>
@@ -311,10 +280,10 @@ const EventDetails = () => {
                                     </button>
                                 </div>
                                 {!showParticipantTable && wallet?.accounts && eventDetails?.dao &&
-                                    <div className="flex flex-row justify-between mt-6 mx-2 text-white ">
-                                        <div className="w-full flex justify-end">
+                                    <div className="flex flex-row justify-between mt-6 md:mx-2 text-white ">
+                                        <div className="w-full flex md:justify-end">
                                             <button
-                                                className="w-fit bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] px-6 py-2 text-lg mb-4 font-medium"
+                                                className="w-fit bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] px-6 py-2 text-lg font-medium"
                                                 onClick={() =>
                                                     showProposalModal()
                                                 }
@@ -380,17 +349,26 @@ const EventDetails = () => {
                                 </div>
 
                                 <NewProposalModal
-                                    tickets={JSON.parse(eventDetails.tickets)}
                                     isVisible={showNewProposalModal}
                                     onClose={() =>
                                         setShowNewProposalModal(false)
                                     }
+                                    fetchEventDetails={() =>
+                                        fetchEventDetails(`get/${Number(id)}`)
+                                    }
+                                    id={Number(id)}
                                 />
 
                                 {showParticipantTable ? (
                                     <ParticipantTable eventParticipants={eventParticipants} />
                                 ) : (
-                                    <ProposalTable />
+                                    <ProposalTable
+                                        eventProposals={eventProposals}
+                                        event_id={Number(id)}
+                                        fetchEventDetails={() =>
+                                            fetchEventDetails(`get/${Number(id)}`)
+                                        }
+                                    />
                                 )}
                             </div>
                         </div>

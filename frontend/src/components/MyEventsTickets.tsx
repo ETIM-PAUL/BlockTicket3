@@ -19,7 +19,9 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
     const [{ connectedChain }] = useSetChain();
     const [postData, setPostData] = useState<boolean>(false);
     const [allEvents, setAllEvents] = useState<any>([]);
+    const [loading, setLoading] = useState<boolean>(false);
     const fetchEvents = async (str: string) => {
+        setLoading(true);
         let payload = str;
         if (!connectedChain) {
             return;
@@ -50,6 +52,7 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                 });
                 const reportData = JSON.parse(decode)
                 setAllEvents(reportData)
+                setLoading(false);
             });
     }
 
@@ -72,76 +75,97 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
 
     return (
         <div className="mt-10 pb-12">
-            <div className="md:flex overflow-x-auto hidden ">
-                <table className=" table  text-white -space-y-4 ">
-                    <thead className="text-black font-semibold text-base bg-[#EEE1FF]">
-                        <tr>
-                            <th>Id</th>
-                            <th>Event Title</th>
-                            <th>Ticket Type</th>
-                            <th>Status</th>
-                            <th>Referral Count</th>
-                            <th>Referral Code</th>
-                        </tr>
-                    </thead>
-                    <tbody className="text-lg">
-                        {MyEventsTicketData.map((myEventTicketData: any) => (
-                            <tr
-                                key={myEventTicketData.id}
-                                className={
-                                    myEventTicketData.id % 2 === 0
-                                        ? "bg-[#9b76f2]"
-                                        : "bg-[#8155ea]"
-                                }
-                            >
-                                <td>{myEventTicketData.id}</td>
-                                <td>{myEventTicketData.title}</td>
-                                <td>{myEventTicketData.ticketType}</td>
-                                <td>{myEventTicketData.status}</td>
-                                <td>{myEventTicketData.referalCount}</td>
-                                <td>{myEventTicketData.referalCode}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            {tickets && tickets?.length === 0 && !loading &&
+                <div
+                    className="text-white font-medium text-lg md:text-3xl mt-10 "
+                >
+                    <h3>No Tickets</h3>
+                </div>
+            }
 
-            {/* Mobile View */}
-            <div className="overflow-x-auto  ">
-                <table className=" md:hidden flex table  text-white w-full">
-                    <thead className="text-black font-semibold text-base bg-[#EEE1FF]">
-                        <tr>
-                            <th>Id</th>
-                            <th>Event Title</th>
-                            <th>Ticket Type</th>
-                            <th>Status</th>
-                            <th>Referral Count</th>
-                            <th>Referral Code</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody className="text-base">
-                        {tickets && tickets?.length > 0 && tickets.map((ticket: any) => (
-                            <tr
-                                key={ticket.id}
-                                className={
-                                    ticket.id % 2 === 0
-                                        ? "bg-[#9b76f2]"
-                                        : "bg-[#8155ea]"
-                                }
-                            >
-                                <td>{ticket.id}</td>
-                                <td>{getEventDetails(ticket.event_id, "title")}</td>
-                                <td>{ticket.ticket_type}</td>
-                                <td>{getEventDetails(ticket.event_id, "status")}</td>
-                                <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.count ?? "N/A"}</td>
-                                <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.code ?? "N/A"}</td>
-                                <td><button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button></td>
+            {tickets && tickets?.length === 0 && loading &&
+                <div
+                    className="text-white font-medium text-lg md:text-3xl mt-10 "
+                >
+                    <h3>Fetching User Tickets</h3>
+                </div>
+            }
+            {(tickets && tickets?.length > 0) &&
+                <div className="md:flex overflow-x-auto hidden ">
+                    <table className=" table  text-white -space-y-4 ">
+                        <thead className="text-black font-semibold text-base bg-[#EEE1FF]">
+                            <tr>
+                                <th>Id</th>
+                                <th>Event Title</th>
+                                <th>Ticket Type</th>
+                                <th>Status</th>
+                                <th>Referral Count</th>
+                                <th>Referral Code</th>
+                                <th>Action</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody className="text-lg">
+                            {tickets && tickets?.length > 0 && tickets.map((ticket: any) => (
+                                <tr
+                                    key={ticket.id}
+                                    className={
+                                        ticket.id % 2 === 0
+                                            ? "bg-[#9b76f2]"
+                                            : "bg-[#8155ea]"
+                                    }
+                                >
+                                    <td>{ticket.id}</td>
+                                    <td>{getEventDetails(ticket.event_id, "title")}</td>
+                                    <td>{ticket.ticket_type}</td>
+                                    <td>{getEventDetails(ticket.event_id, "status")}</td>
+                                    <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.count ?? "N/A"}</td>
+                                    <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.code ?? "N/A"}</td>
+                                    <td><button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            }
+            {/* Mobile View */}
+            {(tickets && tickets?.length) > 0 &&
+
+                <div className="overflow-x-auto  ">
+                    <table className=" md:hidden flex table  text-white w-full">
+                        <thead className="text-black font-semibold text-base bg-[#EEE1FF]">
+                            <tr>
+                                <th>Id</th>
+                                <th>Event Title</th>
+                                <th>Ticket Type</th>
+                                <th>Status</th>
+                                <th>Referral Count</th>
+                                <th>Referral Code</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-base">
+                            {tickets && tickets?.length > 0 && tickets.map((ticket: any) => (
+                                <tr
+                                    key={ticket.id}
+                                    className={
+                                        ticket.id % 2 === 0
+                                            ? "bg-[#9b76f2]"
+                                            : "bg-[#8155ea]"
+                                    }
+                                >
+                                    <td>{ticket.id}</td>
+                                    <td>{getEventDetails(ticket.event_id, "title")}</td>
+                                    <td>{ticket.ticket_type}</td>
+                                    <td>{getEventDetails(ticket.event_id, "status")}</td>
+                                    <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.count ?? "N/A"}</td>
+                                    <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.code ?? "N/A"}</td>
+                                    <td><button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
     );
 };

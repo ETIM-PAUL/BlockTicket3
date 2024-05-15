@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TicketPurchaseModal from "./TicketPurchaseModal";
 import { useRollups } from "../../useRollups";
 import { DappAddress } from "../../constants";
@@ -24,29 +24,23 @@ interface Report {
 }
 
 const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, referral, fetchEventDetails, eventReferrals }: Props) => {
-    const [showTicketModal, setShowTicketModal] = useState<boolean>(false);
     const [processing, setProcessing] = useState<boolean>(false)
     const [ticketId, setTicketId] = useState<number>(0)
     const [referralCode, setReferralCode] = useState<number>(0)
-    const [selectedTicket, setSelectedTicket] = useState<any>()
+    const [balance, setBalance] = useState<string>()
     const rollups = useRollups(DappAddress);
     const [{ wallet }] = useConnectWallet();
     const [{ connectedChain }] = useSetChain();
+    const [postData, setPostData] = useState<boolean>(false);
 
-    if (!isVisible) return null;
-
-    const purchaseTicket = async (ticket_details: any) => {
-        if (wallet?.accounts[0]?.address === organizer) {
-            toast.error("Unauthorized access. You are Event Organizer")
-            return;
-        }
-        setSelectedTicket(ticket_details)
-        setShowTicketModal(true)
-    };
 
     const processTicket = async (ticket_details: any) => {
         if (wallet?.accounts[0]?.address === organizer) {
             toast.error("Unauthorized access. You are Event Organizer")
+            return;
+        }
+        if (Number(balance) < Number(ticket_details?.price)) {
+            toast.error("Insufficient Funds. Please Deposit into the DAPP")
             return;
         }
         if (rollups) {
@@ -69,21 +63,23 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, referral, 
                 setProcessing(false)
             }
         }
+        setProcessing(false)
+
     }
-    const processTicketReferral = async () => {
-        if (referralCode && eventReferrals && !eventReferrals?.find((code: any) => code?.code === Number(referralCode))) {
-            toast.error("Invalid event referral code")
-            return;
-        }
+    const processTicketReferral = async (ticket_details: any) => {
         if (wallet?.accounts[0]?.address === organizer) {
             toast.error("Unauthorized access. You are Event Organizer")
             return;
         }
+        if (Number(balance) <= Number(ticket_details?.price)) {
+            toast.error("Insufficient Funds. Please Deposit into the DAPP")
+            return;
+        }
         if (rollups) {
-            setTicketId(selectedTicket?.id)
+            setTicketId(ticket_details?.id)
             try {
                 setProcessing(true);
-                let str = `{"action": "purchase_ticket", "id": ${id}, "ticket":${selectedTicket?.id}, "purchased_time": "${new Date()}", "ticket_type":"${selectedTicket?.ticketType}", "referral_code":${referralCode}}`
+                let str = `{"action": "purchase_ticket", "id": ${id}, "ticket":${ticket_details?.id}, "purchased_time": "${new Date()}", "ticket_type":"${ticket_details?.ticketType}", "referral_code":${referralCode}}`
                 let data = ethers.utils.toUtf8Bytes(str);
 
                 const result = await rollups.inputContract.addInput(DappAddress, data);
@@ -100,6 +96,48 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, referral, 
             }
         }
     }
+
+    const getBalance = async (str: string) => {
+        let payload = str;
+
+        if (!connectedChain) {
+            return;
+        }
+
+        let apiURL = ""
+
+        if (config[connectedChain.id]?.inspectAPIURL) {
+            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+        } else {
+            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+            return;
+        }
+
+        let fetchData: Promise<Response>;
+        if (postData) {
+            const payloadBlob = new TextEncoder().encode(payload);
+            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+        } else {
+            fetchData = fetch(`${apiURL}/${payload}`);
+        }
+        fetchData
+            .then(response => response.json())
+            .then(data => {
+                // Decode payload from each report
+                const decode = data.reports.map((report: Report) => {
+                    return ethers.utils.toUtf8String(report.payload);
+                });
+                const reportData: any = JSON.parse(decode)
+                setBalance(ethers.utils.formatEther(reportData?.ether))
+                //console.log(parseEther("1000000000000000000", "gwei"))
+            });
+    };
+
+    useEffect(() => {
+        getBalance(`balance/${wallet?.accounts[0]?.address}`)
+    }, [])
+
+    if (!isVisible) return null;
 
     return (
         <>
@@ -118,19 +156,32 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, referral, 
                             X
                         </button>
                         <div className="bg-gradient-to-r from-[#5522CC] to-[#ED4690] z-50 mx-auto flex flex-col mt-10 px-10 pt-16 pb-3">
-                            <h2 className="text-white font-bold text-xl text-center font-nexa">
+                            <h2 className="text-white font-bold text-xl">
                                 Select Your Preferred Ticket Type
                             </h2>
 
+                            <div className="grid text-lg items-center mt-3">
+                                <label htmlFor="referalCode" className="text-white text-base font-bold">
+                                    Referral Code (optional)
+                                </label>
+                                <input
+                                    value={referralCode}
+                                    onChange={(e: any) => setReferralCode(e.target.value)}
+                                    className="bg-white outline-none px-4 py-2 text-black text-base mt-2"
+                                    type="text"
+                                    placeholder="Your Referral Code (Optional)"
+                                />
+                            </div>
+
                             <div className="flex flex-wrap flex-row mt-1 justify-between gap-4 py-6 text-white">
                                 {tickets.length > 0 && tickets.map((item: any) => (
-                                    <div key={item.name} className="pt-2 max-w-[200px] text-center justify-center space-y-4 flex flex-col w-full border shadow-2xl">
+                                    <div key={item.name} className="pt-2 min-w-[200px] text-center justify-center space-y-4 flex flex-col w-full border shadow-2xl">
                                         <p className="text-2xl">{item.ticketType}</p>
                                         <p className="text-xs font-black mb-2 block">{item.price}ETH</p>
                                         <button
                                             disabled={processing}
                                             className="disabled:cursor-not-allowed shadow-2xl text-lg m-0 font-semibold justify-center px-2 py-2.5 text-white  bg-gradient-to-l from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                                            onClick={() => referral ? purchaseTicket(item) : processTicket(item)}
+                                            onClick={() => referral ? processTicketReferral(item) : processTicket(item)}
                                         >
                                             {(!processing) ?
                                                 "Purchase"
@@ -140,19 +191,9 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, referral, 
                                         </button>
                                     </div>
                                 ))
-
                                 }
-
                             </div>
                         </div>
-                        {/*  */}
-
-                        <TicketPurchaseModal
-                            isVisible={showTicketModal}
-                            setReferralCode={setReferralCode}
-                            onSubmit={() => processTicketReferral()}
-                            onClose={() => setShowTicketModal(false)}
-                        />
                     </div>
                 </div>
             </div>

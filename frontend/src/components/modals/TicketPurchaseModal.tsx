@@ -37,7 +37,7 @@ const TicketPurchaseModal = ({ isVisible, onClose, onSubmit, setReferralCode }: 
                                     </label>
                                     <input
                                         value={referalCode}
-                                        onChange={(e: any) => { setReferalCode(e.target.value); setReferralCode(e.target.value) }}
+                                        onChange={(e: any) => setReferralCode(e.target.value)}
                                         className="bg-white outline-none px-4 py-2 text-black w-1/2 text-base"
                                         type="text"
                                         placeholder="Your Referral Code (Optional)"
