@@ -7,11 +7,12 @@ import { toast } from "react-toastify";
 type Props = {
   isVisible: boolean;
   id: Number;
+  ticket_id: Number;
   onClose: boolean | void | string | any;
   fetchEventDetails: any;
 };
 
-const ClaimNFTModal = ({ isVisible, onClose, id, fetchEventDetails }: Props) => {
+const ClaimNFTModal = ({ isVisible, onClose, id, ticket_id, fetchEventDetails }: Props) => {
   const [processing, setProcessing] = useState<boolean>(false)
   const rollups = useRollups(DappAddress);
 
@@ -19,17 +20,16 @@ const ClaimNFTModal = ({ isVisible, onClose, id, fetchEventDetails }: Props) => 
 
   const claimNFT = async (e: any) => {
     if (rollups) {
-
       try {
         setProcessing(true);
-        let str = `{"action": "claim_nft", "id": "${id}"}`
+        let str = `{"action": "claim_nft", "id": ${id}, ticket_id: ${ticket_id}`
         let data = ethers.utils.toUtf8Bytes(str);
 
         const result = await rollups.inputContract.addInput(DappAddress, data);
         const receipt = await result.wait(1);
         // Search for the InputAdded event
         const event = receipt.events?.find((e: any) => e.event === "InputAdded");
-        toast.success("Event NFT has been claimed successfully")
+        toast.success("Event NFT Voucher has been created successfully")
         setProcessing(false);
         fetchEventDetails();
         onClose();

@@ -213,7 +213,8 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                 fetchEventDetails={() =>
                     console.log('kk')
                 }
-                id={Number(selectedTicket?.event_id)} />
+                id={Number(selectedTicket?.event_id)}
+                ticket_id={Number(selectedTicket?.ticket_id)} />
             <GetRefundModal
                 isVisible={refundModal}
                 onClose={() =>
