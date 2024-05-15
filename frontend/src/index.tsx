@@ -28,7 +28,7 @@ import CreateEventPage from "./pages/CreateEventPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
 import { ChakraProvider } from "@chakra-ui/react";
 import Wallet from "./pages/Wallet";
-import Footer from "./components/Footer";
+
 const container = document.getElementById("root");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
 
@@ -52,6 +52,8 @@ const web3Onboard = init({
         ],
     },
 });
+
+export const onboard = web3Onboard
 
 const router = createBrowserRouter([
     {
