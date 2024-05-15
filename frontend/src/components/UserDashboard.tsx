@@ -27,47 +27,52 @@ const UserDashboard = (props: Props) => {
             return;
         }
 
-        let apiURL = ""
+        let apiURL = "";
 
         if (config[connectedChain.id]?.inspectAPIURL) {
             apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
         } else {
-            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+            console.error(
+                `No inspect interface defined for chain ${connectedChain.id}`
+            );
             return;
         }
 
         let fetchData: Promise<Response>;
         if (postData) {
             const payloadBlob = new TextEncoder().encode(payload);
-            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+            fetchData = fetch(`${apiURL}`, {
+                method: "POST",
+                body: payloadBlob,
+            });
         } else {
             fetchData = fetch(`${apiURL}/${payload}`);
         }
         fetchData
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
                 // Decode payload from each report
                 const decode = data.reports.map((report: Report) => {
                     return ethers.utils.toUtf8String(report.payload);
                 });
-                const reportData = decode && JSON.parse(decode)
-                setUserData(reportData)
+                const reportData = decode && JSON.parse(decode);
+                setUserData(reportData);
                 setLoading(false);
             });
-    }
+    };
 
     useEffect(() => {
-        fetchUserData(`get_user_data/${wallet?.accounts[0]?.address}`)
-    }, [])
+        fetchUserData(`get_user_data/${wallet?.accounts[0]?.address}`);
+    }, []);
 
     const showAllEvents = () => {
-        setShowDasboard(false)
+        setShowDasboard(false);
         setShowEvents(true);
         setShowEventTicketTable(false);
     };
 
     const showParticipant = () => {
-        setShowDasboard(false)
+        setShowDasboard(false);
         setShowEventTicketTable(true);
         setShowEvents(false);
     };
@@ -79,27 +84,29 @@ const UserDashboard = (props: Props) => {
             <div className=" bg-gradient-to-l py-10 from-[#5522CC] to-[#ED4690] px-10 md:px-20 h-full">
                 <div className="flex justify-end text-lg font-normal gap-6">
                     <button
-                        className={`flex justify-center border border-bg-[#EEE1FF] py-2 px-4 w-fit text-black ${showEvents
-                            ? "bg-white text-black"
-                            : "bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                            } w-[130px] text-lg font-medium`}
+                        className={`flex justify-center border border-bg-[#EEE1FF] py-2 px-4 w-fit text-black ${
+                            showEvents
+                                ? "bg-white text-black"
+                                : "bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                        } w-[130px] text-lg font-medium`}
                         onClick={showAllEvents}
                     >
                         My Events
                     </button>
 
                     <button
-                        className={`flex justify-center border border-bg-[#EEE1FF] py-2 px-4 w-fit text-black ${showEventTicketTable
-                            ? "bg-white "
-                            : "bg-gradient-to-r from-[#5522CC] to-[#ED4690] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                            } w-[130px] text-lg font-medium`}
+                        className={`flex justify-center border border-bg-[#EEE1FF] py-2 px-4 w-fit text-black ${
+                            showEventTicketTable
+                                ? "bg-white "
+                                : "bg-gradient-to-r from-[#5522CC] to-[#ED4690] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                        } w-[130px] text-lg font-medium`}
                         onClick={showParticipant}
                     >
                         Tickets Purchased
                     </button>
                 </div>
 
-                {showDashboard &&
+                {showDashboard && (
                     <div className="mt-0 md:mt-10 w-full">
                         <div className="flex mt- flex-wrap md:gap-5 max-md:flex-col max-md:gap-0">
                             <div className="flex grow flex-col w-full md:w-[250px] max-md:ml-0 max-md:w-full">
@@ -113,7 +120,9 @@ const UserDashboard = (props: Props) => {
                                         <div className="mt-1.5 text-base font-medium tracking-tight w-full">
                                             Events Created
                                         </div>
-                                        <div className="mt-1.5 text-2xl font-extrabold">{userData?.user_events?.length ?? 0}</div>
+                                        <div className="mt-1.5 text-2xl font-extrabold">
+                                            {userData?.user_events?.length ?? 0}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -128,7 +137,10 @@ const UserDashboard = (props: Props) => {
                                         <div className="mt-1.5 text-base font-medium tracking-tight w-full">
                                             Event Tickets Purchased
                                         </div>
-                                        <div className="mt-1.5 text-2xl font-extrabold">{userData?.user_event_tickets?.length ?? 0}</div>
+                                        <div className="mt-1.5 text-2xl font-extrabold">
+                                            {userData?.user_event_tickets
+                                                ?.length ?? 0}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -144,7 +156,9 @@ const UserDashboard = (props: Props) => {
                                             Total Referrals
                                         </div>
                                         <div className="mt-1.5 text-2xl font-extrabold">
-                                            {userData?.user_event_tickets.filter((item: any) => item.count > 0)?.length ?? 0}
+                                            {userData?.user_event_tickets.filter(
+                                                (item: any) => item.count > 0
+                                            )?.length ?? 0}
                                         </div>
                                     </div>
                                 </div>
@@ -162,24 +176,30 @@ const UserDashboard = (props: Props) => {
                                             Total Proposals
                                         </div>
                                         <div className="mt-1.5 text-2xl font-extrabold">
-                                            {userData?.user_event_proposals?.length ?? 0}
+                                            {userData?.user_event_proposals
+                                                ?.length ?? 0}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
-                }
+                )}
 
-                {!showDashboard &&
+                {!showDashboard && (
                     <div className="">
-                        {showEventTicketTable && <MyEventsTickets referrals={userData?.user_event_referrals} tickets={userData?.user_event_tickets} />}
-                        {showEvents && <MyEvents events={userData?.user_events} />}
+                        {showEventTicketTable && (
+                            <MyEventsTickets
+                                referrals={userData?.user_event_referrals}
+                                tickets={userData?.user_event_tickets}
+                            />
+                        )}
+                        {showEvents && (
+                            <MyEvents events={userData?.user_events} />
+                        )}
                     </div>
-                }
+                )}
             </div>
-            <div className="w-full bg-[#EEE1FF] h-2"></div>
         </div>
     );
 };
