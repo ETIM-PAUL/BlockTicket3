@@ -260,7 +260,6 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
       <TabList>
         <Tab>🚀 Transfer</Tab>
         <Tab>🎟️ Vouchers</Tab>
-        <Tab>🔔 Activity</Tab>
       </TabList>
       <Box p={4} display="flex">
         <TabPanels>
@@ -318,53 +317,6 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
               {/* <AccordionItem>
                 <h2>
                   <AccordionButton>
-                    ERC20
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel>
-                  <Stack>
-                    <Input
-                      type="text"
-                      variant="outline"
-                      placeholder="Address"
-                      onChange={(e) => setErc20Token(String(e.target.value))}
-                      value={erc20Token}
-                    />
-                    <Input
-                      type="number"
-                      variant="outline"
-                      placeholder="Amount"
-                      onChange={(e) => setErc20Amount(Number(e.target.value))}
-                      value={erc20Amount}
-                    />
-                    <Button
-                      colorScheme="blue"
-                      size="sm"
-                      onClick={() =>
-                        depositErc20ToPortal(erc20Token, erc20Amount)
-                      }
-                      disabled={!rollups}
-                    >
-                      Deposit
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        withdrawErc20(erc20Amount, erc20Token);
-                      }}
-                      disabled={!rollups}
-                    >
-                      Withdraw
-                    </Button>
-                  </Stack>
-                  <br />
-                </AccordionPanel>
-              </AccordionItem> */}
-
-              <AccordionItem>
-                <h2>
-                  <AccordionButton>
                     ERC721
                     <AccordionIcon />
                   </AccordionButton>
@@ -406,7 +358,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                     <br />
                   </Stack>
                 </AccordionPanel>
-              </AccordionItem>
+              </AccordionItem> */}
             </Accordion>
           </TabPanel>
 

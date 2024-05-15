@@ -12,7 +12,7 @@ const UserDashboardPage = (props: Props) => {
     return (
         <div className="bg-white flex flex-col h-full w-full">
             <TopNav />
-            <div className="h-full">
+            <div className="md:h-[78vh]">
                 {connectedWallet ?
                     <UserDashboard />
                     :

@@ -36,15 +36,14 @@ const MyEvents = ({ events }: Props) => {
                 {events && events?.length > 0 && events.map((eventData: any) => (
                     <div
                         key={eventData?.id}
-                        className="flex grow flex-col max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-10 "
+                        className="flex flex-col w-full md:max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-4 md:mt-10 "
                     >
-                        <div className="fle">
+                        <div className="fle w-full">
                             <div className="">
                                 <img
                                     src={`https://ipfs.io/ipfs/${formatIPFS(eventData?.logoUrl)}`}
                                     alt="Event-Logo"
                                     className=" w-full rounded-t-lg"
-                                    width={300}
                                 />
                             </div>
 

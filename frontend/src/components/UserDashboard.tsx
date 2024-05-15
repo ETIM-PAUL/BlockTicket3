@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Logo from "./Logo";
-import WalletConnect from "./WalletConnect";
 import MyEvents from "./MyEvents";
 import MyEventsTickets from "./MyEventsTickets";
-import TopNav from "./TopNav";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import configFile from "../config.json";
 import { ethers } from "ethers";
@@ -24,7 +20,7 @@ const UserDashboard = (props: Props) => {
     const [postData, setPostData] = useState<boolean>(false);
     const [{ wallet }] = useConnectWallet();
 
-    const fetchEvents = async (str: string) => {
+    const fetchUserData = async (str: string) => {
         setLoading(true);
         let payload = str;
         if (!connectedChain) {
@@ -54,16 +50,14 @@ const UserDashboard = (props: Props) => {
                 const decode = data.reports.map((report: Report) => {
                     return ethers.utils.toUtf8String(report.payload);
                 });
-                const reportData = JSON.parse(decode)
-                console.log("parsed Reports:", reportData);
+                const reportData = decode && JSON.parse(decode)
                 setUserData(reportData)
                 setLoading(false);
-                //console.log(parseEther("1000000000000000000", "gwei"))
             });
     }
 
     useEffect(() => {
-        fetchEvents(`get_user_data/${wallet?.accounts[0]?.address}`)
+        fetchUserData(`get_user_data/${wallet?.accounts[0]?.address}`)
     }, [])
 
     const showAllEvents = () => {
@@ -168,7 +162,7 @@ const UserDashboard = (props: Props) => {
                                             Total Proposals
                                         </div>
                                         <div className="mt-1.5 text-2xl font-extrabold">
-                                            4
+                                            {userData?.user_event_proposals?.length ?? 0}
                                         </div>
                                     </div>
                                 </div>

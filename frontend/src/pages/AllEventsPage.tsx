@@ -12,7 +12,7 @@ const AllEventsPage = (props: Props) => {
     return (
         <div className="bg-white flex flex-col h-full w-full">
             <TopNav />
-            <div className="h-[80vh]">
+            <div className="md:h-[89vh]">
                 {connectedWallet ?
                     <AllEvents />
                     :

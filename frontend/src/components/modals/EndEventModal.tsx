@@ -31,11 +31,13 @@ const EndEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails, 
                 const receipt = await result.wait(1);
                 // Search for the InputAdded event
                 const event = receipt.events?.find((e: any) => e.event === "InputAdded");
-                setEventDetails({ ...eventDetails, status: 1 })
-                toast.success("Event has been ended successfully")
-                setProcessing(false);
-                fetchEventDetails();
-                onClose();
+                if (event) {
+                    setEventDetails({ ...eventDetails, status: 2 })
+                    toast.success("Event has been ended successfully")
+                    setProcessing(false);
+                    fetchEventDetails();
+                    onClose();
+                }
             } catch (error) {
                 console.log("error", error)
                 setProcessing(false)

@@ -13,7 +13,7 @@ type Props = {
     organizer: string;
     onClose: boolean | void | string | any;
     tickets: any;
-    referral: boolean;
+    referral: number;
     fetchEventDetails: any;
     eventReferrals: any;
 };
@@ -159,19 +159,20 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, referral, 
                             <h2 className="text-white font-bold text-xl">
                                 Select Your Preferred Ticket Type
                             </h2>
-
-                            <div className="grid text-lg items-center mt-3">
-                                <label htmlFor="referalCode" className="text-white text-base font-bold">
-                                    Referral Code (optional)
-                                </label>
-                                <input
-                                    value={referralCode}
-                                    onChange={(e: any) => setReferralCode(e.target.value)}
-                                    className="bg-white outline-none px-4 py-2 text-black text-base mt-2"
-                                    type="text"
-                                    placeholder="Your Referral Code (Optional)"
-                                />
-                            </div>
+                            {referral === 1 &&
+                                <div className="grid text-lg items-center mt-3">
+                                    <label htmlFor="referalCode" className="text-white text-base font-bold">
+                                        Referral Code (optional)
+                                    </label>
+                                    <input
+                                        value={referralCode}
+                                        onChange={(e: any) => setReferralCode(e.target.value)}
+                                        className="bg-white outline-none px-4 py-2 text-black text-base mt-2"
+                                        type="text"
+                                        placeholder="Your Referral Code (Optional)"
+                                    />
+                                </div>
+                            }
 
                             <div className="flex flex-wrap flex-row mt-1 justify-between gap-4 py-6 text-white">
                                 {tickets.length > 0 && tickets.map((item: any) => (

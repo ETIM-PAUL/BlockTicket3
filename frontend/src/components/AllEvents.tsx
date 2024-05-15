@@ -46,6 +46,7 @@ const AllEvents = (props: Props) => {
                 apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
             } else {
                 console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+                setLoading(false);
                 return;
             }
 
@@ -68,6 +69,7 @@ const AllEvents = (props: Props) => {
                     setLoading(false);
                 });
         } catch (error) {
+            setLoading(false);
             console.log(error)
             setAllEvents([])
         }
@@ -140,7 +142,7 @@ const AllEvents = (props: Props) => {
                     {allEvents.length > 0 && allEvents.map((eventData) => (
                         <div
                             key={eventData?.id}
-                            className="flex flex-col w-full md:max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-4md:mt-10 "
+                            className="flex flex-col w-full md:max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-4 md:mt-10 "
                         >
                             <div className="fle w-full">
                                 <div className="">

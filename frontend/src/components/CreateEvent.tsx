@@ -180,7 +180,7 @@ const CreateEvent = (props: Props) => {
             toast.error("Insufficient Funds for Normal Event. Please Deposit into the DAPP")
             return;
         }
-        if (Number(balance) < 0.1 && dao === "false" && referral === "false") {
+        if (Number(balance) < 0.1 && dao === "true" && referral === "true") {
             toast.error("Insufficient Funds for Full-Packaged Event. Please Deposit into the DAPP")
             return;
         }
@@ -204,8 +204,8 @@ const CreateEvent = (props: Props) => {
             if (rollups) {
                 setIsSubmitLoading(true)
                 try {
-                    await uploadIPFS();
-                    await uploadNftIPFS();
+                    uploadIPFS();
+                    uploadNftIPFS();
                     const payload = {
                         title,
                         date,

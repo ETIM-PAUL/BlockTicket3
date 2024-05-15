@@ -7,13 +7,14 @@ import { useConnectWallet } from "@web3-onboard/react";
 
 type Props = {
     event_id: number;
+    event_organizer: string;
     isVisible: boolean;
     fetchEventDetails: any;
     proposal: any;
     onClose: boolean | void | string | any;
 };
 
-const VoteModal = ({ isVisible, onClose, proposal, fetchEventDetails, event_id }: Props) => {
+const VoteModal = ({ isVisible, onClose, proposal, fetchEventDetails, event_id, event_organizer }: Props) => {
     const [processing, setProcessing] = useState<boolean>(false)
     const rollups = useRollups(DappAddress);
     const [{ wallet }] = useConnectWallet();
@@ -26,6 +27,10 @@ const VoteModal = ({ isVisible, onClose, proposal, fetchEventDetails, event_id }
 
     const voteProposal = async (type: string) => {
         const voters: [] = JSON.parse(proposal?.voters)
+        if (wallet?.accounts[0]?.address === event_organizer) {
+            toast.error("Unauthorized access as Event Organizer")
+            return;
+        }
         if (voters.length > 0 && voters.find((voter: any) => voter === wallet?.accounts[0]?.address)) {
             toast.error("Already Voted for this proposal");
             return;

@@ -4,6 +4,9 @@ import { useNavigate } from "react-router";
 import { ethers } from "ethers";
 import configFile from "../config.json";
 import { useSetChain } from "@web3-onboard/react";
+import ClaimNFTModal from "./modals/ClaimNFTModal";
+import GetRefundModal from "./modals/GetRefundModal";
+import { toast } from "react-toastify";
 
 type Props = {
     tickets: any;
@@ -20,6 +23,9 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
     const [postData, setPostData] = useState<boolean>(false);
     const [allEvents, setAllEvents] = useState<any>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [selectedTicket, setSelectedTicket] = useState<any>();
+    const [claimNFTModal, setClaimNFTModal] = useState<boolean>(false);
+    const [refundModal, setRefundModal] = useState<boolean>(false);
     const fetchEvents = async (str: string) => {
         setLoading(true);
         let payload = str;
@@ -66,11 +72,21 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
             return eventDetails?.title;
         }
         if (type === "status") {
-            return (eventDetails?.status === 1 ? "Ongoing" : eventDetails?.status === 0 ? "Pending" : eventDetails?.status === 3 ? "Ended" : "Cancelled");
+            return (eventDetails?.status === 1 ? "Ongoing" : eventDetails?.status === 0 ? "Pending" : eventDetails?.status !== 3 ? "Ended" : "Cancelled");
         }
         if (type === "title") {
             return eventDetails?.title;
         }
+    }
+    function getEventStatus(id: number): number {
+        const eventDetails = allEvents.find((event: any) => Number(event.id) === Number(id));
+        return eventDetails?.status;
+    }
+    function showNFTModal() {
+        setClaimNFTModal(true);
+    }
+    function showRefundModal() {
+        setRefundModal(true);
     }
 
     return (
@@ -120,7 +136,18 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                                     <td>{getEventDetails(ticket.event_id, "status")}</td>
                                     <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.count ?? "N/A"}</td>
                                     <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.code ?? "N/A"}</td>
-                                    <td><button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button></td>
+                                    <td className="space-x-2 items-center">
+                                        <button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button>
+                                        {getEventStatus(ticket.event_id) === 2 &&
+                                            <button onClick={() => { setSelectedTicket(ticket); showNFTModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Claim POAP(NFT)</button>
+                                        }
+                                        {(getEventStatus(ticket.event_id) === 3 && ticket.refunded !== 1) &&
+                                            <button onClick={() => { setSelectedTicket(ticket); showRefundModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Get Refund</button>
+                                        }
+                                        {(getEventStatus(ticket.event_id) === 3 && ticket.refunded === 1) &&
+                                            <button onClick={() => toast.error("Ticket refunded already")} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Refunded</button>
+                                        }
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -159,13 +186,44 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                                     <td>{getEventDetails(ticket.event_id, "status")}</td>
                                     <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.count ?? "N/A"}</td>
                                     <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.code ?? "N/A"}</td>
-                                    <td><button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button></td>
+                                    <td className="space-y-2 md:space-y-0 md:space-x-2 items-center">
+                                        <button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="w-full bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button>
+                                        {getEventStatus(ticket.event_id) === 2 &&
+                                            <button onClick={() => { setSelectedTicket(ticket); showNFTModal() }} className="w-full bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Claim POAP(NFT)</button>
+                                        }
+                                        {(getEventStatus(ticket.event_id) === 3 && ticket.refunded !== 1) &&
+                                            <button onClick={() => { setSelectedTicket(ticket); showRefundModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Get Refund</button>
+                                        }
+                                        {(getEventStatus(ticket.event_id) === 3 && ticket.refunded === 1) &&
+                                            <button onClick={() => toast.error("Ticket refunded already")} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Refunded</button>
+                                        }
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             }
+
+            <ClaimNFTModal
+                isVisible={claimNFTModal}
+                onClose={() =>
+                    setClaimNFTModal(false)
+                }
+                fetchEventDetails={() =>
+                    console.log('kk')
+                }
+                id={Number(selectedTicket?.event_id)} />
+            <GetRefundModal
+                isVisible={refundModal}
+                onClose={() =>
+                    setRefundModal(false)
+                }
+                fetchEventDetails={() =>
+                    console.log('kk')
+                }
+                id={Number(selectedTicket?.event_id)}
+                ticket_id={Number(selectedTicket?.id)} />
         </div>
     );
 };
