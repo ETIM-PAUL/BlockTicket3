@@ -116,7 +116,7 @@ const CreateEvent = (props: Props) => {
                 updateNftUrl(`ipfs://${response.data.IpfsHash}/`);
                 queryPinataFiles();
                 setNftIpfsLoading(false);
-                return true;
+                return `ipfs://${response.data.IpfsHash}/`;
             } else {
                 // toast.error("Please upload a document detailing the project outlines, aims and objectives");
                 setNftIpfsLoading(false);
@@ -154,7 +154,7 @@ const CreateEvent = (props: Props) => {
                 updateLogoUrl(`ipfs://${response.data.IpfsHash}/`);
                 queryPinataFiles();
                 setLogoIpfsLoading(false);
-                return true;
+                return `ipfs://${response.data.IpfsHash}/`;
             } else {
                 // toast.error("Please upload a document detailing the project outlines, aims and objectives");
                 setLogoIpfsLoading(false);
@@ -167,7 +167,6 @@ const CreateEvent = (props: Props) => {
     }
 
     async function createEvent() {
-        console.log(referral)
         if (Number(balance) < 0.06 && referral === "true") {
             toast.error("Insufficient Funds for Referral based Event. Please Deposit into the DAPP")
             return;
@@ -204,39 +203,43 @@ const CreateEvent = (props: Props) => {
             if (rollups) {
                 setIsSubmitLoading(true)
                 try {
-                    uploadIPFS();
-                    uploadNftIPFS();
-                    const payload = {
-                        title,
-                        date,
-                        location,
-                        ticketTypes: ticketTypes,
-                        capacity: Number(capacity),
-                        dao: dao === "true" ? true : false,
-                        referral: referral === "true" ? true : false,
-                        minReferal: Number(minReferal),
-                        referalDiscount: Number(referalDiscount),
-                        nftUrl,
-                        logoUrl
-                    }
-                    console.log(payload)
-                    let str = `{"action": "create_event", "title": "${payload.title}", "date": "${payload.date}", "location": "${payload.location}", "tickets": ${JSON.stringify(ticketTypes)}, "capacity": ${payload.capacity}, "organizer": "${wallet?.accounts[0]?.address}", "dao": ${payload.dao}, "referral": ${payload.referral}, "minReferrals": ${payload.minReferal}, "referralDiscount": ${payload.referalDiscount}, "tokenUrl": "${payload.nftUrl}", "logoUrl": "${payload.logoUrl}"}`
-                    let data = ethers.utils.toUtf8Bytes(str);
+                    await uploadIPFS().then(async (logo) => {
+                        console.log("logo", logo)
+                        await uploadNftIPFS().then(async (nft) => {
+                            console.log("nft", nft)
 
-                    const result = await rollups.inputContract.addInput(DappAddress, data);
-                    const receipt = await result.wait(1);
-                    // Search for the InputAdded event
-                    const event = receipt.events?.find((e: any) => e.event === "InputAdded");
-                    if (!event) {
-                        throw new Error(
-                            `Event Creation Failed, Insufficient ETH in your Wallet`
-                        );
-                    } else {
-                        setIsSubmitLoading(false)
-                        toast("Event Created Successfully");
-                        navigate("/events");
-                    }
+                            const payload = {
+                                title,
+                                date,
+                                location,
+                                ticketTypes: ticketTypes,
+                                capacity: Number(capacity),
+                                dao: dao === "true" ? true : false,
+                                referral: referral === "true" ? true : false,
+                                minReferal: Number(minReferal),
+                                referalDiscount: Number(referalDiscount),
+                                nftUrl: nft,
+                                logoUrl: logo
+                            }
 
+                            let str = `{"action": "create_event", "title": "${payload.title}", "date": "${payload.date}", "location": "${payload.location}", "tickets": ${JSON.stringify(ticketTypes)}, "capacity": ${payload.capacity}, "organizer": "${wallet?.accounts[0]?.address}", "dao": ${payload.dao}, "referral": ${payload.referral}, "minReferrals": ${payload.minReferal}, "referralDiscount": ${payload.referalDiscount}, "tokenUrl": "${payload.nftUrl}", "logoUrl": "${payload.logoUrl}"}`
+                            let data = ethers.utils.toUtf8Bytes(str);
+
+                            const result = await rollups.inputContract.addInput(DappAddress, data);
+                            const receipt = await result.wait(1);
+                            // Search for the InputAdded event
+                            const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+                            if (!event) {
+                                throw new Error(
+                                    `Event Creation Failed, Insufficient ETH in your Wallet`
+                                );
+                            } else {
+                                setIsSubmitLoading(false)
+                                toast("Event Created Successfully");
+                                navigate("/events");
+                            }
+                        })
+                    });
                 }
                 catch (e) {
                     setIsSubmitLoading(false)

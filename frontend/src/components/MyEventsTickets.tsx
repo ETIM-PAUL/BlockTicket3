@@ -88,6 +88,7 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
     function showRefundModal() {
         setRefundModal(true);
     }
+    console.log(tickets)
 
     return (
         <div className="mt-10 pb-12">
@@ -111,7 +112,7 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                     <table className=" table  text-white -space-y-4 ">
                         <thead className="text-black font-semibold text-base bg-[#EEE1FF]">
                             <tr>
-                                <th>Id</th>
+                                {/* <th>Id</th> */}
                                 <th>Event Title</th>
                                 <th>Ticket Type</th>
                                 <th>Status</th>
@@ -130,7 +131,7 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                                             : "bg-[#8155ea]"
                                     }
                                 >
-                                    <td>{ticket.id}</td>
+                                    {/* <td>{ticket.id}</td> */}
                                     <td>{getEventDetails(ticket.event_id, "title")}</td>
                                     <td>{ticket.ticket_type}</td>
                                     <td>{getEventDetails(ticket.event_id, "status")}</td>
@@ -161,7 +162,7 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                     <table className=" md:hidden flex table  text-white w-full">
                         <thead className="text-black font-semibold text-base bg-[#EEE1FF]">
                             <tr>
-                                <th>Id</th>
+                                {/* <th>Id</th> */}
                                 <th>Event Title</th>
                                 <th>Ticket Type</th>
                                 <th>Status</th>
@@ -180,7 +181,7 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                                             : "bg-[#8155ea]"
                                     }
                                 >
-                                    <td>{ticket.id}</td>
+                                    {/* <td>{ticket.id}</td> */}
                                     <td>{getEventDetails(ticket.event_id, "title")}</td>
                                     <td>{ticket.ticket_type}</td>
                                     <td>{getEventDetails(ticket.event_id, "status")}</td>
@@ -211,7 +212,7 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                     setClaimNFTModal(false)
                 }
                 fetchEventDetails={() =>
-                    console.log('kk')
+                    navigate("/my-wallet")
                 }
                 id={Number(selectedTicket?.event_id)}
                 ticket_id={Number(selectedTicket?.ticket_id)} />
@@ -221,9 +222,10 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                     setRefundModal(false)
                 }
                 fetchEventDetails={() =>
-                    console.log('kk')
+                    navigate("/my-wallet")
                 }
                 id={Number(selectedTicket?.event_id)}
+                ticket_type_id={Number(selectedTicket?.ticket_type_id)}
                 ticket_id={Number(selectedTicket?.id)} />
         </div>
     );

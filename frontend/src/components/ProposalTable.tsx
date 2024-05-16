@@ -24,7 +24,7 @@ const ProposalTable = ({ eventProposals, fetchEventDetails, event_id, event_orga
                     <table className=" flex table  text-white -space-y-4 ">
                         <thead className="text-black font-semibold text-base bg-white">
                             <tr>
-                                <th>Id</th>
+                                {/* <th>Id</th> */}
                                 <th>Proposal</th>
                                 <th>UpVotes</th>
                                 <th>DownVotes</th>
@@ -41,7 +41,7 @@ const ProposalTable = ({ eventProposals, fetchEventDetails, event_id, event_orga
                                             : "bg-[#8155ea]"
                                     }
                                 >
-                                    <td>{proposalData.id}</td>
+                                    {/* <td>{proposalData.id}</td> */}
                                     <td>{proposalData.proposer}</td>
                                     <td>{proposalData.upvotes}</td>
                                     <td>{proposalData.downvotes}</td>

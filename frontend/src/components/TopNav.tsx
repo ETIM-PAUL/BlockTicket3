@@ -1,20 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { bgImage, heroImage } from "../assets";
 import Logo from "./Logo";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import configFile from "../config.json";
 import WalletConnect from "./WalletConnect";
-import { useConnectWallet } from "@web3-onboard/react";
+import { useConnectWallet, useSetChain } from "@web3-onboard/react";
+import { toast } from "react-toastify";
 
 type Props = {};
+const config: any = configFile;
 
 const TopNav = (props: Props) => {
     const [{ wallet }] = useConnectWallet();
+    const [{ connectedChain }] = useSetChain();
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
+    const navigate = useNavigate();
     const toggleMobileNav = () => {
         setMobileNavOpen(!mobileNavOpen);
     };
+
+    useEffect(() => {
+        if (!connectedChain) {
+            return;
+        }
+        if (!config[connectedChain.id]?.inspectAPIURL) {
+            console.error(
+                `No inspect interface defined for chain ${connectedChain.id}`
+            );
+            toast.error("Wrong Network, Please Switch Network");
+            navigate("/events")
+            return;
+        }
+    }, [])
+
 
     return (
         <>

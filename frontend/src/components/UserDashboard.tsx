@@ -84,22 +84,20 @@ const UserDashboard = (props: Props) => {
             <div className=" bg-gradient-to-l py-10 from-[#5522CC] to-[#ED4690] px-10 md:px-20 h-full">
                 <div className="flex justify-end text-lg font-normal gap-6">
                     <button
-                        className={`flex justify-center border border-bg-[#EEE1FF] py-2 px-4 w-fit text-black ${
-                            showEvents
-                                ? "bg-white text-black"
-                                : "bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                        } w-[130px] text-lg font-medium`}
+                        className={`flex justify-center border border-bg-[#EEE1FF] py-2 px-4 w-fit text-black ${showEvents
+                            ? "bg-white text-black"
+                            : "bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                            } w-[130px] text-lg font-medium`}
                         onClick={showAllEvents}
                     >
                         My Events
                     </button>
 
                     <button
-                        className={`flex justify-center border border-bg-[#EEE1FF] py-2 px-4 w-fit text-black ${
-                            showEventTicketTable
-                                ? "bg-white "
-                                : "bg-gradient-to-r from-[#5522CC] to-[#ED4690] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
-                        } w-[130px] text-lg font-medium`}
+                        className={`flex justify-center border border-bg-[#EEE1FF] py-2 px-4 w-fit text-black ${showEventTicketTable
+                            ? "bg-white "
+                            : "bg-gradient-to-r from-[#5522CC] to-[#ED4690] text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF]"
+                            } w-[130px] text-lg font-medium`}
                         onClick={showParticipant}
                     >
                         Tickets Purchased
@@ -156,7 +154,7 @@ const UserDashboard = (props: Props) => {
                                             Total Referrals
                                         </div>
                                         <div className="mt-1.5 text-2xl font-extrabold">
-                                            {userData?.user_event_tickets.filter(
+                                            {userData?.user_event_referrals.filter(
                                                 (item: any) => item.count > 0
                                             )?.length ?? 0}
                                         </div>

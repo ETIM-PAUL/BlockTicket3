@@ -8,11 +8,12 @@ type Props = {
   isVisible: boolean;
   id: Number;
   ticket_id: Number;
+  ticket_type_id: Number;
   onClose: boolean | void | string | any;
   fetchEventDetails: any;
 };
 
-const GetRefundModal = ({ isVisible, onClose, id, ticket_id, fetchEventDetails }: Props) => {
+const GetRefundModal = ({ isVisible, onClose, id, ticket_id, ticket_type_id, fetchEventDetails }: Props) => {
   const [processing, setProcessing] = useState<boolean>(false)
   const rollups = useRollups(DappAddress);
   if (!isVisible) return null;
@@ -22,7 +23,7 @@ const GetRefundModal = ({ isVisible, onClose, id, ticket_id, fetchEventDetails }
 
       try {
         setProcessing(true);
-        let str = `{"action": "withdraw_cancelled_ticket", "event_id": ${id}, "ticket_id": ${ticket_id}}`
+        let str = `{"action": "withdraw_cancelled_ticket", "event_id": ${Number(id)}, "ticket_id": ${Number(ticket_id)}, "ticket_type":${Number(ticket_type_id)}}`
         let data = ethers.utils.toUtf8Bytes(str);
 
         const result = await rollups.inputContract.addInput(DappAddress, data);

@@ -371,8 +371,10 @@ const EventDetails = () => {
                                     id={Number(id)}
                                     isVisible={showModal}
                                     organizer={eventDetails.organizer}
+                                    capacity={eventDetails.capacity}
                                     referral={eventDetails.referral}
                                     eventReferrals={eventReferrals}
+                                    purchased_tickets={eventParticipants?.length}
                                     tickets={JSON.parse(eventDetails.tickets)}
                                     onClose={() => setShowModal(false)}
                                     fetchEventDetails={() =>

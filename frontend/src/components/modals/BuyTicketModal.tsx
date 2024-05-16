@@ -10,6 +10,8 @@ import configFile from "../../config.json";
 type Props = {
     isVisible: boolean;
     id: number;
+    capacity: number;
+    purchased_tickets: number;
     organizer: string;
     onClose: boolean | void | string | any;
     tickets: any;
@@ -23,7 +25,7 @@ interface Report {
     payload: string;
 }
 
-const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, referral, fetchEventDetails, eventReferrals }: Props) => {
+const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, capacity, referral, fetchEventDetails, eventReferrals, purchased_tickets }: Props) => {
     const [processing, setProcessing] = useState<boolean>(false)
     const [ticketId, setTicketId] = useState<number>(0)
     const [referralCode, setReferralCode] = useState<number>(0)
@@ -41,6 +43,10 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, referral, 
         }
         if (Number(balance) < Number(ticket_details?.price)) {
             toast.error("Insufficient Funds. Please Deposit into the DAPP")
+            return;
+        }
+        if (capacity === purchased_tickets) {
+            toast.error("Event has reached it's capacity")
             return;
         }
         if (rollups) {
@@ -67,8 +73,14 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, referral, 
 
     }
     const processTicketReferral = async (ticket_details: any) => {
+        console.log(Number(referralCode))
+        console.log(eventReferrals.find((referral: any) => Number(referral?.code) === Number(referralCode)))
         if (wallet?.accounts[0]?.address === organizer) {
             toast.error("Unauthorized access. You are Event Organizer")
+            return;
+        }
+        if (!eventReferrals.find((referral: any) => Number(referral?.code) === Number(referralCode))?.code) {
+            toast.error("Invalid Event Referral Code")
             return;
         }
         if (Number(balance) <= Number(ticket_details?.price)) {

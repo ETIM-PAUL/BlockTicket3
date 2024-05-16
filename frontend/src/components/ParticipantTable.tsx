@@ -21,7 +21,7 @@ const ParticipantTable = ({ eventParticipants }: Props) => {
                     <table className=" flex table  text-white -space-y-4 ">
                         <thead className="text-black font-semibold text-base bg-white">
                             <tr>
-                                <th>Id</th>
+                                {/* <th>Id</th> */}
                                 <th>Participant</th>
                                 <th>Ticket Type</th>
                                 <th>Date Purchased</th>
@@ -37,7 +37,7 @@ const ParticipantTable = ({ eventParticipants }: Props) => {
                                             : "bg-[#8155ea]"
                                     }
                                 >
-                                    <td>{participantData?.id}</td>
+                                    {/* <td>{participantData?.id}</td> */}
                                     <td>
                                         {shortenAddress(participantData?.address)}
                                     </td>

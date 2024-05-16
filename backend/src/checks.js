@@ -49,7 +49,7 @@ class CheckActions {
         }
     }
 
-    buy_event_ticket(ticket_type_id, dapp_address, event_tickets, msg_sender, event_referrals, event_data, event_participants) {
+    buy_event_ticket(ticket_type_id, dapp_address, event_tickets, msg_sender, event_referrals, event_data, event_participants, referral_code) {
 
         if (event_data.status !== 0) {
             throw new Error("Event has either ended, cancelled or ongoing");
@@ -62,15 +62,17 @@ class CheckActions {
         const eth_balance = bal.ether
         let check;
         let ticket_fee = event_tickets.find((event_ticket) => event_ticket.id === ticket_type_id).price;
-        const user_referral = event_referrals.find((event_referral) => event_referral.owner === msg_sender)
-
+        const user_referral = event_referrals.find((event_referral) => (event_referral.owner === msg_sender && event_referral.code === referral_code))
 
         if (!ticket_fee) {
             throw new Error(`Invalid Ticket`);
         }
-        if (user_referral?.count >= event_data.minReferrals) {
+        if (user_referral && user_referral?.count >= event_data.minReferrals && (user_referral?.claimed === false || user_referral?.claimed === 0)) {
             let holding_ticket_fee = ticket_fee;
             ticket_fee = (event_data.referralDiscount * holding_ticket_fee) / 100
+            this.db.run(
+                `UPDATE event_referrals SET claimed = true WHERE code = ${user_referral.code};`
+            );
         }
         if (Number(eth_balance) < Number(ticket_fee)) {
             throw new Error(`User ethers balance not enough to buy ${ticket_type_id.ticketType} ticket`);
@@ -79,7 +81,7 @@ class CheckActions {
         if (check) {
             let increase_bal = event_data.totalETHBal + ticket_fee;
             this.db.run(
-                `UPDATE events SET totalETHBal = ${increase_count} WHERE id = ${event_data.id};`
+                `UPDATE events SET totalETHBal = ${increase_bal} WHERE id = ${event_data.id};`
             );
 
             this.wallet.ether_transfer(getAddress(msg_sender), getAddress(dapp_address), parseEther(ticket_fee.toString()))
@@ -91,6 +93,22 @@ class CheckActions {
 
     isParticipant(msg_sender, participants) {
         const event_participant = participants.find((participant) => participant.address === msg_sender);
+        if (event_participant) {
+            return true
+        } else {
+            return false;
+        }
+    }
+    isRefunded(msg_sender, participants) {
+        const event_participant = participants.find((participant) => (participant.address === msg_sender && participant?.refunded !== 1));
+        if (event_participant) {
+            return true
+        } else {
+            return false;
+        }
+    }
+    isClaimNFT(msg_sender, participants) {
+        const event_participant = participants.find((participant) => (participant.address === msg_sender && participant?.claimedNFT !== 1));
         if (event_participant) {
             return true
         } else {

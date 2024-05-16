@@ -53,8 +53,6 @@ const web3Onboard = init({
     },
 });
 
-export const onboard = web3Onboard
-
 const router = createBrowserRouter([
     {
         path: "/",
@@ -86,16 +84,14 @@ const router = createBrowserRouter([
     },
 ]);
 root.render(
-    <React.StrictMode>
-        <Web3OnboardProvider web3Onboard={web3Onboard}>
-            <ChakraProvider>
-                <div className="">
-                    <RouterProvider router={router} />
-                </div>
-            </ChakraProvider>
-            <ToastContainer />
-        </Web3OnboardProvider>
-    </React.StrictMode>
+    <Web3OnboardProvider web3Onboard={web3Onboard}>
+        <ChakraProvider>
+            <div className="">
+                <RouterProvider router={router} />
+            </div>
+        </ChakraProvider>
+        <ToastContainer />
+    </Web3OnboardProvider>
 );
 
 reportWebVitals();

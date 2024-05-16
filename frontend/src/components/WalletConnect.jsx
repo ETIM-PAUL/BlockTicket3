@@ -1,8 +1,7 @@
 import React from "react";
-import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
+import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import configFile from "../config.json";
-import { ethers } from "ethers";
-import { onboard } from "..";
+
 
 const config = configFile;
 
@@ -10,11 +9,9 @@ const WalletConnect = () => {
     const [{ wallet }, connect, disconnect] = useConnectWallet();
     const [{ connectedChain }, setChain] = useSetChain();
 
-    const [connectedWallet] = useWallets();
-
     const switchNetwork = async () => {
         try {
-            await setChain({ chainId: '0x7a69', chainNamespace: 'evm' })
+            await setChain({ chainId: '0x7a69', chainNamespace: 'evm', token: 'DummyETH', label: 'localhost', rpcUrl: 'http://localhost:8545' })
 
         } catch (switchError) {
             console.log(switchError)
