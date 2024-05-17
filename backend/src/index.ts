@@ -26,8 +26,6 @@ const rollup_server =
   process.env.ROLLUP_HTTP_SERVER_URL ??
   "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE";
 
-const SYSTEM_ADMINS = ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"];
-
 //NFT address
 const erc721_contract_address = getAddress(
   "0x5067457698Fd6Fa1C6964e416b3f42713513B3dD"
@@ -121,21 +119,33 @@ const handleAdvance: any = async (data: any) => {
   const msg_sender = data.metadata.msg_sender.toLowerCase();
 
   try {
-    let eventPayload: any;
+    let eventPayload: any = JSON.parse(fromHex(payload, "string")) as Event;
+
     if (
       msg_sender === "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE".toLowerCase()
     ) {
       let rollup_address = payload;
       router.set_rollup_address(rollup_address, "ether_withdraw");
       console.log("Setting DApp address");
-      processed = true;
-    } else if (
+      return "accept";
+    }
+
+    if (msg_sender === "0xffdbe43d4c855bf7e0f105c400a50857f53ab044") {
+      //deposit ethers into the dapp
+      try {
+        router.process("ether_deposit", payload);
+        return "accept";
+      } catch (error) {
+        console.log(error);
+        return "false";
+      }
+    }
+
+    if (
       msg_sender !== "0xffdbe43d4c855bf7e0f105c400a50857f53ab044" &&
       msg_sender !== "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE" &&
       msg_sender !== "0x59b22D57D4f067708AB0c00552767405926dc768"
     ) {
-      eventPayload = JSON.parse(fromHex(payload, "string")) as Event;
-
       if (!eventPayload.action) throw new Error("No action provided");
 
       //Creating Event
@@ -183,10 +193,7 @@ const handleAdvance: any = async (data: any) => {
         const event_participants = await db.get(
           `SELECT * FROM event_tickets WHERE event_id = ${eventPayload.id} LIMIT 1;`
         );
-        if (
-          event?.organizer === data.metadata.msg_sender.toLowerCase() ||
-          SYSTEM_ADMINS.includes(event?.organizer)
-        ) {
+        if (event?.organizer === data.metadata.msg_sender.toLowerCase()) {
           throw new Error("Access Denied");
         } else {
           const referralCodes: any = await db.all(
@@ -203,8 +210,7 @@ const handleAdvance: any = async (data: any) => {
             data.metadata.msg_sender,
             event_referrals,
             event,
-            event_participants,
-            eventPayload.referral_code
+            event_participants
           );
           if (ticket_process) {
             const generatedCode = generate_code(referralCodes);
@@ -320,10 +326,9 @@ const handleAdvance: any = async (data: any) => {
         );
         const ticket_price = JSON.parse(event?.tickets).find(
           (event_ticket: any) =>
-            Number(event_ticket.id) === Number(eventPayload.ticket_type_id)
+            Number(event_ticket.id) === Number(eventPayload.ticket_type)
         ).price;
-        // 9979.1574
-        // GO
+
         if (
           ticket_price &&
           check_actions.isParticipant(msg_sender, event_participants) &&
@@ -462,20 +467,15 @@ const handleAdvance: any = async (data: any) => {
           }
         } else throw new Error("Insufficient funds");
       }
-    } else if (msg_sender === "0xffdbe43d4c855bf7e0f105c400a50857f53ab044") {
-      //deposit into the dapp
-      try {
-        router.process("ether_deposit", payload);
-      } catch (error) {
-        processed = false;
-      }
-    } else {
-      try {
-        router.process(eventPayload.method, data);
-        processed = true;
-      } catch (e) {
-        return new Error_out(`failed to process command ${payload} ${e}`);
-      }
+    }
+
+    try {
+      console.log("data", data);
+      console.log("eventPayload", eventPayload);
+      router.process(eventPayload.method, data);
+      processed = true;
+    } catch (e) {
+      return new Error_out(`failed to process command ${payload} ${e}`);
     }
 
     if (processed) {

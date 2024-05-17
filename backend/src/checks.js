@@ -49,7 +49,7 @@ class CheckActions {
         }
     }
 
-    buy_event_ticket(ticket_type_id, dapp_address, event_tickets, msg_sender, event_referrals, event_data, event_participants, referral_code) {
+    buy_event_ticket(ticket_type_id, dapp_address, event_tickets, msg_sender, event_referrals, event_data, event_participants) {
 
         if (event_data.status !== 0) {
             throw new Error("Event has either ended, cancelled or ongoing");
@@ -62,7 +62,7 @@ class CheckActions {
         const eth_balance = bal.ether
         let check;
         let ticket_fee = event_tickets.find((event_ticket) => event_ticket.id === ticket_type_id).price;
-        const user_referral = event_referrals.find((event_referral) => (event_referral.owner === msg_sender && event_referral.code === referral_code))
+        const user_referral = event_referrals.find((event_referral) => event_referral.owner === msg_sender)
 
         if (!ticket_fee) {
             throw new Error(`Invalid Ticket`);
@@ -75,7 +75,7 @@ class CheckActions {
             );
         }
         if (Number(eth_balance) < Number(ticket_fee)) {
-            throw new Error(`User ethers balance not enough to buy ${ticket_type_id.ticketType} ticket`);
+            throw new Error(`User ethers balance not enough to buy ticket`);
         } else check = true;
 
         if (check) {

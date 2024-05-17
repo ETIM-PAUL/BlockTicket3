@@ -99,9 +99,9 @@ const AllEvents = (props: Props) => {
     return (
         <div className="h-full flex flex-col">
             <div className="w-full bg-[#EEE1FF] h-2"></div>
-            <div className="bg-base-100 p-8 bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
+            <div className="bg-base-100 py-8 px-3 md:px-24 bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
                 {connectedChain && config[connectedChain.id]?.inspectAPIURL &&
-                    <div className="flex items-center md:mx-14 flex-row gap-2 md:gap-4 justify-start md:justify-end md:mt-6 ">
+                    <div className="flex items-center flex-row gap-2 md:gap-4 justify-start md:justify-end md:mt-6 ">
                         <button
                             className={`py-2 px-4 rounded-md border border-bg-[#EEE1FF] w-fit items-center text-center flex  justify-center font-medium text-lg ${activeButton === "LiveEvent"
                                 ? "bg-white text-black"

@@ -43,6 +43,9 @@ import { Notices } from "./Notices";
 import { Reports } from "./Reports";
 import { toast } from "react-toastify";
 import { DappAddress } from "./constants";
+import { FcMoneyTransfer } from "react-icons/fc";
+import { RiLuggageDepositFill } from "react-icons/ri";
+import { FaTelegramPlane } from "react-icons/fa";
 
 interface IInputPropos {
   dappAddress: string;
@@ -54,12 +57,14 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
   const [connectedWallet] = useWallets();
   const [input, setInput] = useState<string>("");
   const [dappRelayedAddress, setDappRelayedAddress] = useState<boolean>(false)
-  const [etherAmount, setEtherAmount] = useState<string>("0");
+  const [etherAmount, setEtherAmount] = useState<string>("0.1");
   const [processing, setProcessing] = useState<boolean>(false)
+  const [depositing, setDepositing] = useState<boolean>(false)
+  const [active, setActive] = useState<string>("deposit")
 
   const provider = new ethers.providers.Web3Provider(connectedWallet.provider);
 
-  const sendAddress = async (str: string) => {
+  const sendAddress = async () => {
     if (rollups) {
       try {
         await rollups.relayContract.relayDAppAddress(propos.dappAddress);
@@ -71,25 +76,40 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
   };
 
   const depositEtherToPortal = async (amount: number) => {
+    if (amount <= 0) {
+      toast.error("amount must be greater than zero");
+      return;
+    }
     try {
       if (rollups && provider) {
+        setDepositing(true);
         const data = ethers.utils.toUtf8Bytes(`Deposited (${amount}) ether.`);
         const txOverrides = { value: ethers.utils.parseEther(`${amount}`) };
         console.log("Ether to deposit: ", txOverrides);
 
         // const tx = await ...
-        rollups.etherPortalContract.depositEther(
+        const result = await rollups.etherPortalContract.depositEther(
           propos.dappAddress,
           data,
           txOverrides
         );
+        const receipt = await result.wait(1);
+        console.log(receipt)
+        toast.success("Ethers deposited successfully")
+        setDepositing(false);
       }
     } catch (e) {
+      setDepositing(false);
       console.log(`${e}`);
+      toast.error(e?.data?.message)
     }
   };
 
   const withdrawEther = async (amount: number) => {
+    if (amount <= 0) {
+      toast.error("amount must be greater than zero");
+      return;
+    }
     try {
       if (rollups && provider) {
         setProcessing(true);
@@ -112,6 +132,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
       }
     } catch (e) {
       setProcessing(false);
+      toast.error(e?.data?.message)
       console.log(e);
     }
   };
@@ -137,196 +158,193 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
     }
   };
 
-  const transferNftToPortal = async (
-    contractAddress: string,
-    nftid: number
-  ) => {
-    try {
-      if (rollups && provider) {
-        const data = ethers.utils.toUtf8Bytes(
-          `Deposited (${nftid}) of ERC721 (${contractAddress}).`
-        );
-        //const data = `Deposited ${args.amount} tokens (${args.token}) for DAppERC20Portal(${portalAddress}) (signer: ${address})`;
-        const signer = provider.getSigner();
-        const signerAddress = await signer.getAddress();
+  // const transferNftToPortal = async (
+  //   contractAddress: string,
+  //   nftid: number
+  // ) => {
+  //   try {
+  //     if (rollups && provider) {
+  //       const data = ethers.utils.toUtf8Bytes(
+  //         `Deposited (${nftid}) of ERC721 (${contractAddress}).`
+  //       );
+  //       //const data = `Deposited ${args.amount} tokens (${args.token}) for DAppERC20Portal(${portalAddress}) (signer: ${address})`;
+  //       const signer = provider.getSigner();
+  //       const signerAddress = await signer.getAddress();
 
-        const erc721PortalAddress = rollups.erc721PortalContract.address;
+  //       const erc721PortalAddress = rollups.erc721PortalContract.address;
 
-        const tokenContract = signer
-          ? IERC721__factory.connect(contractAddress, signer)
-          : IERC721__factory.connect(contractAddress, provider);
+  //       const tokenContract = signer
+  //         ? IERC721__factory.connect(contractAddress, signer)
+  //         : IERC721__factory.connect(contractAddress, provider);
 
-        // query current approval
-        const currentApproval = await tokenContract.getApproved(nftid);
-        if (currentApproval !== erc721PortalAddress) {
-          // Allow portal to withdraw `amount` tokens from signer
-          const tx = await tokenContract.approve(erc721PortalAddress, nftid);
-          const receipt = await tx.wait(1);
-          const event = (
-            await tokenContract.queryFilter(
-              tokenContract.filters.Approval(),
-              receipt.blockHash
-            )
-          ).pop();
-          if (!event) {
-            throw Error(
-              `could not approve ${nftid} for DAppERC721Portal(${erc721PortalAddress})  (signer: ${signerAddress}, tx: ${tx.hash})`
-            );
-          }
-        }
+  //       // query current approval
+  //       const currentApproval = await tokenContract.getApproved(nftid);
+  //       if (currentApproval !== erc721PortalAddress) {
+  //         // Allow portal to withdraw `amount` tokens from signer
+  //         const tx = await tokenContract.approve(erc721PortalAddress, nftid);
+  //         const receipt = await tx.wait(1);
+  //         const event = (
+  //           await tokenContract.queryFilter(
+  //             tokenContract.filters.Approval(),
+  //             receipt.blockHash
+  //           )
+  //         ).pop();
+  //         if (!event) {
+  //           throw Error(
+  //             `could not approve ${nftid} for DAppERC721Portal(${erc721PortalAddress})  (signer: ${signerAddress}, tx: ${tx.hash})`
+  //           );
+  //         }
+  //       }
 
-        // Transfer
-        rollups.erc721PortalContract.depositERC721Token(
-          contractAddress,
-          propos.dappAddress,
-          nftid,
-          "0x",
-          data
-        );
-      }
-    } catch (e) {
-      console.log(`${e}`);
-    }
-  };
+  //       // Transfer
+  //       rollups.erc721PortalContract.depositERC721Token(
+  //         contractAddress,
+  //         propos.dappAddress,
+  //         nftid,
+  //         "0x",
+  //         data
+  //       );
+  //     }
+  //   } catch (e) {
+  //     console.log(`${e}`);
+  //   }
+  // };
 
   return (
-    <Tabs variant="enclosed" size="lg" align="center">
-      <TabList>
-        <Tab>🚀 Transfer</Tab>
-        <Tab>🎟️ Vouchers</Tab>
-      </TabList>
-      <Box p={4} display="flex">
-        <TabPanels>
-          <TabPanel>
-            <Text fontSize="sm" color="grey">
+    <div className="px-4">
+      <div className="flex justify-center w-full gap-2 md:gap-8">
+        <div onClick={() => setActive("deposit")} className="flex flex-col gap- w-[100px] md:w-[150px] items-center p-3 shadow-xl rounded-[24px] border py-2 px-1 text-base hover:cursor-pointer bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
+          <RiLuggageDepositFill className="text-center text-white text-2xl" />
+          <span className="text-lg text-white font-bold">Deposit</span>
+        </div>
+        <div onClick={() => setActive("withdraw")} className="flex flex-col gap- w-[100px] md:w-[150px] items-center p-3 shadow-xl rounded-[24px] border py-2 px-1 text-base hover:cursor-pointer bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
+          <FcMoneyTransfer className="text-center text-2xl" />
+          <span className="text-lg text-white font-bold">Withdraw</span>
+        </div>
+        <div onClick={() => setActive("vouchers")} className="flex flex-col gap- w-[100px] md:w-[150px] items-center p-3 shadow-xl rounded-[24px] border py-2 px-1 text-base hover:cursor-pointer bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
+          <FaTelegramPlane className="text-center text-white text-2xl" />
+          <span className="text-lg text-white font-bold">Vouchers</span>
+        </div>
+      </div>
+
+      <div className="mx-4 mt-6">
+        {active === "deposit" &&
+          <div>
+            <h3 className="text-gray-600 text-sm text-start">
               BlockTicket3 receives asset deposits via Portal smart contracts on
               the base layer.
-            </Text>
-            <br />
-            <Accordion size="xl" defaultIndex={[0]} allowMultiple>
-              <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    Ether
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel>
-                  <Stack>
-                    <NumberInput
-                      defaultValue={0.01}
-                      onChange={(value) => setEtherAmount(value)}
-                      value={etherAmount}
-                    >
-                      <NumberInputField />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                    <Button
-                      colorScheme="blue"
-                      size="sm"
-                      onClick={() => {
-                        depositEtherToPortal(Number(etherAmount));
-                      }}
-                      disabled={!rollups}
-                    >
-                      Deposit
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        withdrawEther(Number(etherAmount));
-                      }}
-                      disabled={!rollups || processing}
-                    >
-                      {processing ? "Processing" : "Withdraw"}
-                    </Button>
-                  </Stack>
-                  <br />
-                </AccordionPanel>
-              </AccordionItem>
+            </h3>
 
-              {/* <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    ERC721
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel>
-                  <Stack>
-                    <Input
-                      type="text"
-                      variant="outline"
-                      placeholder="Address"
-                      onChange={(e) => setErc721(String(e.target.value))}
-                      value={erc721}
-                    />
-                    <Input
-                      type="number"
-                      variant="outline"
-                      placeholder="ID"
-                      onChange={(e) => setErc721Id(Number(e.target.value))}
-                      value={erc721Id}
-                    />
-                    <Button
-                      colorScheme="blue"
-                      size="sm"
-                      onClick={() => transferNftToPortal(erc721, erc721Id)}
-                      disabled={!rollups}
-                    >
-                      Transfer
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        withdrawErc721(erc721, erc721Id);
-                      }}
-                      disabled={!rollups}
-                    >
-                      Withdraw
-                    </Button>
-                    <br />
-                    <br />
-                  </Stack>
-                </AccordionPanel>
-              </AccordionItem> */}
-            </Accordion>
-          </TabPanel>
+            <div className="w-full mt-4 flex flex-col justify-center text-center">
+              <label
+                htmlFor=""
+                className="font-normal text-[17px] leading-5 tracking-[0.5%] "
+              >
+                Amount to Deposit (ETH)
+              </label>
+              <div className="flex items-center border-[1px] border-[#696969] rounded-lg pl-[10px] w-[80%] mx-auto gap-4 h-[72px] mt-2">
+                <p className="font-normal head2 text-[24px] leading-[32px mt-1.5">ETH</p>
+                <input
+                  defaultValue={0.01}
+                  value={etherAmount}
+                  onChange={(e) => setEtherAmount(e.target.value)}
+                  type="text"
+                  className="w-full text-[36px] placeholder:text-[24px] leading-[53.2px] text-[#696969] h-[100%] outline-none rounded-r-lg"
+                />
+              </div>
+            </div>
 
-          <TabPanel>
-            <Accordion defaultIndex={[0]} allowMultiple>
-              <Text fontSize="sm" color="grey">
-                After the withdraw request, the user has to execute a voucher to transfer assets from Cartesi dApp to their account.
-              </Text>
+            <div className="flex justify-center">
+              <button
+                className="w-[360px] h-[58px] rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
+                onClick={() => {
+                  depositEtherToPortal(Number(etherAmount));
+                }}
+                disabled={!rollups || depositing || processing}
+              >
+                {depositing ? "Processing" : "Deposit"}
+              </button>
+            </div>
+          </div>
+        }
+        {active === "withdraw" &&
+          <div>
+            <h3 className="text-gray-600 text-sm text-start md:text-center">
+              BlockTicket3 receives asset deposits via Portal smart contracts on
+              the base layer.
+            </h3>
+
+            <div className="w-full mt-4 flex flex-col justify-center text-center">
+              <label
+                htmlFor=""
+                className="font-normal text-[17px] leading-5 tracking-[0.5%] "
+              >
+                Amount to Withdraw (ETH)
+              </label>
+              <div className="flex items-center border-[1px] border-[#696969] rounded-lg pl-[10px] w-[80%] mx-auto gap-4 h-[72px] mt-2">
+                <p className="font-normal head2 text-[24px] leading-[32px mt-1.5">ETH</p>
+                <input
+                  defaultValue={0.01}
+                  value={etherAmount}
+                  onChange={(e) => setEtherAmount(e.target.value)}
+                  type="text"
+                  className="w-full text-[36px] placeholder:text-[24px] leading-[53.2px] text-[#696969] h-[100%] outline-none rounded-r-lg"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <button
+                className="w-[360px] h-[58px] rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
+                onClick={() => {
+                  withdrawEther(Number(etherAmount));
+                }}
+                disabled={!rollups || depositing || processing}
+              >
+                {depositing ? "Processing" : "Withdraw"}
+              </button>
+            </div>
+          </div>
+        }
+        {active === "vouchers" &&
+          <div>
+            <div>
+              <h3 className="text-gray-600 text-sm text-start md:text-center">
+                After the withdraw request, the user has to execute a voucher to transfer assets from blockTicket3 dApp to their account.
+              </h3>
               <br />
               {!dappRelayedAddress &&
-                <div>
+                <div className="w-full flex flex-col items-center">
                   Let the dApp know its address! <br />
-                  <Button
-                    size="sm"
-                    onClick={() => sendAddress(input)}
-                    disabled={!rollups}
+                  <button
+                    className="w-[360px] h-[58px] rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
+                    onClick={() => sendAddress()}
+                    disabled={!rollups || depositing || processing}
                   >
-                    Relay Address
-                  </Button>
+                    {depositing ? "Processing" : "Relay Address"}
+                  </button>
                   <br />
                   <br />
                 </div>
               }
               {dappRelayedAddress && <Vouchers dappAddress={propos.dappAddress} />}
-            </Accordion>
-          </TabPanel>
-          <TabPanel>
-            <Notices />
-            <br />
-            <Reports />
-          </TabPanel>
-        </TabPanels>
-      </Box>
-    </Tabs>
-    //</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <Tabs variant="enclosed" size="lg" align="center">
+        <Box p={4} display="flex">
+          <TabPanels>
+
+            {/* <TabPanel>
+              <Notices />
+              <br />
+              <Reports />
+            </TabPanel> */}
+          </TabPanels>
+        </Box>
+      </Tabs>
+    </div>
   );
 };

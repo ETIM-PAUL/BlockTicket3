@@ -10,11 +10,11 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import { ethers } from "ethers";
 // import { useRollups } from "./useRollups";
-
+import { BsClipboard2Fill } from "react-icons/bs";
 import configFile from "./config.json";
 import { parseEther } from "ethers/lib/utils";
 //import "./App.css"
@@ -33,6 +33,8 @@ import {
   Box,
   Spacer
 } from '@chakra-ui/react'
+import { shortenAddress } from "./utils";
+import { toast } from "react-toastify";
 
 const config: any = configFile;
 interface Report {
@@ -40,9 +42,15 @@ interface Report {
 }
 
 export const Balance: React.FC = () => {
+  const [reports, setReports] = useState<string[]>([]);
+  const [decodedReports, setDecodedReports] = useState<any>({});
+  const [hexData, setHexData] = useState<boolean>(false);
+  const [postData, setPostData] = useState<boolean>(false);
+
   // const rollups = useRollups();
   const [{ connectedChain }] = useSetChain();
   const [{ wallet }] = useConnectWallet();
+
   const inspectCall = async (str: string) => {
     let payload = str;
     if (hexData) {
@@ -73,8 +81,6 @@ export const Balance: React.FC = () => {
       .then(response => response.json())
       .then(data => {
         setReports(data.reports);
-        setMetadata({ status: data.status, exception_payload: data.exception_payload });
-
         // Decode payload from each report
         const decode = data.reports.map((report: Report) => {
           return ethers.utils.toUtf8String(report.payload);
@@ -85,22 +91,48 @@ export const Balance: React.FC = () => {
         //console.log(parseEther("1000000000000000000", "gwei"))
       });
   };
-  const [inspectData, setInspectData] = useState<string>("");
-  const [reports, setReports] = useState<string[]>([]);
-  const [decodedReports, setDecodedReports] = useState<any>({});
-  const [metadata, setMetadata] = useState<any>({});
-  const [hexData, setHexData] = useState<boolean>(false);
-  const [postData, setPostData] = useState<boolean>(false);
+
+  useEffect(() => {
+    inspectCall(`balance/${wallet?.accounts[0]?.address}`)
+  }, [])
+
+  function copyToClipboard() {
+    if (!wallet) {
+      return;
+    }
+    navigator.clipboard.writeText(wallet?.accounts[0]?.address).then(function () {
+      toast.success("Wallet address copied successfully");
+    }).catch(function (err) {
+      console.error('Could not copy text: ', err);
+    });
+  }
 
   return (
     <Box borderWidth='1px' borderRadius='lg' overflow='hidden'>
-      <TableContainer>
+      <div className=" bg-no-repeat p-4 rounded-[8px] min-w-[305px] h-[200px] flex flex-col items-between justify-between bg-gradient-to-r from-[#5522CC] to-[#ED4690]">
+        <div className="flex items-center justify-end gap-2 py-1">
+          <span className="text-xl md:text-4xl font-bold text-white ">{shortenAddress(wallet?.accounts[0]?.address)}</span>
+          <BsClipboard2Fill onClick={copyToClipboard} className="text-white hover:text-blue-400 cursor-pointer text-2xl" />
+        </div>
+        {reports?.length === 0 && (
+          <span className='sm:text-base grotesk font-bold leading-[25.5px] tracking-[0.085px] mt-4 mb-2 text-xl px-3 text-white'>looks like your BlockTicket3 balance is zero! 🙁</span>
+        )}
+        {decodedReports && decodedReports.ether && (
+          <div className='text-white px-3'>
+            <span className='text-base block mb-1.5'>Balance</span>
+            <span className="sm:text-2xl grotesk font-bold leading-[25.5px] tracking-[0.085px] mt-4 mb-2 text-2xl">
+              {ethers.utils.formatEther(decodedReports.ether)}
+            </span>
+          </div>
+        )}
+      </div>
+      {/* <TableContainer>
         <Stack>
           <Table variant='striped' size="lg">
             <Thead>
               <Tr>
                 <Th textAlign={'center'}>Ether</Th>
-                {/* <Th textAlign={'center'}>ERC-20</Th> */}
+                <Th textAlign={'center'}>ERC-20</Th>
                 <Th textAlign={'center'}>ERC-721</Th>
               </Tr>
             </Thead>
@@ -114,11 +146,6 @@ export const Balance: React.FC = () => {
               {<Tr key={`${decodedReports}`}>
                 {decodedReports && decodedReports.ether && (
                   <Td textAlign={'center'}>{ethers.utils.formatEther(decodedReports.ether)}</Td>)}
-                {/* {decodedReports && decodedReports.erc20 && (
-                  <Td textAlign={'center'}>
-                    <div>📍 {String(decodedReports.erc20).split(",")[0]}</div>
-                    <div>🤑 {Number(String(decodedReports.erc20).split(",")[1]) > 0 ? Number(String(decodedReports.erc20).split(",")[1]) / 10 ** 18 : null} </div>
-                  </Td>)} */}
                 {decodedReports && decodedReports.erc721 && (
                   <Td textAlign={'center'}>
                     <div>📍 {String(decodedReports.erc721).split(",")[0]}</div>
@@ -129,7 +156,7 @@ export const Balance: React.FC = () => {
           </Table>
           <Button onClick={() => inspectCall(`balance/${wallet?.accounts[0]?.address}`)}>Get Balance</Button>
         </Stack>
-      </TableContainer>
+      </TableContainer> */}
     </Box>
   );
 };

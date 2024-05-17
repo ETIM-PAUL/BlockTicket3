@@ -73,13 +73,15 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, capacity, 
 
     }
     const processTicketReferral = async (ticket_details: any) => {
-        console.log(Number(referralCode))
-        console.log(eventReferrals.find((referral: any) => Number(referral?.code) === Number(referralCode)))
+        if (capacity === purchased_tickets) {
+            toast.error("Event has reached it's capacity")
+            return;
+        }
         if (wallet?.accounts[0]?.address === organizer) {
             toast.error("Unauthorized access. You are Event Organizer")
             return;
         }
-        if (!eventReferrals.find((referral: any) => Number(referral?.code) === Number(referralCode))?.code) {
+        if (Number(referralCode) > 0 && !eventReferrals.find((referral: any) => Number(referral?.code) === Number(referralCode))?.code) {
             toast.error("Invalid Event Referral Code")
             return;
         }

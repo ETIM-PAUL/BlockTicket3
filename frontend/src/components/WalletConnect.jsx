@@ -48,7 +48,7 @@ const WalletConnect = () => {
                 <button
                     onClick={() => switchNetwork(wallet)}
                     type="button"
-                    className="font-medium rounded-lg text-base md:text-lg p-2 md:px-4 md:py-3 text-center bg-white text-black"
+                    className="font-medium rounded-lg text-base md:text-lg p-2 md:px-4 md:py-3 text-center bg-red-500 text-white"
                 >
                     ✂️ Wrong Network
                 </button>

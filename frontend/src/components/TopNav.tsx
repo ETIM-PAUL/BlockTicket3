@@ -39,7 +39,7 @@ const TopNav = (props: Props) => {
             {/* Background Image and Hero */}
             <nav className="bg-white border-gray-200 px-3 py-3 md:py-2 md:px-24  bg-gradient-to-r from-[#5522CC] to-[#ED4690]">
                 <div className="flex items-center  justify-between">
-                    <div className="w-full flex flex-wrap  justify-between md:mx-auto  md:p-4 mx-10">
+                    <div className="w-full flex flex-wrap  justify-between md:mx-auto md:p-4 mx-">
                         <div className="md:-ml-8 mt- md:mt-0 ">
                             <Logo />
                         </div>
