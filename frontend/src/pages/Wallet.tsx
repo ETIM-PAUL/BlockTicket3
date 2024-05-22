@@ -23,7 +23,7 @@ import { Reports } from "../Reports";
 
 //import "./App.css";
 import { Balance } from "../Balance";
-import { SimpleGrid } from "@chakra-ui/react"
+import { SimpleGrid } from "@chakra-ui/react";
 import TopNav from "../components/TopNav";
 import Footer from "../components/Footer";
 import { toast } from "react-toastify";
@@ -31,34 +31,31 @@ import { useWallets } from "@web3-onboard/react";
 import { useNavigate } from "react-router";
 import { DappAddress } from "../constants";
 
-
 const Wallet: FC = () => {
     const [connectedWallet] = useWallets();
     const navigate = useNavigate();
     useEffect(() => {
         if (!connectedWallet) {
             toast.error("Wallet not connected");
-            navigate("/")
+            navigate("/");
         }
-    }, [])
+    }, []);
 
     return (
         <>
             <TopNav />
-            <div className=" bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
-
+            <div className=" bg-gradient-to-l from-[#5522CC] to-[#ED4690] ">
                 <div className="w-full bg-[#EEE1FF] h-2"></div>
-                {connectedWallet &&
+                {connectedWallet && (
                     <GraphQLProvider>
-                        <SimpleGrid className="bg-white border my-4 rounded-t-[8px] w-[90%] md:max-w-[50%] mx-auto">
-
+                        <SimpleGrid className="bg-white border my-4 rounded-t-[8px] w-[90%] md:max-w-[70%] mx-auto ">
                             <Balance />
                             <br /> <br />
                             <Transfers dappAddress={DappAddress} />
                             <br /> <br />
                         </SimpleGrid>
                     </GraphQLProvider>
-                }
+                )}
                 <div className="w-full bg-[#EEE1FF] h-2"></div>
             </div>
             <Footer />
