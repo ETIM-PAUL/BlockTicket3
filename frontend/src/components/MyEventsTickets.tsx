@@ -205,28 +205,31 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                     </table>
                 </div>
             }
-
-            <ClaimNFTModal
-                isVisible={claimNFTModal}
-                onClose={() =>
-                    setClaimNFTModal(false)
-                }
-                fetchEventDetails={() =>
-                    navigate("/my-wallet")
-                }
-                id={Number(selectedTicket?.event_id)}
-                ticket_id={Number(selectedTicket?.ticket_id)} />
-            <GetRefundModal
-                isVisible={refundModal}
-                onClose={() =>
-                    setRefundModal(false)
-                }
-                fetchEventDetails={() =>
-                    navigate("/my-wallet")
-                }
-                id={Number(selectedTicket?.event_id)}
-                ticket_type_id={Number(selectedTicket?.ticket_type_id)}
-                ticket_id={Number(selectedTicket?.id)} />
+            {selectedTicket?.id &&
+                <ClaimNFTModal
+                    isVisible={claimNFTModal}
+                    onClose={() =>
+                        setClaimNFTModal(false)
+                    }
+                    walletNavigate={() =>
+                        navigate("/my-wallet")
+                    }
+                    id={Number(selectedTicket?.event_id)}
+                    ticket_id={Number(selectedTicket?.ticket_id)} />
+            }
+            {selectedTicket?.id &&
+                <GetRefundModal
+                    isVisible={refundModal}
+                    onClose={() =>
+                        setRefundModal(false)
+                    }
+                    fetchEventDetails={() =>
+                        navigate("/my-wallet")
+                    }
+                    id={Number(selectedTicket?.event_id)}
+                    ticket_type_id={Number(selectedTicket?.ticket_type_id)}
+                    ticket_id={Number(selectedTicket?.id)} />
+            }
         </div>
     );
 };

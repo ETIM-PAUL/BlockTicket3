@@ -10,7 +10,6 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React from "react";
 import App from "./App";
 import configFile from "./config.json";
 import reportWebVitals from "./reportWebVitals";

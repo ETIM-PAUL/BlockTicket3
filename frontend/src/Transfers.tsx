@@ -14,33 +14,7 @@ import React, { useState } from "react";
 import { ethers } from "ethers";
 import { useRollups } from "./useRollups";
 import { useWallets } from "@web3-onboard/react";
-import {
-  IERC1155__factory,
-  IERC20__factory,
-  IERC721__factory,
-} from "./generated/rollups";
-import { Tabs, TabList, TabPanels, TabPanel, Tab } from "@chakra-ui/react";
-import { Divider } from "@chakra-ui/react";
-import { Button, Box } from "@chakra-ui/react";
-import {
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-} from "@chakra-ui/react";
-import { Input, Stack, Flex } from "@chakra-ui/react";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
-} from "@chakra-ui/react";
-import { Text } from "@chakra-ui/react";
 import { Vouchers } from "./Vouchers";
-import { Notices } from "./Notices";
-import { Reports } from "./Reports";
 import { toast } from "react-toastify";
 import { DappAddress } from "./constants";
 import { FcMoneyTransfer } from "react-icons/fc";
@@ -55,7 +29,6 @@ interface IInputPropos {
 export const Transfers: React.FC<IInputPropos> = (propos) => {
   const rollups = useRollups(propos.dappAddress);
   const [connectedWallet] = useWallets();
-  const [input, setInput] = useState<string>("");
   const [dappRelayedAddress, setDappRelayedAddress] = useState<boolean>(false)
   const [etherAmount, setEtherAmount] = useState<string>("0.1");
   const [processing, setProcessing] = useState<boolean>(false)
@@ -98,7 +71,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
         toast.success("Ethers deposited successfully")
         setDepositing(false);
       }
-    } catch (e) {
+    } catch (e: any) {
       setDepositing(false);
       console.log(`${e}`);
       toast.error(e?.data?.message)
@@ -126,89 +99,17 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
         const result = await rollups.inputContract.addInput(DappAddress, payload);
         const receipt = await result.wait(1);
         // Search for the InputAdded event
-        const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+        receipt.events?.find((e: any) => e.event === "InputAdded");
         toast.success("Ethers withdraw voucher created successfully")
         setProcessing(false);
       }
-    } catch (e) {
+    } catch (e: any) {
       setProcessing(false);
       toast.error(e?.data?.message)
       console.log(e);
     }
   };
 
-  const withdrawErc721 = async (address: String, id: number) => {
-    try {
-      if (rollups && provider) {
-        let erc721_id = String(id);
-        console.log("erc721 after parsing: ", erc721_id);
-        const input_obj = {
-          method: "erc721_withdrawal",
-          args: {
-            erc721: address,
-            token_id: id,
-          },
-        };
-        const data = JSON.stringify(input_obj);
-        let payload = ethers.utils.toUtf8Bytes(data);
-        await rollups.inputContract.addInput(propos.dappAddress, payload);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  // const transferNftToPortal = async (
-  //   contractAddress: string,
-  //   nftid: number
-  // ) => {
-  //   try {
-  //     if (rollups && provider) {
-  //       const data = ethers.utils.toUtf8Bytes(
-  //         `Deposited (${nftid}) of ERC721 (${contractAddress}).`
-  //       );
-  //       //const data = `Deposited ${args.amount} tokens (${args.token}) for DAppERC20Portal(${portalAddress}) (signer: ${address})`;
-  //       const signer = provider.getSigner();
-  //       const signerAddress = await signer.getAddress();
-
-  //       const erc721PortalAddress = rollups.erc721PortalContract.address;
-
-  //       const tokenContract = signer
-  //         ? IERC721__factory.connect(contractAddress, signer)
-  //         : IERC721__factory.connect(contractAddress, provider);
-
-  //       // query current approval
-  //       const currentApproval = await tokenContract.getApproved(nftid);
-  //       if (currentApproval !== erc721PortalAddress) {
-  //         // Allow portal to withdraw `amount` tokens from signer
-  //         const tx = await tokenContract.approve(erc721PortalAddress, nftid);
-  //         const receipt = await tx.wait(1);
-  //         const event = (
-  //           await tokenContract.queryFilter(
-  //             tokenContract.filters.Approval(),
-  //             receipt.blockHash
-  //           )
-  //         ).pop();
-  //         if (!event) {
-  //           throw Error(
-  //             `could not approve ${nftid} for DAppERC721Portal(${erc721PortalAddress})  (signer: ${signerAddress}, tx: ${tx.hash})`
-  //           );
-  //         }
-  //       }
-
-  //       // Transfer
-  //       rollups.erc721PortalContract.depositERC721Token(
-  //         contractAddress,
-  //         propos.dappAddress,
-  //         nftid,
-  //         "0x",
-  //         data
-  //       );
-  //     }
-  //   } catch (e) {
-  //     console.log(`${e}`);
-  //   }
-  // };
 
   return (
     <div className="px-4">
@@ -248,7 +149,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                   defaultValue={0.01}
                   value={etherAmount}
                   onChange={(e) => setEtherAmount(e.target.value)}
-                  type="text"
+                  type="number"
                   className="w-full text-[36px] placeholder:text-[24px] leading-[53.2px] text-[#696969] h-[100%] outline-none rounded-r-lg"
                 />
               </div>
@@ -332,19 +233,6 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
           </div>
         }
       </div>
-
-      <Tabs variant="enclosed" size="lg" align="center">
-        <Box p={4} display="flex">
-          <TabPanels>
-
-            {/* <TabPanel>
-              <Notices />
-              <br />
-              <Reports />
-            </TabPanel> */}
-          </TabPanels>
-        </Box>
-      </Tabs>
     </div>
   );
 };

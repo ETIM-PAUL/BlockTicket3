@@ -5,7 +5,7 @@ type Props = {};
 const NewProposalForm = (props: Props) => {
     const [proposal, setProposal] = useState();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: any) => {
         e.preventDefault();
     };
 

@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
-import TicketPurchaseModal from "./TicketPurchaseModal";
+import React, { useState } from "react";
 import { useRollups } from "../../useRollups";
 import { DappAddress } from "../../constants";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
-import { useConnectWallet, useSetChain } from "@web3-onboard/react";
-import configFile from "../../config.json";
+import { useConnectWallet } from "@web3-onboard/react";
 
 type Props = {
     isVisible: boolean;
     id: number;
+    balance: any;
     capacity: number;
     purchased_tickets: number;
     organizer: string;
@@ -20,20 +19,12 @@ type Props = {
     eventReferrals: any;
 };
 
-const config: any = configFile;
-interface Report {
-    payload: string;
-}
-
-const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, capacity, referral, fetchEventDetails, eventReferrals, purchased_tickets }: Props) => {
+const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, organizer, capacity, referral, fetchEventDetails, eventReferrals, purchased_tickets }: Props) => {
     const [processing, setProcessing] = useState<boolean>(false)
     const [ticketId, setTicketId] = useState<number>(0)
     const [referralCode, setReferralCode] = useState<number>(0)
-    const [balance, setBalance] = useState<string>()
     const rollups = useRollups(DappAddress);
     const [{ wallet }] = useConnectWallet();
-    const [{ connectedChain }] = useSetChain();
-    const [postData, setPostData] = useState<boolean>(false);
 
 
     const processTicket = async (ticket_details: any) => {
@@ -72,6 +63,7 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, capacity, 
         setProcessing(false)
 
     }
+
     const processTicketReferral = async (ticket_details: any) => {
         if (capacity === purchased_tickets) {
             toast.error("Event has reached it's capacity")
@@ -111,46 +103,6 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, capacity, 
         }
     }
 
-    const getBalance = async (str: string) => {
-        let payload = str;
-
-        if (!connectedChain) {
-            return;
-        }
-
-        let apiURL = ""
-
-        if (config[connectedChain.id]?.inspectAPIURL) {
-            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
-        } else {
-            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
-            return;
-        }
-
-        let fetchData: Promise<Response>;
-        if (postData) {
-            const payloadBlob = new TextEncoder().encode(payload);
-            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
-        } else {
-            fetchData = fetch(`${apiURL}/${payload}`);
-        }
-        fetchData
-            .then(response => response.json())
-            .then(data => {
-                // Decode payload from each report
-                const decode = data.reports.map((report: Report) => {
-                    return ethers.utils.toUtf8String(report.payload);
-                });
-                const reportData: any = JSON.parse(decode)
-                setBalance(ethers.utils.formatEther(reportData?.ether))
-                //console.log(parseEther("1000000000000000000", "gwei"))
-            });
-    };
-
-    useEffect(() => {
-        getBalance(`balance/${wallet?.accounts[0]?.address}`)
-    }, [])
-
     if (!isVisible) return null;
 
     return (
@@ -189,8 +141,8 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, organizer, capacity, 
                             }
 
                             <div className="flex flex-wrap flex-row mt-1 justify-between gap-4 py-6 text-white">
-                                {tickets.length > 0 && tickets.map((item: any) => (
-                                    <div key={item.name} className="pt-2 min-w-[200px] text-center justify-center space-y-4 flex flex-col w-full border shadow-2xl">
+                                {tickets.length > 0 && tickets.map((item: any, index: number) => (
+                                    <div key={index} className="pt-2 min-w-[200px] text-center justify-center space-y-4 flex flex-col w-full border shadow-2xl">
                                         <p className="text-2xl">{item.ticketType}</p>
                                         <p className="text-xs font-black mb-2 block">{item.price}ETH</p>
                                         <button

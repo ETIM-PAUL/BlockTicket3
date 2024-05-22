@@ -93,9 +93,10 @@ export const Balance: React.FC = () => {
       });
   };
 
-  useEffect(() => {
+  function getBalance() {
+    console.log("jjj")
     inspectCall(`balance/${wallet?.accounts[0]?.address}`)
-  }, [])
+  }
 
   function copyToClipboard() {
     if (!wallet) {
@@ -118,6 +119,16 @@ export const Balance: React.FC = () => {
         {reports?.length === 0 && (
           <span className='sm:text-base grotesk font-bold leading-[25.5px] tracking-[0.085px] mt-4 mb-2 text-xl px-3 text-white'>looks like your BlockTicket3 balance is zero! 🙁</span>
         )}
+
+        <div className="w-full flex justify-end">
+          <button
+            className="w-fit h-[58px] disabled:cursor-not-allowed rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-base leading-[25.5px] tracking-[0.5%] mt-6 px-2"
+            onClick={() => getBalance()}
+          >
+            Fetch Balance
+          </button>
+        </div>
+
         {decodedReports && decodedReports.ether && (
           <div className='text-white px-3'>
             <span className='text-base block mb-1.5'>Balance</span>

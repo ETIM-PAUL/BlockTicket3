@@ -27,7 +27,7 @@ const AllEvents = (props: Props) => {
     const navigate = useNavigate();
     const [{ wallet }] = useConnectWallet();
 
-    const handleButtonClick = (button) => {
+    const handleButtonClick = (button: string) => {
         setActiveButton(button);
     };
 
@@ -139,12 +139,12 @@ const AllEvents = (props: Props) => {
                             <h3>No Events</h3>
                         </div>
                     )}
-                    {activeButton === "LiveEvent" && allEvents.length > 0 && allEvents.filter((event) => event.status === 1).length === 0 &&
+                    {activeButton === "LiveEvent" && allEvents.length > 0 && allEvents.filter((event: any) => event.status === 1).length === 0 &&
                         <div className="text-white font-medium text-lg md:text-3xl mt-4 md:mt-10 ">
                             <h3>No Live Events</h3>
                         </div>
                     }
-                    {activeButton === "UpcomingEvent" && allEvents.length > 0 && allEvents.filter((event) => event.status === 0).length === 0 &&
+                    {activeButton === "UpcomingEvent" && allEvents.length > 0 && allEvents.filter((event: any) => event.status === 0).length === 0 &&
                         <div className="text-white font-medium text-lg md:text-3xl mt-4 md:mt-10 ">
                             <h3>No Upcoming Events</h3>
                         </div>
@@ -155,7 +155,7 @@ const AllEvents = (props: Props) => {
                         </div>
                     )}
 
-                    {allEvents.length > 0 && activeButton === "LiveEvent" && allEvents.filter((event) => event.status === 1).map((eventData) => (
+                    {allEvents.length > 0 && activeButton === "LiveEvent" && allEvents.filter((event: any) => event.status === 1).map((eventData: any) => (
                         <div
                             key={eventData?.id}
                             className="flex flex-col w-full md:max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-4 md:mt-10 "
@@ -209,7 +209,7 @@ const AllEvents = (props: Props) => {
                             </Link>
                         </div>
                     ))}
-                    {allEvents.length > 0 && activeButton === "UpcomingEvent" && allEvents.filter((event) => event.status === 0).map((eventData) => (
+                    {allEvents.length > 0 && activeButton === "UpcomingEvent" && allEvents.filter((event: any) => event.status === 0).map((eventData: any) => (
                         <div
                             key={eventData?.id}
                             className="flex flex-col w-full md:max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-4 md:mt-10 "

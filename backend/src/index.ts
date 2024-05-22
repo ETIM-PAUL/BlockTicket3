@@ -3,7 +3,6 @@ import { components, paths } from "./schema";
 import { generate_code } from "./utils";
 import {
   encodeFunctionData,
-  fromHex,
   getAddress,
   hexToBytes,
   hexToString,
@@ -11,12 +10,14 @@ import {
   toHex,
 } from "viem";
 import { Router, AdvanceRoute } from "cartesi-router";
+
 // Importing and initializing DB
-// @ts-ignore
 import { Database } from "node-sqlite3-wasm";
+
 // @ts-ignore
 import { CheckActions } from "./checks";
-import { Wallet, Error_out, Voucher } from "cartesi-wallet";
+
+import { Wallet, Voucher } from "cartesi-wallet";
 
 //abi of erc721 smart contract on L1
 import { erc721abi } from "./erc721";
@@ -122,6 +123,8 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
 
   try {
     let eventString: any = hexToString(payload) as any as Event;
+
+    // set dapp address
     if (
       msg_sender === "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE".toLowerCase()
     ) {
@@ -131,8 +134,8 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
       return "accept";
     }
 
+    //deposit ethers into the dapp
     if (msg_sender === "0xffdbe43d4c855bf7e0f105c400a50857f53ab044") {
-      //deposit ethers into the dapp
       try {
         router.process("ether_deposit", payload);
         return "accept";
@@ -450,11 +453,6 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
 
       //withdraw ether from the dapp
       if (eventPayload.action === "ether_withdraw") {
-        // const balance: any = router.process("balance", msg_sender);
-        // const bal = JSON.parse(fromHex(balance.payload, "string"));
-        // const eth_balance = bal.ether;
-        // router.process("ether_withdraw", data);
-        // return "accept";
         let voucher: any = wallet.ether_withdraw(
           getAddress("0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e"),
           getAddress(msg_sender),
@@ -473,8 +471,6 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
     }
 
     try {
-      console.log("data", data);
-      console.log("eventPayload", eventPayload);
       router.process(eventPayload.action, data);
       processed = true;
     } catch (e) {

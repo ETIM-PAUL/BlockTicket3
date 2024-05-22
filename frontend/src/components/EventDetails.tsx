@@ -1,28 +1,17 @@
-import React, { Suspense, lazy, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { NavLink, useNavigate } from "react-router-dom";
-import { EventsData, formatIPFS } from "../constants";
-import { Link, useParams } from "react-router-dom";
-import WalletConnect from "./WalletConnect";
-import Logo from "./Logo";
+import React, { useEffect, useState } from "react";
+import { formatIPFS } from "../constants";
+import { useParams } from "react-router-dom";
 import ProposalTable from "./ProposalTable";
-import { PurchaseHistory } from "../constants";
-import { minimumPrice, shortenAddress } from "../utils";
+import { minimumPrice } from "../utils";
 import BuyTicketModal from "./modals/BuyTicketModal";
-import TicketPurchaseModal from "./modals/TicketPurchaseModal";
 import StartEventModal from "./modals/StartEventModal";
 import EndEventModal from "./modals/EndEventModal";
 import NewProposalModal from "./modals/NewProposalModal";
-import ParticipantModal from "./modals/ParticipantModal";
 import ParticipantTable from "./ParticipantTable";
-import TopNav from "./TopNav";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import { toast } from "react-toastify";
 import configFile from "../config.json";
 import { ethers } from "ethers";
-import Footer from "./Footer";
 import CancelEventModal from "./modals/CancelEventModal";
 import moment from "moment";
 
@@ -36,6 +25,7 @@ const EventDetails = () => {
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const [{ connectedChain }] = useSetChain();
+    const [balance, setBalance] = useState<string>()
     const [showModal, setShowModal] = useState<boolean>(false);
     const [eventDetails, setEventDetails] = useState<any>();
     const [eventParticipants, setEventParticipants] = useState<any>([]);
@@ -64,7 +54,6 @@ const EventDetails = () => {
     };
 
     const startEvent = () => {
-        console.log(eventDetails?.status)
         if (eventDetails?.status === 1) {
             toast.error("Event is in Progress")
             return;
@@ -78,6 +67,7 @@ const EventDetails = () => {
             )
         }
     };
+
     const endEvent = () => {
         if (eventDetails?.status !== 1) {
             toast.error("Event is not in Progress")
@@ -92,6 +82,7 @@ const EventDetails = () => {
             )
         }
     };
+
     const cancelEvent = () => {
         if (eventDetails?.status !== 0) {
             toast.error("Event has either Started, Ended, or Cancelled ")
@@ -106,6 +97,7 @@ const EventDetails = () => {
             )
         }
     };
+
     const buyTicket = () => {
         if (eventDetails?.status !== 0) {
             toast.error("Event has either Started, Ended, or Cancelled ")
@@ -119,7 +111,6 @@ const EventDetails = () => {
 
     // Find the event with the matching id
     const fetchEventDetails = async (str: string) => {
-        console.log("jj")
         setLoading(true);
         let payload = str;
         if (!connectedChain) {
@@ -188,6 +179,42 @@ const EventDetails = () => {
             });
     }
 
+    const getBalance = async (str: string) => {
+        let payload = str;
+
+        if (!connectedChain) {
+            return;
+        }
+
+        let apiURL = ""
+
+        if (config[connectedChain.id]?.inspectAPIURL) {
+            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+        } else {
+            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+            return;
+        }
+
+        let fetchData: Promise<Response>;
+        if (postData) {
+            const payloadBlob = new TextEncoder().encode(payload);
+            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+        } else {
+            fetchData = fetch(`${apiURL}/${payload}`);
+        }
+        fetchData
+            .then(response => response.json())
+            .then(data => {
+                // Decode payload from each report
+                const decode = data.reports.map((report: Report) => {
+                    return ethers.utils.toUtf8String(report.payload);
+                });
+                const reportData: any = JSON.parse(decode)
+                setBalance(ethers.utils.formatEther(reportData?.ether))
+                //console.log(parseEther("1000000000000000000", "gwei"))
+            });
+    };
+
     const showProposalModal = () => {
         if (eventParticipants?.length > 0 && eventParticipants.finwallet?.accounts[0]?.address === eventDetails?.organizer) {
             toast.error("Unauthorized access. You'are Event Organizer");
@@ -206,12 +233,13 @@ const EventDetails = () => {
     useEffect(() => {
         fetchEventDetails(`get/${Number(id)}`)
         fetchReferralCodes(`get_event_referrals/${Number(id)}`)
+        getBalance(`balance/${wallet?.accounts[0]?.address}`)
         // If no eventData was found, show a message
     }, [])
 
     return (
-        <>
-            {eventDetails?.id ?
+        <div className="h-full">
+            {(eventDetails?.id && !loading) &&
                 <main className="min-h-screen bg-white">
                     <div className="bg-white px-3 py-4 md:px-20 md:py-10 flex flex-col items-stretch">
                         <div className="flex w-full flex-col items-stretch ">
@@ -366,10 +394,10 @@ const EventDetails = () => {
                                 }
 
                                 {/* Modals */}
-                                {/*  */}
                                 <BuyTicketModal
                                     id={Number(id)}
                                     isVisible={showModal}
+                                    balance={balance}
                                     organizer={eventDetails.organizer}
                                     capacity={eventDetails.capacity}
                                     referral={eventDetails.referral}
@@ -381,8 +409,6 @@ const EventDetails = () => {
                                         fetchEventDetails(`get/${Number(id)}`)
                                     }
                                 />
-
-                                {/*  */}
 
                                 <div className="">
                                     <StartEventModal
@@ -397,9 +423,6 @@ const EventDetails = () => {
                                         }
                                         eventDetails={eventDetails}
                                         setEventDetails={setEventDetails}
-                                        fetchEventDetails={() =>
-                                            fetchEventDetails(`get/${Number(id)}`)
-                                        }
 
                                     />
 
@@ -415,9 +438,6 @@ const EventDetails = () => {
                                         }
                                         eventDetails={eventDetails}
                                         setEventDetails={setEventDetails}
-                                        fetchEventDetails={() =>
-                                            fetchEventDetails(`get/${Number(id)}`)
-                                        }
                                     />
                                     <CancelEventModal
                                         isVisible={
@@ -431,9 +451,6 @@ const EventDetails = () => {
                                         }
                                         eventDetails={eventDetails}
                                         setEventDetails={setEventDetails}
-                                        fetchEventDetails={() =>
-                                            fetchEventDetails(`get/${Number(id)}`)
-                                        }
                                     />
                                 </div>
 
@@ -463,10 +480,25 @@ const EventDetails = () => {
                             </div>
                         </div>
                     </div>
-
-                    <Footer />
                 </main>
-                :
+            }
+            {(!eventDetails?.id && loading) &&
+
+                <div className="h-full flex flex-col">
+                    <div className="w-full bg-[#EEE1FF] h-2"></div>
+
+                    <div className="bg-base-100 h-full py-8 px-10 md:px-24 bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
+
+                        <div
+                            className="text-white font-medium text-lg md:text-3xl mt-10 "
+                        >
+                            <h3>Fetching Event Details</h3>
+                        </div>
+                    </div>
+                </div>
+            }
+            {(!eventDetails?.id && !loading) &&
+
                 <div className="h-full flex flex-col">
                     <div className="w-full bg-[#EEE1FF] h-2"></div>
 
@@ -478,11 +510,9 @@ const EventDetails = () => {
                             <h3>Invalid Event</h3>
                         </div>
                     </div>
-                    <div className="w-full bg-[#EEE1FF] h-2"></div>
-                    <Footer />
                 </div>
             }
-        </>
+        </div>
     );
 };
 

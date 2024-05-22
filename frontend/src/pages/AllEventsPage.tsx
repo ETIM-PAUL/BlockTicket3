@@ -12,11 +12,9 @@ const AllEventsPage = (props: Props) => {
     return (
         <div className=" bg-gradient-to-l from-[#5522CC] to-[#ED4690] flex flex-col min-h-screen">
             {" "}
-            {/* Updated class */}
             <TopNav />
             <main className="flex-grow">
                 {" "}
-                {/* New main tag with flex-grow */}
                 {connectedWallet ? (
                     <AllEvents />
                 ) : (

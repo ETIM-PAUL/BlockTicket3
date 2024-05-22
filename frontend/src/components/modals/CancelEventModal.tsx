@@ -10,10 +10,9 @@ type Props = {
   onClose: boolean | void | string | any;
   eventDetails: any
   setEventDetails: any
-  fetchEventDetails: any;
 };
 
-const CancelEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails, fetchEventDetails }: Props) => {
+const CancelEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails }: Props) => {
   const [processing, setProcessing] = useState<boolean>(false)
   const rollups = useRollups(DappAddress);
 
@@ -35,7 +34,6 @@ const CancelEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetail
           setEventDetails({ ...eventDetails, status: 3 })
           toast.success("Event has been cancelled successfully")
           setProcessing(false);
-          fetchEventDetails();
           onClose();
         }
       } catch (error) {

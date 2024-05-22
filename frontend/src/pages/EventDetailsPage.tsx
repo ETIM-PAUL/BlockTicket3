@@ -10,9 +10,11 @@ const EventDetailsPage = (props: Props) => {
     const [connectedWallet] = useWallets();
 
     return (
-        <div className="bg-white flex flex-col h-full w-full">
+        <div className=" bg-gradient-to-l from-[#5522CC] to-[#ED4690] flex flex-col min-h-screen">
+            {" "}
             <TopNav />
-            <div className="h-[80vh]">
+            <main className="flex-grow">
+                {" "}
                 {connectedWallet ?
                     <EventDetails />
                     :
@@ -26,11 +28,14 @@ const EventDetailsPage = (props: Props) => {
                                 <h3>Please Connect Your Wallet to Fetch The Event Details</h3>
                             </div>
                         </div>
-                        <div className="w-full bg-[#EEE1FF] h-2"></div>
-                        <Footer />
                     </div>
                 }
-            </div>
+            </main>
+            <footer className="mt-auto">
+                <div className="w-full bg-[#EEE1FF] h-2"></div>
+
+                <Footer />
+            </footer>
         </div>
     );
 };

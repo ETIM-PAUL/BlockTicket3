@@ -1,20 +1,72 @@
 import { ethers } from "ethers";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DappAddress } from "../../constants";
 import { useRollups } from "../../useRollups";
 import { toast } from "react-toastify";
+import { useSetChain } from "@web3-onboard/react";
+import configFile from "../../config.json";
+
+const config: any = configFile;
+interface Report {
+  payload: string;
+}
 
 type Props = {
   isVisible: boolean;
   id: Number;
   ticket_id: Number;
   onClose: boolean | void | string | any;
-  fetchEventDetails: any;
+  walletNavigate: any;
 };
 
-const ClaimNFTModal = ({ isVisible, onClose, id, ticket_id, fetchEventDetails }: Props) => {
+const ClaimNFTModal = ({ isVisible, onClose, id, ticket_id, walletNavigate }: Props) => {
   const [processing, setProcessing] = useState<boolean>(false)
+  const [nftUrl, setNFTUrl] = useState<string>("")
   const rollups = useRollups(DappAddress);
+  const [postData, setPostData] = useState<boolean>(false);
+  const [{ connectedChain }] = useSetChain();
+
+
+  // Find the event with the matching id
+  const fetchEventDetails = async (str: string) => {
+    let payload = str;
+    if (!connectedChain) {
+      return;
+    }
+
+    let apiURL = ""
+
+    if (config[connectedChain.id]?.inspectAPIURL) {
+      apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+    } else {
+      console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+      return;
+    }
+
+    let fetchData: Promise<Response>;
+    if (postData) {
+      const payloadBlob = new TextEncoder().encode(payload);
+      fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+    } else {
+      fetchData = fetch(`${apiURL}/${payload}`);
+    }
+    fetchData
+      .then(response => response.json())
+      .then(data => {
+        // Decode payload from each report
+        const decode = data.reports.map((report: Report) => {
+          return ethers.utils.toUtf8String(report.payload);
+        });
+        const reportData = JSON.parse(decode)
+        console.log(reportData)
+        setNFTUrl(reportData.event?.tokenUrl)
+      });
+  }
+
+  useEffect(() => {
+    fetchEventDetails(`get/${Number(id)}`)
+    // If no eventData was found, show a message
+  }, [])
 
   if (!isVisible) return null;
 
@@ -22,16 +74,16 @@ const ClaimNFTModal = ({ isVisible, onClose, id, ticket_id, fetchEventDetails }:
     if (rollups) {
       try {
         setProcessing(true);
-        let str = `{"action": "claim_nft", "id": ${id}, ticket_id: ${ticket_id}`
+        let str = `{"action": "claim_nft", "id": ${id}, "ticket_id": ${ticket_id}, "nft_url":"${nftUrl}"`
         let data = ethers.utils.toUtf8Bytes(str);
 
         const result = await rollups.inputContract.addInput(DappAddress, data);
         const receipt = await result.wait(1);
         // Search for the InputAdded event
-        const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+        receipt.events?.find((e: any) => e.event === "InputAdded");
         toast.success("Event NFT Voucher has been created successfully")
         setProcessing(false);
-        fetchEventDetails();
+        walletNavigate();
         onClose();
       } catch (error) {
         console.log("error", error)
