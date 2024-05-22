@@ -31,8 +31,8 @@ import {
   Button,
   Stack,
   Box,
-  Spacer
-} from '@chakra-ui/react'
+  Spacer,
+} from "@chakra-ui/react";
 import { shortenAddress } from "./utils";
 import { toast } from "react-toastify";
 
@@ -61,34 +61,39 @@ export const Balance: React.FC = () => {
       return;
     }
 
-    let apiURL = ""
+    let apiURL = "";
 
     if (config[connectedChain.id]?.inspectAPIURL) {
       apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
     } else {
-      console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+      console.error(
+        `No inspect interface defined for chain ${connectedChain.id}`
+      );
       return;
     }
 
     let fetchData: Promise<Response>;
     if (postData) {
       const payloadBlob = new TextEncoder().encode(payload);
-      fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+      fetchData = fetch(`${apiURL}`, {
+        method: "POST",
+        body: payloadBlob,
+      });
     } else {
       fetchData = fetch(`${apiURL}/${payload}`);
     }
     fetchData
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         setReports(data.reports);
         // Decode payload from each report
         const decode = data.reports.map((report: Report) => {
           return ethers.utils.toUtf8String(report.payload);
         });
-        const reportData = JSON.parse(decode)
-        console.log("reportData")
-        console.log(reportData)
-        setDecodedReports(reportData)
+        const reportData = JSON.parse(decode);
+        console.log("reportData");
+        console.log(reportData);
+        setDecodedReports(reportData);
         //console.log(parseEther("1000000000000000000", "gwei"))
       });
   };
@@ -102,11 +107,14 @@ export const Balance: React.FC = () => {
     if (!wallet) {
       return;
     }
-    navigator.clipboard.writeText(wallet?.accounts[0]?.address).then(function () {
-      toast.success("Wallet address copied successfully");
-    }).catch(function (err) {
-      console.error('Could not copy text: ', err);
-    });
+    navigator.clipboard
+      .writeText(wallet?.accounts[0]?.address)
+      .then(function () {
+        toast.success("Wallet address copied successfully");
+      })
+      .catch(function (err) {
+        console.error("Could not copy text: ", err);
+      });
   }
 
   return (
