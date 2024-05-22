@@ -15,5 +15,6 @@
         "noEmit": true,
         "jsx": "react-jsx"
     },
-    "include": ["frontend/src"]
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
 }

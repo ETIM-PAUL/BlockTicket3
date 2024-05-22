@@ -287,7 +287,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                   defaultValue={0.01}
                   value={etherAmount}
                   onChange={(e) => setEtherAmount(e.target.value)}
-                  type="text"
+                  type="number"
                   className="w-full text-[36px] placeholder:text-[24px] leading-[53.2px] text-[#696969] h-[100%] outline-none rounded-r-lg"
                 />
               </div>
@@ -295,13 +295,13 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
 
             <div className="flex justify-center">
               <button
-                className="w-[360px] h-[58px] rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
+                className="w-[360px] h-[58px] disabled:cursor-not-allowed rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
                 onClick={() => {
                   withdrawEther(Number(etherAmount));
                 }}
                 disabled={!rollups || depositing || processing}
               >
-                {depositing ? "Processing" : "Withdraw"}
+                {processing ? "Processing" : "Withdraw"}
               </button>
             </div>
           </div>
@@ -317,7 +317,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                 <div className="w-full flex flex-col items-center">
                   Let the dApp know its address! <br />
                   <button
-                    className="w-[360px] h-[58px] rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
+                    className="w-[360px] h-[58px] disabled:cursor-not-allowed rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
                     onClick={() => sendAddress()}
                     disabled={!rollups || depositing || processing}
                   >

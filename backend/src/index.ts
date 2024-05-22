@@ -12,13 +12,14 @@ import {
 } from "viem";
 import { Router, AdvanceRoute } from "cartesi-router";
 // Importing and initializing DB
+// @ts-ignore
 import { Database } from "node-sqlite3-wasm";
 // @ts-ignore
 import { CheckActions } from "./checks";
 import { Wallet, Error_out, Voucher } from "cartesi-wallet";
 
 //abi of erc721 smart contract on L1
-import erc721abi from "./erc721.json";
+import { erc721abi } from "./erc721";
 
 import { Event, EventPayload, EventStatus } from "./interface";
 
@@ -34,7 +35,8 @@ const erc721_contract_address = getAddress(
 const wallet = new Wallet(new Map());
 
 //Database instance
-const db = new Database("database.db");
+// let db = new Database(":memory:");
+let db = new Database("/tmp/database.db");
 
 const check_actions = new CheckActions(wallet, db);
 
@@ -94,7 +96,7 @@ type AdvanceRequestHandler = (
 ) => Promise<RequestHandlerResult>;
 
 let DAPP_ADDRESS: any =
-  "0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C".toLowerCase();
+  "0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e".toLowerCase();
 
 class MintNft extends AdvanceRoute {
   execute = (request: any) => {
@@ -111,7 +113,7 @@ class MintNft extends AdvanceRoute {
 
 router.addRoute("mint_nft", new MintNft());
 
-const handleAdvance: any = async (data: any) => {
+const handleAdvance: AdvanceRequestHandler = async (data: any) => {
   console.log("Received advance request data " + JSON.stringify(data));
   const payload = data.payload;
   let processed = false;
@@ -119,8 +121,7 @@ const handleAdvance: any = async (data: any) => {
   const msg_sender = data.metadata.msg_sender.toLowerCase();
 
   try {
-    let eventPayload: any = JSON.parse(fromHex(payload, "string")) as Event;
-
+    let eventString: any = hexToString(payload) as any as Event;
     if (
       msg_sender === "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE".toLowerCase()
     ) {
@@ -137,16 +138,19 @@ const handleAdvance: any = async (data: any) => {
         return "accept";
       } catch (error) {
         console.log(error);
-        return "false";
+        return "reject";
       }
     }
+
+    let eventPayload = JSON.parse(eventString);
 
     if (
       msg_sender !== "0xffdbe43d4c855bf7e0f105c400a50857f53ab044" &&
       msg_sender !== "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE" &&
       msg_sender !== "0x59b22D57D4f067708AB0c00552767405926dc768"
     ) {
-      if (!eventPayload.action) throw new Error("No action provided");
+      if (eventPayload?.action === undefined || eventPayload?.action === null)
+        throw new Error("No action provided");
 
       //Creating Event
       if (eventPayload.action === "create_event") {
@@ -264,7 +268,7 @@ const handleAdvance: any = async (data: any) => {
 
       //Start Event
       if (eventPayload.action === "start_event") {
-        const event = await db.get(
+        const event: any = await db.get(
           `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
         );
         if (event?.organizer === data.metadata.msg_sender.toLowerCase()) {
@@ -302,7 +306,7 @@ const handleAdvance: any = async (data: any) => {
 
       //Cancel Event
       if (eventPayload.action === "cancel_event") {
-        const event = await db.get(
+        const event: any = await db.get(
           `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
         );
         if (event?.organizer === data.metadata.msg_sender.toLowerCase()) {
@@ -351,7 +355,7 @@ const handleAdvance: any = async (data: any) => {
 
       //create a proposal for an event you are participating
       if (eventPayload.action === "create_proposal") {
-        const event = await db.get(
+        const event: any = await db.get(
           `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
         );
         const event_participants = await db.all(
@@ -380,7 +384,7 @@ const handleAdvance: any = async (data: any) => {
 
       //vote or downvote on a proposal
       if (eventPayload.action === "action_proposal") {
-        const event = await db.get(
+        const event: any = await db.get(
           `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
         );
         const event_proposal: any = await db.get(
@@ -425,9 +429,9 @@ const handleAdvance: any = async (data: any) => {
         } else throw new Error("Access Denied");
       }
 
-      //withdraw ether from the dapp
+      //claim poap after event ends
       if (eventPayload.action === "claim_nft") {
-        const event = await db.get(
+        const event: any = await db.get(
           `SELECT * FROM events WHERE id = ${eventPayload.id} LIMIT 1;`
         );
         const event_participants = await db.all(
@@ -446,36 +450,35 @@ const handleAdvance: any = async (data: any) => {
 
       //withdraw ether from the dapp
       if (eventPayload.action === "ether_withdraw") {
-        const balance: any = router.process("balance", msg_sender);
-        const bal = JSON.parse(fromHex(balance.payload, "string"));
-        const eth_balance = bal.ether;
+        // const balance: any = router.process("balance", msg_sender);
+        // const bal = JSON.parse(fromHex(balance.payload, "string"));
+        // const eth_balance = bal.ether;
+        // router.process("ether_withdraw", data);
+        // return "accept";
+        let voucher: any = wallet.ether_withdraw(
+          getAddress("0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e"),
+          getAddress(msg_sender),
+          BigInt(eventPayload?.args?.amount)
+        );
 
-        if (Number(eventPayload?.args?.amount) <= Number(eth_balance)) {
-          let voucher: any = wallet.ether_withdraw(
-            getAddress("0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE"),
-            getAddress(msg_sender),
-            BigInt(eventPayload?.args?.amount)
-          );
-
-          if (voucher?.destination) {
-            const advance_req = await fetch(rollup_server + "/voucher", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(voucher),
-            });
-            return "accept";
-          }
-        } else throw new Error("Insufficient funds");
+        if (voucher?.destination) {
+          const advance_req = await fetch(rollup_server + "/voucher", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(voucher),
+          });
+          return "accept";
+        }
       }
     }
 
     try {
       console.log("data", data);
       console.log("eventPayload", eventPayload);
-      router.process(eventPayload.method, data);
+      router.process(eventPayload.action, data);
       processed = true;
     } catch (e) {
-      return new Error_out(`failed to process command ${payload} ${e}`);
+      return "reject";
     }
 
     if (processed) {

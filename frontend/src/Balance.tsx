@@ -86,7 +86,8 @@ export const Balance: React.FC = () => {
           return ethers.utils.toUtf8String(report.payload);
         });
         const reportData = JSON.parse(decode)
-
+        console.log("reportData")
+        console.log(reportData)
         setDecodedReports(reportData)
         //console.log(parseEther("1000000000000000000", "gwei"))
       });

@@ -3,8 +3,6 @@
   "version": "0.1.0",
   "description": "BlockTicket3 DApp",
   "dependencies": {
-    "@dao-library/core": "^2.1.0",
-    "@dao-library/voting": "^2.1.0",
     "cartesi-router": "^1.0.4",
     "cartesi-wallet": "^1.0.5",
     "ethers": "^6.7.1",

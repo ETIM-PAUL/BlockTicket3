@@ -58,21 +58,24 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
     };
 
     const executeVoucher = async (voucher: any) => {
+        console.log("receipt", voucher)
         if (rollups && !!voucher.proof) {
-
             const newVoucherToExecute = { ...voucher };
             try {
                 const tx = await rollups.dappContract.executeVoucher(voucher.destination, voucher.payload, voucher.proof);
                 const receipt = await tx.wait();
                 newVoucherToExecute.msg = `voucher executed! (tx="${tx.hash}")`;
+
                 if (receipt.events) {
                     newVoucherToExecute.msg = `${newVoucherToExecute.msg} - resulting events: ${JSON.stringify(receipt.events)}`;
                     newVoucherToExecute.executed = await rollups.dappContract.wasVoucherExecuted(BigNumber.from(voucher.input.index), BigNumber.from(voucher.index));
+                    console.log("newVoucher", newVoucherToExecute)
                 }
             } catch (e) {
                 newVoucherToExecute.msg = `COULD NOT EXECUTE VOUCHER: ${JSON.stringify(e)}`;
                 console.log(`COULD NOT EXECUTE VOUCHER: ${JSON.stringify(e)}`);
             }
+
             setVoucherToExecute(newVoucherToExecute);
         }
     }
