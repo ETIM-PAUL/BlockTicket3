@@ -4,11 +4,10 @@ import VoteModal from "./modals/VoteModal";
 type Props = {
     event_id: any;
     event_organizer: any;
-    fetchEventDetails: any;
     eventProposals: any;
 };
 
-const ProposalTable = ({ eventProposals, fetchEventDetails, event_id, event_organizer }: Props) => {
+const ProposalTable = ({ eventProposals, event_id, event_organizer }: Props) => {
     const [showModal, setShowModal] = useState<boolean>(false);
     return (
         <div className="mt-4">
@@ -59,7 +58,6 @@ const ProposalTable = ({ eventProposals, fetchEventDetails, event_id, event_orga
                                             event_organizer={event_organizer}
                                             event_id={event_id}
                                             proposal={proposalData}
-                                            fetchEventDetails={fetchEventDetails}
                                             isVisible={showModal}
                                             onClose={() => setShowModal(false)}
                                         />

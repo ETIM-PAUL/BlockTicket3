@@ -1,30 +1,33 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useRollups } from "../../useRollups";
 import { DappAddress } from "../../constants";
 import { ethers } from "ethers";
 import { toast } from "react-toastify";
 import { useConnectWallet } from "@web3-onboard/react";
+import { GlobalContext } from "../../context/GlobalContext";
 
 type Props = {
     isVisible: boolean;
     id: number;
     balance: any;
+    setBalance: any;
     capacity: number;
-    purchased_tickets: number;
+    purchased_tickets: any;
     organizer: string;
     onClose: boolean | void | string | any;
     tickets: any;
     referral: number;
-    fetchEventDetails: any;
+    setEventParticipants: any;
     eventReferrals: any;
 };
 
-const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, organizer, capacity, referral, fetchEventDetails, eventReferrals, purchased_tickets }: Props) => {
+const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, setBalance, organizer, capacity, referral, eventReferrals, purchased_tickets, setEventParticipants }: Props) => {
     const [processing, setProcessing] = useState<boolean>(false)
     const [ticketId, setTicketId] = useState<number>(0)
     const [referralCode, setReferralCode] = useState<number>(0)
     const rollups = useRollups(DappAddress);
     const [{ wallet }] = useConnectWallet();
+    const { state, dispatch }: any = useContext(GlobalContext);
 
 
     const processTicket = async (ticket_details: any) => {
@@ -32,11 +35,12 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, organizer, c
             toast.error("Unauthorized access. You are Event Organizer")
             return;
         }
+
         if (Number(balance) < Number(ticket_details?.price)) {
             toast.error("Insufficient Funds. Please Deposit into the DAPP")
             return;
         }
-        if (capacity === purchased_tickets) {
+        if (capacity === purchased_tickets?.length) {
             toast.error("Event has reached it's capacity")
             return;
         }
@@ -51,9 +55,14 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, organizer, c
                 const receipt = await result.wait(1);
                 // Search for the InputAdded event
                 const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+                dispatch({
+                    type: "SET_BALANCE",
+                    payload: (Number(state.balance) - Number(ticket_details?.price)).toString(),
+                });
+                setBalance(ticket_details?.price.toString())
                 toast.success("Event ticket purchased successfully")
                 setProcessing(false);
-                fetchEventDetails();
+                setEventParticipants([...purchased_tickets, { "id": purchased_tickets[purchased_tickets.length - 1] ? purchased_tickets[purchased_tickets.length - 1].id + 1 : 1, "event_id": id, "ticket_type_id": ticket_details?.id, "purchased_time": new Date(), "ticket_type": ticket_details?.ticketType, "address": wallet?.accounts[0]?.address, "refunded": false, "claimedNFT": false }]);
                 onClose();
             } catch (error) {
                 console.log("error", error)
@@ -65,7 +74,7 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, organizer, c
     }
 
     const processTicketReferral = async (ticket_details: any) => {
-        if (capacity === purchased_tickets) {
+        if (capacity === purchased_tickets?.length) {
             toast.error("Event has reached it's capacity")
             return;
         }
@@ -92,9 +101,14 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, organizer, c
                 const receipt = await result.wait(1);
                 // Search for the InputAdded event
                 const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+                dispatch({
+                    type: "SET_BALANCE",
+                    payload: (Number(state.balance) - Number(ticket_details?.price)).toString(),
+                });
+                setBalance(ticket_details?.price.toString())
                 toast.success("Event ticket purchased successfully")
                 setProcessing(false);
-                fetchEventDetails();
+                setEventParticipants([...purchased_tickets, { "id": purchased_tickets[purchased_tickets.length - 1] ? purchased_tickets[purchased_tickets.length - 1].id + 1 : 1, "event_id": id, "ticket_type_id": ticket_details?.id, "purchased_time": new Date(), "ticket_type": ticket_details?.ticketType, "address": wallet?.accounts[0]?.address, "refunded": false, "claimedNFT": false }]);
                 onClose();
             } catch (error) {
                 console.log("error", error)
@@ -108,7 +122,6 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, organizer, c
     return (
         <>
             <div className="fixed inset-0 z-10 items-center justify-center bg-[#292929] bg-opacity-75"></div>
-
             <div
                 className="fixed inset-0 flex justify-center items-center z-50"
                 id="wrapper"

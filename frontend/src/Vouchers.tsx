@@ -27,6 +27,7 @@ import {
     Button,
     Text
 } from '@chakra-ui/react'
+import { toast } from "react-toastify";
 
 type Voucher = {
     id: string;
@@ -45,6 +46,7 @@ interface IVoucherPropos {
 export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
     const [result, reexecuteQuery] = useVouchersQuery();
     const [voucherToFetch, setVoucherToFetch] = React.useState([0, 0]);
+    const [executing, setExecuting] = React.useState(false);
     const [voucherResult, reexecuteVoucherQuery] = useVoucherQuery({
         variables: { voucherIndex: voucherToFetch[0], inputIndex: voucherToFetch[1] }//, pause: !!voucherIdToFetch
     });
@@ -58,7 +60,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
     };
 
     const executeVoucher = async (voucher: any) => {
-        console.log("receipt", voucher)
+        setExecuting(true);
         if (rollups && !!voucher.proof) {
             const newVoucherToExecute = { ...voucher };
             try {
@@ -70,8 +72,12 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                     newVoucherToExecute.msg = `${newVoucherToExecute.msg} - resulting events: ${JSON.stringify(receipt.events)}`;
                     newVoucherToExecute.executed = await rollups.dappContract.wasVoucherExecuted(BigNumber.from(voucher.input.index), BigNumber.from(voucher.index));
                     console.log("newVoucher", newVoucherToExecute)
+                    toast.success("Voucher Executed successfully!");
+                    setExecuting(false);
                 }
             } catch (e) {
+                setExecuting(false);
+                toast.error("Could not execute voucher")
                 newVoucherToExecute.msg = `COULD NOT EXECUTE VOUCHER: ${JSON.stringify(e)}`;
                 console.log(`COULD NOT EXECUTE VOUCHER: ${JSON.stringify(e)}`);
             }
@@ -218,7 +224,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                             <Td>{voucherToExecute.input.index}</Td>
                             {/*<Td>{voucherToExecute.destination}</Td> */}
                             <Td>
-                                <Button size='sm' isDisabled={!voucherToExecute.proof || voucherToExecute.executed} onClick={() => executeVoucher(voucherToExecute)}>{voucherToExecute.proof ? (voucherToExecute.executed ? "Voucher executed" : "Execute voucher") : "No proof yet"}</Button>
+                                <Button size='sm' isDisabled={!voucherToExecute.proof || voucherToExecute.executed || executing} onClick={() => executeVoucher(voucherToExecute)}>{voucherToExecute.proof ? (voucherToExecute.executed ? "Voucher executed" : executing ? "Executing" : "Execute voucher") : "No proof yet"}</Button>
                             </Td>
                             <Td>{voucherToExecute.index}</Td>
                             {/* <td>{voucherToExecute.payload}</td> */}
@@ -256,7 +262,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                                 <Button size='sm' onClick={() => getProof(n)}>Info</Button>
                             </Td>
                             {/* <td>{n.input.payload}</td> */}
-                            <Td color={'grey'}>{n.payload}</Td>
+                            <span className="text-gray-500 text-wrap max-w-[200px] my-2 block">{n.payload}</span>
                             {/* <td>
                                 <button disabled={!!n.proof} onClick={() => executeVoucher(n)}>Execute voucher</button>
                             </td> */}

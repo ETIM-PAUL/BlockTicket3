@@ -46,12 +46,14 @@ export const Balance: React.FC = () => {
   const [decodedReports, setDecodedReports] = useState<any>({});
   const [hexData, setHexData] = useState<boolean>(false);
   const [postData, setPostData] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // const rollups = useRollups();
   const [{ connectedChain }] = useSetChain();
   const [{ wallet }] = useConnectWallet();
 
   const inspectCall = async (str: string) => {
+    setLoading(true)
     let payload = str;
     if (hexData) {
       const uint8array = ethers.utils.arrayify(payload);
@@ -91,15 +93,15 @@ export const Balance: React.FC = () => {
           return ethers.utils.toUtf8String(report.payload);
         });
         const reportData = JSON.parse(decode);
-        console.log("reportData");
-        console.log(reportData);
         setDecodedReports(reportData);
+        toast.success("current balance fetched")
         //console.log(parseEther("1000000000000000000", "gwei"))
-      });
+        setLoading(false)
+      }
+      );
   };
 
   function getBalance() {
-    console.log("jjj")
     inspectCall(`balance/${wallet?.accounts[0]?.address}`)
   }
 
@@ -119,7 +121,7 @@ export const Balance: React.FC = () => {
 
   return (
     <Box borderWidth='1px' borderRadius='lg' overflow='hidden'>
-      <div className=" bg-no-repeat p-4 rounded-[8px] min-w-[305px] h-[200px] flex flex-col items-between justify-between bg-gradient-to-r from-[#5522CC] to-[#ED4690]">
+      <div className=" bg-no-repeat p-4 rounded-[8px] w-full h-[250px] flex flex-col items-between justify-between bg-gradient-to-r from-[#5522CC] to-[#ED4690]">
         <div className="flex items-center justify-end gap-2 py-1">
           <span className="text-xl md:text-4xl font-bold text-white ">{shortenAddress(wallet?.accounts[0]?.address)}</span>
           <BsClipboard2Fill onClick={copyToClipboard} className="text-white hover:text-blue-400 cursor-pointer text-2xl" />
@@ -133,7 +135,7 @@ export const Balance: React.FC = () => {
             className="w-fit h-[58px] disabled:cursor-not-allowed rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-base leading-[25.5px] tracking-[0.5%] mt-6 px-2"
             onClick={() => getBalance()}
           >
-            Fetch Balance
+            {loading ? "Fetching..." : "Fetch Balance"}
           </button>
         </div>
 

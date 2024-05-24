@@ -4,15 +4,17 @@ import { toast } from "react-toastify";
 import { useRollups } from "../../useRollups";
 import { DappAddress } from "../../constants";
 import { ethers } from "ethers";
+import { useConnectWallet } from "@web3-onboard/react";
 
 type Props = {
     id: number;
-    fetchEventDetails: any;
+    eventProposals: any;
+    setEventProposals: any;
     isVisible: boolean;
     onClose: boolean | void | string | any;
 };
 
-const NewProposalModal = ({ isVisible, onClose, fetchEventDetails, id }: Props) => {
+const NewProposalModal = ({ isVisible, onClose, setEventProposals, eventProposals, id }: Props) => {
     const [proposal, setProposal] = useState("");
     const [processing, setProcessing] = useState<boolean>(false)
     const rollups = useRollups(DappAddress);
@@ -38,11 +40,11 @@ const NewProposalModal = ({ isVisible, onClose, fetchEventDetails, id }: Props) 
                     const result = await rollups.inputContract.addInput(DappAddress, data);
                     const receipt = await result.wait(1);
                     // Search for the InputAdded event
-                    const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+                    receipt.events?.find((e: any) => e.event === "InputAdded");
                     setProposal("");
                     toast.success("Proposal created successfully")
                     setProcessing(false);
-                    fetchEventDetails();
+                    setEventProposals([...eventProposals, { "id": eventProposals[eventProposals.length - 1].id++, "proposer": proposal, "upvotes": 0, "downvotes": 0 }])
                     onClose();
                 } catch (error) {
                     console.log("error", error)

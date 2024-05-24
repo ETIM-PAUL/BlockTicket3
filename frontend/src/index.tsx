@@ -27,6 +27,7 @@ import CreateEventPage from "./pages/CreateEventPage";
 import UserDashboardPage from "./pages/UserDashboardPage";
 import { ChakraProvider } from "@chakra-ui/react";
 import Wallet from "./pages/Wallet";
+import GlobalProvider from "./context/GlobalContext";
 
 const container = document.getElementById("root");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
@@ -82,12 +83,15 @@ const router = createBrowserRouter([
         element: <UserDashboardPage />,
     },
 ]);
+
 root.render(
     <Web3OnboardProvider web3Onboard={web3Onboard}>
         <ChakraProvider>
-            <div className="">
-                <RouterProvider router={router} />
-            </div>
+            <GlobalProvider>
+                <div className="">
+                    <RouterProvider router={router} />
+                </div>
+            </GlobalProvider>
         </ChakraProvider>
         <ToastContainer />
     </Web3OnboardProvider>

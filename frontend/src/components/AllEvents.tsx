@@ -1,28 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { EventsData, formatDate, formatIPFS } from "../constants";
+import { formatDate, formatIPFS } from "../constants";
 import { CiLocationOn } from "react-icons/ci";
 import { CiCalendarDate } from "react-icons/ci";
 import { GiTakeMyMoney } from "react-icons/gi";
-import TopNav from "./TopNav";
 import { toast } from "react-toastify";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import configFile from "../config.json";
-import { ethers } from "ethers";
+import { GlobalContext } from "../context/GlobalContext";
 
 type Props = {};
 
 const config: any = configFile;
-interface Report {
-    payload: string;
-}
+
 
 const AllEvents = (props: Props) => {
     const [activeButton, setActiveButton] = useState("LiveEvent");
-    const [loading, setLoading] = useState(false);
-    const [allEvents, setAllEvents] = useState<any>([]);
+    const { state } = useContext(GlobalContext);
     const [{ connectedChain }] = useSetChain();
-    const [postData, setPostData] = useState<boolean>(false);
 
     const navigate = useNavigate();
     const [{ wallet }] = useConnectWallet();
@@ -31,62 +26,6 @@ const AllEvents = (props: Props) => {
         setActiveButton(button);
     };
 
-    const fetchEvents = async (str: string) => {
-        try {
-            setLoading(true);
-            let payload = str;
-            if (!connectedChain) {
-                return;
-            }
-
-            let apiURL = "";
-
-            if (config[connectedChain.id]?.inspectAPIURL) {
-                apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
-            } else {
-                console.error(
-                    `No inspect interface defined for chain ${connectedChain.id}`
-                );
-                setLoading(false);
-                return;
-            }
-
-            let fetchData: Promise<Response>;
-            if (postData) {
-                const payloadBlob = new TextEncoder().encode(payload);
-                fetchData = fetch(`${apiURL}`, {
-                    method: "POST",
-                    body: payloadBlob,
-                });
-            } else {
-                fetchData = fetch(`${apiURL}/${payload}`);
-            }
-            fetchData
-                .then((response) => response.json())
-                .then((data) => {
-                    // Decode payload from each report
-                    const decode = data.reports.map((report: Report) => {
-                        return ethers.utils.toUtf8String(report.payload);
-                    });
-                    const reportData = JSON.parse(decode);
-                    setAllEvents(reportData);
-                    console.log(reportData)
-                    setLoading(false);
-                });
-        } catch (error) {
-            setLoading(false);
-            console.log(error);
-            setAllEvents([]);
-        }
-    };
-
-    useEffect(() => {
-        let closed;
-        if (!closed) {
-            fetchEvents("get_all/");
-        }
-        closed = false;
-    }, []);
 
     const createEvent = () => {
         if (!wallet?.accounts) {
@@ -134,28 +73,28 @@ const AllEvents = (props: Props) => {
                     </div>
                 }
                 <div className="flex flex-wrap justify-start gap-4 mt-4 mx-1 pb-20">
-                    {allEvents.length === 0 && !loading && (
+                    {state.events.length === 0 && !state?.loading && (
                         <div className="text-white font-medium text-lg md:text-3xl mt-4 md:mt-10 ">
                             <h3>No Events</h3>
                         </div>
                     )}
-                    {activeButton === "LiveEvent" && allEvents.length > 0 && allEvents.filter((event: any) => event.status === 1).length === 0 &&
+                    {activeButton === "LiveEvent" && state.events.length > 0 && state.events.filter((event: any) => event.status === 1).length === 0 &&
                         <div className="text-white font-medium text-lg md:text-3xl mt-4 md:mt-10 ">
                             <h3>No Live Events</h3>
                         </div>
                     }
-                    {activeButton === "UpcomingEvent" && allEvents.length > 0 && allEvents.filter((event: any) => event.status === 0).length === 0 &&
+                    {activeButton === "UpcomingEvent" && state.events.length > 0 && state.events.filter((event: any) => event.status === 0).length === 0 &&
                         <div className="text-white font-medium text-lg md:text-3xl mt-4 md:mt-10 ">
                             <h3>No Upcoming Events</h3>
                         </div>
                     }
-                    {allEvents.length === 0 && loading && (
+                    {state.events.length === 0 && state?.loading && (
                         <div className="text-white font-medium text-lg md:text-3xl mt-4 md:mt-10 ">
                             <h3>Fetching Events</h3>
                         </div>
                     )}
 
-                    {allEvents.length > 0 && activeButton === "LiveEvent" && allEvents.filter((event: any) => event.status === 1).map((eventData: any) => (
+                    {state.events.length > 0 && activeButton === "LiveEvent" && state.events.filter((event: any) => event.status === 1).map((eventData: any) => (
                         <div
                             key={eventData?.id}
                             className="flex flex-col w-full md:max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-4 md:mt-10 "
@@ -209,7 +148,7 @@ const AllEvents = (props: Props) => {
                             </Link>
                         </div>
                     ))}
-                    {allEvents.length > 0 && activeButton === "UpcomingEvent" && allEvents.filter((event: any) => event.status === 0).map((eventData: any) => (
+                    {state.events.length > 0 && activeButton === "UpcomingEvent" && state.events.filter((event: any) => event.status === 0).map((eventData: any) => (
                         <div
                             key={eventData?.id}
                             className="flex flex-col w-full md:max-w-[300px] items-center rounded-xl rounded-b-none shadow-md mt-4 md:mt-10 "

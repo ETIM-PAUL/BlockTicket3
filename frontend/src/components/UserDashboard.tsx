@@ -190,6 +190,7 @@ const UserDashboard = (props: Props) => {
                             <MyEventsTickets
                                 referrals={userData?.user_event_referrals}
                                 tickets={userData?.user_event_tickets}
+                                events={userData?.all_events}
                             />
                         )}
                         {showEvents && (

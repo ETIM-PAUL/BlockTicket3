@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { bgImage } from "../assets";
@@ -9,6 +9,7 @@ import { useRollups } from "../useRollups";
 import { DappAddress } from "../constants";
 import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
 import configFile from "../config.json";
+import { GlobalContext } from "../context/GlobalContext";
 
 type Props = {};
 interface Report {
@@ -42,9 +43,10 @@ const CreateEvent = (props: Props) => {
     const [logoUrl, updateLogoUrl] = useState("");
     const [logoFile, updateLogoFile] = useState("");
     const [logoIpfsLoading, setLogoIpfsLoading] = useState(false);
+    const { state, dispatch }: any = useContext(GlobalContext);
 
     const [{ wallet }] = useConnectWallet();
-    const [balance, setBalance] = useState<string>()
+    const [balance, setBalance] = useState<string>(state?.balance)
     const navigate = useNavigate();
 
 
@@ -54,40 +56,40 @@ const CreateEvent = (props: Props) => {
     const [nftIpfsLoading, setNftIpfsLoading] = useState(false);
     const [isSubmitLoading, setIsSubmitLoading] = useState(false);
 
-    const getBalance = async (str: string) => {
-        let payload = str;
+    // const getBalance = async (str: string) => {
+    //     let payload = str;
 
-        if (!connectedChain) {
-            return;
-        }
+    //     if (!connectedChain) {
+    //         return;
+    //     }
 
-        let apiURL = ""
+    //     let apiURL = ""
 
-        if (config[connectedChain.id]?.inspectAPIURL) {
-            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
-        } else {
-            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
-            return;
-        }
+    //     if (config[connectedChain.id]?.inspectAPIURL) {
+    //         apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+    //     } else {
+    //         console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+    //         return;
+    //     }
 
-        let fetchData: Promise<Response>;
-        if (postData) {
-            const payloadBlob = new TextEncoder().encode(payload);
-            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
-        } else {
-            fetchData = fetch(`${apiURL}/${payload}`);
-        }
-        fetchData
-            .then(response => response.json())
-            .then(data => {
-                // Decode payload from each report
-                const decode = data.reports.map((report: Report) => {
-                    return ethers.utils.toUtf8String(report.payload);
-                });
-                const reportData: any = JSON.parse(decode)
-                setBalance(ethers.utils.formatEther(reportData?.ether))
-            });
-    };
+    //     let fetchData: Promise<Response>;
+    //     if (postData) {
+    //         const payloadBlob = new TextEncoder().encode(payload);
+    //         fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
+    //     } else {
+    //         fetchData = fetch(`${apiURL}/${payload}`);
+    //     }
+    //     fetchData
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             // Decode payload from each report
+    //             const decode = data.reports.map((report: Report) => {
+    //                 return ethers.utils.toUtf8String(report.payload);
+    //             });
+    //             const reportData: any = JSON.parse(decode)
+    //             setBalance(ethers.utils.formatEther(reportData?.ether))
+    //         });
+    // };
 
     async function uploadNftIPFS() {
         const file = nftFile;
@@ -167,22 +169,33 @@ const CreateEvent = (props: Props) => {
     }
 
     async function createEvent() {
+        let creation_price: number = 0;
+
         if (Number(balance) < 0.06 && referral === "true") {
             toast.error("Insufficient Funds for Referral based Event. Please Deposit into the DAPP")
             return;
+        } else {
+            creation_price = 0.06
         }
         if (Number(balance) < 0.04 && dao === "true") {
             toast.error("Insufficient Funds for DAO based Event. Please Deposit into the DAPP")
             return;
+        } else {
+            creation_price = 0.04
         }
         if (Number(balance) < 0.02 && dao === "false" && referral === "false") {
             toast.error("Insufficient Funds for Normal Event. Please Deposit into the DAPP")
             return;
+        } else {
+            creation_price = 0.02
         }
         if (Number(balance) < 0.1 && dao === "true" && referral === "true") {
             toast.error("Insufficient Funds for Full-Packaged Event. Please Deposit into the DAPP")
             return;
+        } else {
+            creation_price = 0.1
         }
+
         if (!title || !date || !location || !capacity) {
             toast.error("Incomplete Event Details");
             return;
@@ -234,6 +247,15 @@ const CreateEvent = (props: Props) => {
                                     `Event Creation Failed, Insufficient ETH in your Wallet`
                                 );
                             } else {
+                                dispatch({
+                                    type: "SET_BALANCE",
+                                    payload: (Number(state.balance) - Number(creation_price)).toString(),
+                                });
+                                setBalance(creation_price.toString())
+                                dispatch({
+                                    type: "APPEND_EVENTS",
+                                    payload: { ...payload, "id": state?.events[state?.events.length - 1] ? state?.events[state?.events.length - 1].id + 1 : 1, "organizer": wallet?.accounts[0]?.address, "status": 0 },
+                                });
                                 setIsSubmitLoading(false)
                                 toast("Event Created Successfully");
                                 navigate("/events");
@@ -302,7 +324,7 @@ const CreateEvent = (props: Props) => {
 
     useEffect(() => {
         testPinataConnection();
-        getBalance(`balance/${wallet?.accounts[0]?.address}`)
+        // getBalance(`balance/${wallet?.accounts[0]?.address}`)
     });
 
     return (

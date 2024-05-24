@@ -74,14 +74,13 @@ const ClaimNFTModal = ({ isVisible, onClose, id, ticket_id, walletNavigate }: Pr
     if (rollups) {
       try {
         setProcessing(true);
-        let str = `{"action": "claim_nft", "id": ${id}, "ticket_id": ${ticket_id}, "nft_url":"${nftUrl}"`
+        let str = `{"action": "claim_nft", "id": ${id}, "ticket_id": ${ticket_id}, "nft_url":"${nftUrl}"}`
         let data = ethers.utils.toUtf8Bytes(str);
-
         const result = await rollups.inputContract.addInput(DappAddress, data);
         const receipt = await result.wait(1);
         // Search for the InputAdded event
         receipt.events?.find((e: any) => e.event === "InputAdded");
-        toast.success("Event NFT Voucher has been created successfully")
+        toast.success("Event NFT Voucher has been created successfully");
         setProcessing(false);
         walletNavigate();
         onClose();

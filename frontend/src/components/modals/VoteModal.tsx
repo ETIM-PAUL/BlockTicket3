@@ -9,14 +9,14 @@ type Props = {
     event_id: number;
     event_organizer: string;
     isVisible: boolean;
-    fetchEventDetails: any;
     proposal: any;
     onClose: boolean | void | string | any;
 };
 
-const VoteModal = ({ isVisible, onClose, proposal, fetchEventDetails, event_id, event_organizer }: Props) => {
+const VoteModal = ({ isVisible, onClose, proposal, event_id, event_organizer }: Props) => {
     const [downVoteProcessing, setDownVoteProcessing] = useState<boolean>(false)
     const [upvoteProcessing, setUpvoteProcessing] = useState<boolean>(false)
+    const [voters, setVoters] = useState<any>(JSON.parse(proposal?.voters))
     const rollups = useRollups(DappAddress);
     const [{ wallet }] = useConnectWallet();
 
@@ -27,7 +27,6 @@ const VoteModal = ({ isVisible, onClose, proposal, fetchEventDetails, event_id, 
     };
 
     const voteProposal = async (type: string) => {
-        const voters: [] = JSON.parse(proposal?.voters)
         if (wallet?.accounts[0]?.address === event_organizer) {
             toast.error("Unauthorized access as Event Organizer")
             return;
@@ -51,17 +50,18 @@ const VoteModal = ({ isVisible, onClose, proposal, fetchEventDetails, event_id, 
                     const result = await rollups.inputContract.addInput(DappAddress, data);
                     const receipt = await result.wait(1);
                     // Search for the InputAdded event
-                    const event = receipt.events?.find((e: any) => e.event === "InputAdded");
+                    receipt.events?.find((e: any) => e.event === "InputAdded");
                     toast.success("Proposal Vote updated")
                     if (type === "upvote") {
                         setUpvoteProcessing(false);
+                        proposal.upvotes = proposal.upvotes + 1;
                     } else {
+                        proposal.downvotes = proposal.downvotes + 1;
                         setDownVoteProcessing(false);
                     }
-                    fetchEventDetails();
+                    setVoters([...voters, wallet?.accounts[0]?.address])
                     onClose();
                 } catch (error) {
-                    console.log("error", error)
                     if (type === "upvote") {
                         setUpvoteProcessing(false);
                     } else {

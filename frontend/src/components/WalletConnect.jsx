@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import configFile from "../config.json";
+import { GlobalContext } from "../context/GlobalContext";
 
 
 const config = configFile;
@@ -8,11 +9,15 @@ const config = configFile;
 const WalletConnect = () => {
     const [{ wallet }, connect, disconnect] = useConnectWallet();
     const [{ connectedChain }, setChain] = useSetChain();
+    const { state, dispatch } = useContext(GlobalContext);
 
     const switchNetwork = async () => {
         try {
             await setChain({ chainId: '0x7a69', chainNamespace: 'evm', token: 'DummyETH', label: 'localhost', rpcUrl: 'http://localhost:8545' })
-
+            dispatch({
+                type: "SET_FETCHING",
+                payload: !state?.fetching,
+            });
         } catch (switchError) {
             console.log(switchError)
             // The network has not been added to MetaMask
@@ -28,7 +33,10 @@ const WalletConnect = () => {
         <div>
             {!wallet?.accounts && (
                 <button
-                    onClick={() => connect()}
+                    onClick={() => connect().then(() => dispatch({
+                        type: "SET_FETCHING",
+                        payload: !state?.fetching,
+                    }))}
                     type="button"
                     className="font-medium rounded-lg text-xl p-2 md:px-4 md:py-3 text-center bg-white text-black"
                 >

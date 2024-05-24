@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { formatIPFS } from "../constants";
 import { useParams } from "react-router-dom";
 import ProposalTable from "./ProposalTable";
@@ -14,6 +14,7 @@ import configFile from "../config.json";
 import { ethers } from "ethers";
 import CancelEventModal from "./modals/CancelEventModal";
 import moment from "moment";
+import { GlobalContext } from "../context/GlobalContext";
 
 const config: any = configFile;
 interface Report {
@@ -22,10 +23,11 @@ interface Report {
 
 const EventDetails = () => {
     // Get the id from the URL
+    const { state, dispatch }: any = useContext(GlobalContext);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const [{ connectedChain }] = useSetChain();
-    const [balance, setBalance] = useState<string>()
+    const [balance, setBalance] = useState<string>(state?.balance)
     const [showModal, setShowModal] = useState<boolean>(false);
     const [eventDetails, setEventDetails] = useState<any>();
     const [eventParticipants, setEventParticipants] = useState<any>([]);
@@ -38,7 +40,7 @@ const EventDetails = () => {
     const [showEndEventModal, setShowEndEventModal] = useState<boolean>(false);
     const [showNewProposalModal, setShowNewProposalModal] =
         useState<boolean>(false);
-    const [showParticipantTable, setShowParticipantTable] = useState(false);
+    const [showParticipantTable, setShowParticipantTable] = useState(true);
     const [postData, setPostData] = useState<boolean>(false);
 
     const [{ wallet }] = useConnectWallet();
@@ -144,76 +146,41 @@ const EventDetails = () => {
                 console.log(reportData)
                 setEventDetails(reportData.event)
                 setEventParticipants(reportData.event_tickets ?? [])
+                setEventReferrals(reportData.event_referrals ?? [])
                 setEventProposals(reportData.event_proposals ?? [])
                 setLoading(false);
             });
     }
 
-    const fetchReferralCodes = async (str: string) => {
-        let payload = str;
-        if (!connectedChain) {
-            return;
-        }
+    // const fetchReferralCodes = async (str: string) => {
+    //     let payload = str;
+    //     if (!connectedChain) {
+    //         return;
+    //     }
 
-        let apiURL = ""
+    //     let apiURL = ""
 
-        if (config[connectedChain.id]?.inspectAPIURL) {
-            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
-        } else {
-            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
-            return;
-        }
+    //     if (config[connectedChain.id]?.inspectAPIURL) {
+    //         apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+    //     } else {
+    //         console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+    //         return;
+    //     }
 
-        let fetchData: Promise<Response>;
-        fetchData = fetch(`${apiURL}/${payload}`);
+    //     let fetchData: Promise<Response>;
+    //     fetchData = fetch(`${apiURL}/${payload}`);
 
-        fetchData
-            .then(response => response.json())
-            .then(data => {
-                // Decode payload from each report
-                const decode = data.reports.map((report: Report) => {
-                    return ethers.utils.toUtf8String(report.payload);
-                });
-                const reportData = JSON.parse(decode)
-                setEventReferrals(reportData);
-            });
-    }
-
-    const getBalance = async (str: string) => {
-        let payload = str;
-
-        if (!connectedChain) {
-            return;
-        }
-
-        let apiURL = ""
-
-        if (config[connectedChain.id]?.inspectAPIURL) {
-            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
-        } else {
-            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
-            return;
-        }
-
-        let fetchData: Promise<Response>;
-        if (postData) {
-            const payloadBlob = new TextEncoder().encode(payload);
-            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
-        } else {
-            fetchData = fetch(`${apiURL}/${payload}`);
-        }
-        fetchData
-            .then(response => response.json())
-            .then(data => {
-                // Decode payload from each report
-                const decode = data.reports.map((report: Report) => {
-                    return ethers.utils.toUtf8String(report.payload);
-                });
-                const reportData: any = JSON.parse(decode)
-                setBalance(ethers.utils.formatEther(reportData?.ether))
-                //console.log(parseEther("1000000000000000000", "gwei"))
-            });
-    };
+    //     fetchData
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             // Decode payload from each report
+    //             const decode = data.reports.map((report: Report) => {
+    //                 return ethers.utils.toUtf8String(report.payload);
+    //             });
+    //             const reportData = JSON.parse(decode)
+    //             setEventReferrals(reportData);
+    //         });
+    // }
 
     const showProposalModal = () => {
         if (eventParticipants?.length > 0 && eventParticipants.finwallet?.accounts[0]?.address === eventDetails?.organizer) {
@@ -231,10 +198,8 @@ const EventDetails = () => {
     }
 
     useEffect(() => {
+        console.log("running")
         fetchEventDetails(`get/${Number(id)}`)
-        fetchReferralCodes(`get_event_referrals/${Number(id)}`)
-        getBalance(`balance/${wallet?.accounts[0]?.address}`)
-        // If no eventData was found, show a message
     }, [])
 
     return (
@@ -398,16 +363,15 @@ const EventDetails = () => {
                                     id={Number(id)}
                                     isVisible={showModal}
                                     balance={balance}
+                                    setBalance={setBalance}
                                     organizer={eventDetails.organizer}
                                     capacity={eventDetails.capacity}
                                     referral={eventDetails.referral}
                                     eventReferrals={eventReferrals}
-                                    purchased_tickets={eventParticipants?.length}
+                                    purchased_tickets={eventParticipants}
                                     tickets={JSON.parse(eventDetails.tickets)}
+                                    setEventParticipants={setEventParticipants}
                                     onClose={() => setShowModal(false)}
-                                    fetchEventDetails={() =>
-                                        fetchEventDetails(`get/${Number(id)}`)
-                                    }
                                 />
 
                                 <div className="">
@@ -459,9 +423,8 @@ const EventDetails = () => {
                                     onClose={() =>
                                         setShowNewProposalModal(false)
                                     }
-                                    fetchEventDetails={() =>
-                                        fetchEventDetails(`get/${Number(id)}`)
-                                    }
+                                    setEventProposals={setEventProposals}
+                                    eventProposals={eventProposals}
                                     id={Number(id)}
                                 />
 
@@ -472,9 +435,6 @@ const EventDetails = () => {
                                         event_organizer={eventDetails?.organizer}
                                         eventProposals={eventProposals}
                                         event_id={Number(id)}
-                                        fetchEventDetails={() =>
-                                            fetchEventDetails(`get/${Number(id)}`)
-                                        }
                                     />
                                 )}
                             </div>

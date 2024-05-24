@@ -1,9 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { MyEventsTicketData } from "../constants";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import { ethers } from "ethers";
-import configFile from "../config.json";
-import { useSetChain } from "@web3-onboard/react";
 import ClaimNFTModal from "./modals/ClaimNFTModal";
 import GetRefundModal from "./modals/GetRefundModal";
 import { toast } from "react-toastify";
@@ -11,60 +7,17 @@ import { toast } from "react-toastify";
 type Props = {
     tickets: any;
     referrals: any;
+    events: any;
 };
-const config: any = configFile;
-interface Report {
-    payload: string;
-}
 
-const MyEventsTickets = ({ tickets, referrals }: Props) => {
+const MyEventsTickets = ({ tickets, referrals, events }: Props) => {
     const navigate = useNavigate();
-    const [{ connectedChain }] = useSetChain();
-    const [postData, setPostData] = useState<boolean>(false);
-    const [allEvents, setAllEvents] = useState<any>([]);
+    const [allEvents, setAllEvents] = useState<any>(events);
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedTicket, setSelectedTicket] = useState<any>();
     const [claimNFTModal, setClaimNFTModal] = useState<boolean>(false);
     const [refundModal, setRefundModal] = useState<boolean>(false);
-    const fetchEvents = async (str: string) => {
-        setLoading(true);
-        let payload = str;
-        if (!connectedChain) {
-            return;
-        }
 
-        let apiURL = ""
-
-        if (config[connectedChain.id]?.inspectAPIURL) {
-            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
-        } else {
-            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
-            return;
-        }
-
-        let fetchData: Promise<Response>;
-        if (postData) {
-            const payloadBlob = new TextEncoder().encode(payload);
-            fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
-        } else {
-            fetchData = fetch(`${apiURL}/${payload}`);
-        }
-        fetchData
-            .then(response => response.json())
-            .then(data => {
-                // Decode payload from each report
-                const decode = data.reports.map((report: Report) => {
-                    return ethers.utils.toUtf8String(report.payload);
-                });
-                const reportData = JSON.parse(decode)
-                setAllEvents(reportData)
-                setLoading(false);
-            });
-    }
-
-    useEffect(() => {
-        fetchEvents("get_all/")
-    }, [])
 
     function getEventDetails(id: number, type: string) {
         const eventDetails = allEvents.find((event: any) => event.id === id);
@@ -131,7 +84,6 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                                             : "bg-[#8155ea]"
                                     }
                                 >
-                                    {/* <td>{ticket.id}</td> */}
                                     <td>{getEventDetails(ticket.event_id, "title")}</td>
                                     <td>{ticket.ticket_type}</td>
                                     <td>{getEventDetails(ticket.event_id, "status")}</td>
@@ -139,8 +91,8 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                                     <td>{referrals?.find((referral: any) => referral?.ticket_id === ticket.id)?.code ?? "N/A"}</td>
                                     <td className="space-x-2 items-center">
                                         <button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button>
-                                        {getEventStatus(ticket.event_id) === 2 &&
-                                            <button onClick={() => { setSelectedTicket(ticket); showNFTModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Claim POAP(NFT)</button>
+                                        {(getEventStatus(ticket.event_id) === 2) &&
+                                            <button disabled={ticket.claimedNFT === 1} onClick={() => { setSelectedTicket(ticket); showNFTModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">{ticket.claimedNFT === 1 ? "NFT Claimed" : "Claim POAP(NFT)"}</button>
                                         }
                                         {(getEventStatus(ticket.event_id) === 3 && ticket.refunded !== 1) &&
                                             <button onClick={() => { setSelectedTicket(ticket); showRefundModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Get Refund</button>
@@ -215,7 +167,7 @@ const MyEventsTickets = ({ tickets, referrals }: Props) => {
                         navigate("/my-wallet")
                     }
                     id={Number(selectedTicket?.event_id)}
-                    ticket_id={Number(selectedTicket?.ticket_id)} />
+                    ticket_id={Number(selectedTicket?.id)} />
             }
             {selectedTicket?.id &&
                 <GetRefundModal

@@ -10,7 +10,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { ethers } from "ethers";
 import { useRollups } from "./useRollups";
 import { useWallets } from "@web3-onboard/react";
@@ -20,6 +20,7 @@ import { DappAddress } from "./constants";
 import { FcMoneyTransfer } from "react-icons/fc";
 import { RiLuggageDepositFill } from "react-icons/ri";
 import { FaTelegramPlane } from "react-icons/fa";
+import { GlobalContext } from "./context/GlobalContext";
 
 interface IInputPropos {
   dappAddress: string;
@@ -34,6 +35,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
   const [processing, setProcessing] = useState<boolean>(false)
   const [depositing, setDepositing] = useState<boolean>(false)
   const [active, setActive] = useState<string>("deposit")
+  const { state, dispatch }: any = useContext(GlobalContext);
 
   const provider = new ethers.providers.Web3Provider(connectedWallet.provider);
 
@@ -68,6 +70,10 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
         );
         const receipt = await result.wait(1);
         console.log(receipt)
+        dispatch({
+          type: "SET_BALANCE",
+          payload: (Number(state.balance) + Number(amount)).toString(),
+        });
         toast.success("Ethers deposited successfully")
         setDepositing(false);
       }

@@ -29,9 +29,10 @@ const rollup_server =
   "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE";
 
 //NFT address
-const erc721_contract_address = getAddress(
+let erc721_contract_address = getAddress(
   "0x5067457698Fd6Fa1C6964e416b3f42713513B3dD"
 );
+let admin = getAddress("0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266");
 //wallet instance
 const wallet = new Wallet(new Map());
 
@@ -101,12 +102,13 @@ let DAPP_ADDRESS: any =
 
 class MintNft extends AdvanceRoute {
   execute = (request: any) => {
-    const data: any = this.parse_request(request);
-    console.log("minting erc721 token.....", data);
+    const dat = this.parse_request(request);
+    console.log("minting erc721 token.....", this.request_args);
+    console.log("minting erc721 data.....", request);
     const call = encodeFunctionData({
       abi: erc721abi,
       functionName: "mintPOAP",
-      args: [this.msg_sender, "https://ipfs"],
+      args: [this.msg_sender, "ipps"],
     });
     return new Voucher(erc721_contract_address, hexToBytes(call));
   };
@@ -432,6 +434,14 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
         } else throw new Error("Access Denied");
       }
 
+      //change nft address
+      if (eventPayload.action === "set_nft_address") {
+        if (admin !== data.metadata.msg_sender.toLowerCase()) {
+          erc721_contract_address = eventPayload.nft_address;
+          processed = true;
+        } else throw new Error("Access Denied");
+      }
+
       //claim poap after event ends
       if (eventPayload.action === "claim_nft") {
         const event: any = await db.get(
@@ -444,10 +454,18 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
           event?.organizer !== data.metadata.msg_sender.toLowerCase() &&
           check_actions.isClaimNFT(msg_sender, event_participants)
         ) {
-          router.process("mint_nft", payload);
-          db.run(
-            `UPDATE event_tickets SET claimedNFT = true WHERE id = ${eventPayload.ticket_id};`
-          );
+          let voucher: any = router.process("mint_nft", data);
+          if (voucher?.destination) {
+            await fetch(rollup_server + "/voucher", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(voucher),
+            });
+            db.run(
+              `UPDATE event_tickets SET claimedNFT = true WHERE id = ${eventPayload.ticket_id};`
+            );
+            return "accept";
+          }
         } else throw new Error("Access Denied Or NFT Claimed already");
       }
 
@@ -460,7 +478,7 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
         );
 
         if (voucher?.destination) {
-          const advance_req = await fetch(rollup_server + "/voucher", {
+          await fetch(rollup_server + "/voucher", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(voucher),
@@ -513,13 +531,22 @@ const handleInspect: InspectRequestHandler = async (data) => {
         "SELECT * FROM event_tickets WHERE event_id = ?",
         `${eventPayload[1]}`
       );
+      const event_referrals = await db.all(
+        "SELECT * FROM event_referrals WHERE event_id = ?",
+        `${eventPayload[1]}`
+      );
       const event_proposals = await db.all(
         "SELECT * FROM event_proposals WHERE event_id = ?",
         `${eventPayload[1]}`
       );
 
       const payload = toHex(
-        JSON.stringify({ event, event_tickets, event_proposals })
+        JSON.stringify({
+          event,
+          event_tickets,
+          event_referrals,
+          event_proposals,
+        })
       );
       const inspect_req = await fetch(rollup_server + "/report", {
         method: "POST",
@@ -531,41 +558,46 @@ const handleInspect: InspectRequestHandler = async (data) => {
       console.log("Received report status " + inspect_req.status);
       return "accept";
     }
-    if (eventPayload[0] == "get_event_participants") {
-      const event_participants = await db.all(
-        "SELECT * FROM event_tickets WHERE event_id = ?",
-        `${eventPayload[1]}`
-      );
 
-      const payload = toHex(JSON.stringify(event_participants));
-      const inspect_req = await fetch(rollup_server + "/report", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ payload }),
-      });
-      console.log("Received report status " + inspect_req.status);
-      return "accept";
-    }
-    if (eventPayload[0] == "get_event_referrals") {
-      const event_referrals = await db.all(
-        "SELECT * FROM event_referrals WHERE event_id = ?",
-        `${eventPayload[1]}`
-      );
+    // if (eventPayload[0] == "get_event_participants") {
+    //   const event_participants = await db.all(
+    //     "SELECT * FROM event_tickets WHERE event_id = ?",
+    //     `${eventPayload[1]}`
+    //   );
 
-      const payload = toHex(JSON.stringify(event_referrals));
-      const inspect_req = await fetch(rollup_server + "/report", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ payload }),
-      });
-      console.log("Received report status " + inspect_req.status);
-      return "accept";
-    }
+    //   const payload = toHex(JSON.stringify(event_participants));
+    //   const inspect_req = await fetch(rollup_server + "/report", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ payload }),
+    //   });
+    //   console.log("Received report status " + inspect_req.status);
+    //   return "accept";
+    // }
+
+    // if (eventPayload[0] == "get_event_referrals") {
+    //   const event_referrals = await db.all(
+    //     "SELECT * FROM event_referrals WHERE event_id = ?",
+    //     `${eventPayload[1]}`
+    //   );
+
+    //   const payload = toHex(JSON.stringify(event_referrals));
+    //   const inspect_req = await fetch(rollup_server + "/report", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ payload }),
+    //   });
+    //   console.log("Received report status " + inspect_req.status);
+    //   return "accept";
+    // }
+
     if (eventPayload[0] == "get_user_data") {
+      const all_events = await db.all("SELECT * FROM events");
+
       const user_events = await db.all(
         "SELECT * FROM events WHERE organizer = ?",
         `${eventPayload[1]}`
@@ -587,6 +619,7 @@ const handleInspect: InspectRequestHandler = async (data) => {
 
       const payload = toHex(
         JSON.stringify({
+          all_events,
           user_events,
           user_event_referrals,
           user_event_tickets,
@@ -603,6 +636,7 @@ const handleInspect: InspectRequestHandler = async (data) => {
       console.log("Received report status " + inspect_req.status);
       return "accept";
     }
+
     if (eventPayload[0] == "get_all") {
       const listOfEvents = await db.all(`SELECT * FROM events`);
       const payload = toHex(JSON.stringify(listOfEvents));
@@ -616,6 +650,7 @@ const handleInspect: InspectRequestHandler = async (data) => {
       console.log("Received report status " + inspect_req.status);
       return "accept";
     }
+
     if (eventPayload[0] == "balance") {
       const balance: any = router.process(eventPayload[0], eventPayload[1]);
       const inspect_req = await fetch(rollup_server + "/report", {
