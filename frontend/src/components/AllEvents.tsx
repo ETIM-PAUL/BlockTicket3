@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatDate, formatIPFS } from "../constants";
 import { CiLocationOn } from "react-icons/ci";
@@ -25,6 +25,11 @@ const AllEvents = (props: Props) => {
     const handleButtonClick = (button: string) => {
         setActiveButton(button);
     };
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [])
+
 
 
     const createEvent = () => {

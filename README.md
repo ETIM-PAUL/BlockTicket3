@@ -1,5 +1,8 @@
 # Welcome to BlockTicket3
 
+# Link to Notion for Setting up and testing locally
+https://www.notion.so/BlockTicket3-f00c498945714e55a87f3d8bfd8e1051
+
 BlockTicket3 harnesses Cartesi's unique features to address specific challenges associated with decentralized applications, particularly in the context of ticketing platforms and events management.
 
 ## Unique Features of BlockTicket3

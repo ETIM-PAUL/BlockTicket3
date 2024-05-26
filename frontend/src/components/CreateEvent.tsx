@@ -281,8 +281,8 @@ const CreateEvent = (props: Props) => {
     };
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         testPinataConnection();
-        // getBalance(`balance/${wallet?.accounts[0]?.address}`)
     });
 
     return (

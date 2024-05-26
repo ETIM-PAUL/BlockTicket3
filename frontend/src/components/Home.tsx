@@ -31,12 +31,12 @@ const Home = () => {
                         </p>
 
                         <div className=" justify-center">
-                            <a href="/create-event">
+                            <Link to="/create-event">
                                 <button className="bg-[#F5167E] rounded-md text-center justify-center items-center mt-6 p-2 text-white text-xl hover:bg-[#5522CC] w-1/2">
                                     {" "}
                                     Create Event
                                 </button>
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
