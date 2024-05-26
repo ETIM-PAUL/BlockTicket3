@@ -143,7 +143,6 @@ const EventDetails = () => {
                     return ethers.utils.toUtf8String(report.payload);
                 });
                 const reportData = JSON.parse(decode)
-                console.log(reportData)
                 setEventDetails(reportData.event)
                 setEventParticipants(reportData.event_tickets ?? [])
                 setEventReferrals(reportData.event_referrals ?? [])
@@ -168,7 +167,6 @@ const EventDetails = () => {
     }
 
     useEffect(() => {
-        console.log("running")
         fetchEventDetails(`get/${Number(id)}`)
     }, [])
 

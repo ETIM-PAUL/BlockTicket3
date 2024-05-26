@@ -67,7 +67,6 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                 const tx = await rollups.dappContract.executeVoucher(voucher.destination, voucher.payload, voucher.proof);
                 const receipt: any = await tx.wait();
                 newVoucherToExecute.msg = `voucher executed! (tx="${tx.hash}")`;
-                console.log(receipt)
                 if (receipt.events?.length > 0) {
                     newVoucherToExecute.msg = `${newVoucherToExecute.msg} - resulting events: ${JSON.stringify(receipt.events)}`;
                     newVoucherToExecute.executed = await rollups.dappContract.wasVoucherExecuted(BigNumber.from(voucher.input.index), BigNumber.from(voucher.index));

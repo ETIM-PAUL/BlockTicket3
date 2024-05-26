@@ -31,7 +31,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
   const rollups = useRollups(propos.dappAddress);
   const [connectedWallet] = useWallets();
   const [dappRelayedAddress, setDappRelayedAddress] = useState<boolean>(false)
-  const [etherAmount, setEtherAmount] = useState<string>("0.1");
+  const [etherAmount, setEtherAmount] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false)
   const [depositing, setDepositing] = useState<boolean>(false)
   const [active, setActive] = useState<string>("deposit")
@@ -154,13 +154,13 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                 Amount to Deposit (ETH)
               </label>
               <div className="flex items-center border-[1px] border-[#696969] rounded-lg pl-[10px] w-[80%] mx-auto gap-4 h-[72px] mt-2">
-                <p className="font-normal head2 text-[24px] leading-[32px mt-1.5">ETH</p>
+                <p className="font-normal head2 text-[24px] leading-[32px mt-2.5">ETH</p>
                 <input
-                  defaultValue={0.01}
+                  placeholder="Enter Amount in ETH"
                   value={etherAmount}
                   onChange={(e) => setEtherAmount(e.target.value)}
                   type="number"
-                  className="w-full text-[36px] placeholder:text-[24px] leading-[53.2px] text-[#696969] h-[100%] outline-none rounded-r-lg"
+                  className="w-full text-[36px] placeholder:pl-1 placeholder:text-[20px] leading-[53.2px] text-[#696969] h-[100%] outline-none rounded-r-lg"
                 />
               </div>
             </div>
@@ -193,13 +193,13 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                 Amount to Withdraw (ETH)
               </label>
               <div className="flex items-center border-[1px] border-[#696969] rounded-lg pl-[10px] w-[80%] mx-auto gap-4 h-[72px] mt-2">
-                <p className="font-normal head2 text-[24px] leading-[32px mt-1.5">ETH</p>
+                <p className="font-normal head2 text-[24px] leading-[32px mt-2.5">ETH</p>
                 <input
-                  defaultValue={0.01}
+                  placeholder="Enter Amount in ETH"
                   value={etherAmount}
                   onChange={(e) => setEtherAmount(e.target.value)}
                   type="number"
-                  className="w-full text-[36px] placeholder:text-[24px] leading-[53.2px] text-[#696969] h-[100%] outline-none rounded-r-lg"
+                  className="w-full text-[36px] placeholder:pl-1 placeholder:text-[20px] leading-[53.2px] text-[#696969] h-[100%] outline-none rounded-r-lg"
                 />
               </div>
             </div>

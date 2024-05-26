@@ -52,8 +52,8 @@ const MyEventsTickets = ({ tickets, referrals, events, nfts }: Props) => {
         setRefundModal(true);
     }
 
-    function isNFTMinted(event_id: any) {
-        const nft_url = nfts.find((nft: any) => Number(nft?.eventid) === event_id)
+    function isNFTMinted(event_id: any, ticket_id: any) {
+        const nft_url = nfts.find((nft: any) => (Number(nft?.eventid) === event_id) && (Number(nft?.ticketid) === ticket_id));
         return nft_url
     }
 
@@ -108,7 +108,7 @@ const MyEventsTickets = ({ tickets, referrals, events, nfts }: Props) => {
                                         {(getEventStatus(ticket.event_id) === 2) &&
                                             <button disabled={ticket.claimedNFT === 1} onClick={() => { setSelectedTicket(ticket); showNFTModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">{ticket.claimedNFT === 1 ? "NFT Claimed" : "Claim POAP(NFT)"}</button>
                                         }
-                                        {(isNFTMinted(ticket.event_id)) &&
+                                        {(isNFTMinted(ticket.event_id, ticket.id)) &&
                                             <button onClick={() => { setSelectedNFT(getEventDetails(ticket.event_id, "tokenUrl")); showNFT(); }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View NFT</button>
                                         }
                                         {(getEventStatus(ticket.event_id) === 3 && ticket.refunded !== 1) &&
@@ -159,10 +159,10 @@ const MyEventsTickets = ({ tickets, referrals, events, nfts }: Props) => {
                                     <td className="space-y-2 md:space-y-0 md:space-x-2 items-center">
                                         <button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="w-full bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button>
                                         {getEventStatus(ticket.event_id) === 2 &&
-                                            <button onClick={() => { setSelectedTicket(ticket); showNFTModal() }} className="w-full bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Claim POAP(NFT)</button>
+                                            <button disabled={ticket.claimedNFT === 1} onClick={() => { setSelectedTicket(ticket); showNFTModal() }} className="w-full bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">{ticket.claimedNFT === 1 ? "NFT Claimed" : "Claim POAP(NFT)"}</button>
                                         }
-                                        {isNFTMinted(ticket.event_id) &&
-                                            <button className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View NFT</button>
+                                        {isNFTMinted(ticket.event_id, ticket.id) &&
+                                            <button onClick={() => { setSelectedNFT(getEventDetails(ticket.event_id, "tokenUrl")); showNFT(); }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View NFT</button>
                                         }
                                         {(getEventStatus(ticket.event_id) === 3 && ticket.refunded !== 1) &&
                                             <button onClick={() => { setSelectedTicket(ticket); showRefundModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">Get Refund</button>

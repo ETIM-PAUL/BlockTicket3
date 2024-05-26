@@ -122,7 +122,7 @@ const UserDashboard = (props: Props) => {
                 </div>
 
                 {showDashboard && (
-                    <div className="mt-0 md:mt-10 w-full">
+                    <div className="mt-0 md:my-10 w-full">
                         <div className="flex mt- flex-wrap md:gap-5 max-md:flex-col max-md:gap-0">
                             <div className="flex grow flex-col w-full md:w-[250px] max-md:ml-0 max-md:w-full">
                                 <div className="flex flex-col grow justify-center text-white max-md:mt-10">
@@ -150,7 +150,7 @@ const UserDashboard = (props: Props) => {
                                             </div>
                                         </div>
                                         <div className="mt-1.5 text-base font-medium tracking-tight w-full">
-                                            Event Tickets Purchased
+                                            Tickets Purchased
                                         </div>
                                         <div className="mt-1.5 text-2xl font-extrabold">
                                             {userData?.user_event_tickets

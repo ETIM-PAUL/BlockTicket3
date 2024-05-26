@@ -1,15 +1,16 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useConnectWallet, useSetChain } from "@web3-onboard/react";
 import configFile from "../config.json";
 import { GlobalContext } from "../context/GlobalContext";
+import { ethers } from "ethers";
 
 
-const config = configFile;
+const config: any = configFile;
 
 const WalletConnect = () => {
     const [{ wallet }, connect, disconnect] = useConnectWallet();
-    const [{ connectedChain }, setChain] = useSetChain();
-    const { state, dispatch } = useContext(GlobalContext);
+    const [{ connectedChain }, setChain]: any = useSetChain();
+    const { state, dispatch }: any = useContext(GlobalContext);
 
     const switchNetwork = async () => {
         try {
@@ -18,7 +19,7 @@ const WalletConnect = () => {
                 type: "SET_FETCHING",
                 payload: !state?.fetching,
             });
-        } catch (switchError) {
+        } catch (switchError: any) {
             console.log(switchError)
             // The network has not been added to MetaMask
             if (switchError.code === 4902) {
@@ -28,6 +29,61 @@ const WalletConnect = () => {
 
         }
     }
+
+    useEffect(() => {
+        const provider: any = new ethers.providers.Web3Provider(window.ethereum);
+        const handleAccountsChanged = (accounts: any) => {
+            // console.log(accounts[0])
+            // console.log(wallet && wallet.accounts[0].address)
+            if (accounts.length === 0) {
+                console.log('Please connect to a wallet.');
+            } else {
+                getBalance(`balance/${accounts[0]}`);
+                console.log('current account:', accounts[0]);
+            }
+        };
+
+        provider.provider.on("accountsChanged", handleAccountsChanged);
+
+        // Clean up the event listener on component unmount
+        return () => {
+            provider.provider.removeListener("accountsChanged");
+        };
+    }, []);
+
+    const getBalance = async (str: string) => {
+        let payload = str;
+
+        if (!connectedChain) {
+            return;
+        }
+
+        let apiURL = ""
+
+        if (config[connectedChain.id]?.inspectAPIURL) {
+            apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
+        } else {
+            console.error(`No inspect interface defined for chain ${connectedChain.id}`);
+            return;
+        }
+
+        let fetchData: Promise<Response>;
+
+        fetchData = fetch(`${apiURL}/${payload}`);
+        fetchData
+            .then(response => response.json())
+            .then(data => {
+                // Decode payload from each report
+                const decode = data.reports.map((report: { payload: string }) => {
+                    return ethers.utils.toUtf8String(report.payload);
+                });
+                const reportData: any = JSON.parse(decode)
+                dispatch({
+                    type: "SET_BALANCE",
+                    payload: ethers.utils.formatEther(reportData?.ether),
+                });
+            });
+    };
 
     return (
         <div>
@@ -54,7 +110,7 @@ const WalletConnect = () => {
             )}
             {(wallet?.accounts && !config[connectedChain.id]?.inspectAPIURL) && (
                 <button
-                    onClick={() => switchNetwork(wallet)}
+                    onClick={() => switchNetwork()}
                     type="button"
                     className="font-medium rounded-lg text-base md:text-lg p-2 md:px-4 md:py-3 text-center bg-red-500 text-white"
                 >
