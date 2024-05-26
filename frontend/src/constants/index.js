@@ -394,6 +394,7 @@ export const MyEventsTicketData = [
 ];
 
 export const DappAddress = "0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e";
+export const ERC721Address = "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9";
 
 export function formatDate(inputDate) {
     const date = new Date(inputDate);

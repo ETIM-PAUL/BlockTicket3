@@ -271,6 +271,41 @@ export const erc721abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "getNFTHolders",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "id",
+            type: "uint256",
+          },
+          {
+            internalType: "address",
+            name: "owner",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "eventid",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "ticketid",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct BlockTicket3.NftDetails[]",
+        name: "_nftHolders",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -302,19 +337,18 @@ export const erc721abi = [
         type: "address",
       },
       {
-        internalType: "string",
-        name: "tokenURI",
-        type: "string",
+        internalType: "uint256",
+        name: "_eventid",
+        type: "uint256",
       },
-    ],
-    name: "mintPOAP",
-    outputs: [
       {
         internalType: "uint256",
-        name: "",
+        name: "_ticketid",
         type: "uint256",
       },
     ],
+    name: "mintPOAP",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -326,6 +360,40 @@ export const erc721abi = [
         internalType: "string",
         name: "",
         type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "nfts",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "id",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "eventid",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "ticketid",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

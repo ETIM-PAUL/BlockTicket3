@@ -217,10 +217,7 @@ const CreateEvent = (props: Props) => {
                 setIsSubmitLoading(true)
                 try {
                     await uploadIPFS().then(async (logo) => {
-                        console.log("logo", logo)
                         await uploadNftIPFS().then(async (nft) => {
-                            console.log("nft", nft)
-
                             const payload = {
                                 title,
                                 date,

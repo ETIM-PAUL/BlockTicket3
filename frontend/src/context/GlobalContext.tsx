@@ -42,6 +42,13 @@ const reducer = (state: Props, action: any) => {
                 ...state,
                 events: action.payload,
             };
+        case "UPDATE_EVENT_STATUS":
+            return {
+                ...state,
+                events: state.events.map(event =>
+                    event.id === action.payload.id ? { ...event, status: action.payload.status } : event
+                )
+            };
         case "SET_BALANCE":
             return {
                 ...state,

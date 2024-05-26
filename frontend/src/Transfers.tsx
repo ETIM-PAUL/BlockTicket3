@@ -106,6 +106,10 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
         const receipt = await result.wait(1);
         // Search for the InputAdded event
         receipt.events?.find((e: any) => e.event === "InputAdded");
+        dispatch({
+          type: "SET_BALANCE",
+          payload: (Number(state.balance) - Number(amount)).toString(),
+        });
         toast.success("Ethers withdraw voucher created successfully")
         setProcessing(false);
       }

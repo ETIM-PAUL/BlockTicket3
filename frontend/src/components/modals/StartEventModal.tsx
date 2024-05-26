@@ -1,8 +1,9 @@
 import { ethers } from "ethers";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { DappAddress } from "../../constants";
 import { useRollups } from "../../useRollups";
 import { toast } from "react-toastify";
+import { GlobalContext } from "../../context/GlobalContext";
 
 type Props = {
     isVisible: boolean;
@@ -15,6 +16,7 @@ type Props = {
 const StartEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails }: Props) => {
     const [processing, setProcessing] = useState<boolean>(false)
     const rollups = useRollups(DappAddress);
+    const { state, dispatch }: any = useContext(GlobalContext);
 
     if (!isVisible) return null;
 
@@ -31,6 +33,10 @@ const StartEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails
                 // Search for the InputAdded event
                 const event = receipt.events?.find((e: any) => e.event === "InputAdded");
                 if (event) {
+                    dispatch({
+                        type: "UPDATE_EVENT_STATUS",
+                        payload: { id, status: 1 },
+                    });
                     setEventDetails({ ...eventDetails, status: 1 })
                     toast.success("Event status has been changed successfully")
                     setProcessing(false);

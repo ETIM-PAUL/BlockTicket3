@@ -44,7 +44,7 @@ const NewProposalModal = ({ isVisible, onClose, setEventProposals, eventProposal
                     setProposal("");
                     toast.success("Proposal created successfully")
                     setProcessing(false);
-                    setEventProposals([...eventProposals, { "id": eventProposals[eventProposals.length - 1].id++, "proposer": proposal, "upvotes": 0, "downvotes": 0 }])
+                    setEventProposals([...eventProposals, { "id": eventProposals[eventProposals.length - 1] ? eventProposals[eventProposals.length - 1].id + 1 : 1, "proposer": proposal, "upvotes": 0, "downvotes": 0 }])
                     onClose();
                 } catch (error) {
                     console.log("error", error)

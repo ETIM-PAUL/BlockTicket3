@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import MyEvents from "./MyEvents";
 import MyEventsTickets from "./MyEventsTickets";
-import { useConnectWallet, useSetChain } from "@web3-onboard/react";
+import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
 import configFile from "../config.json";
 import { ethers } from "ethers";
+import { ERC721Address } from "../constants";
+import { erc721abi } from "../constants/erc721";
 
 const config: any = configFile;
 type Props = {};
@@ -15,10 +17,13 @@ const UserDashboard = (props: Props) => {
     const [showEvents, setShowEvents] = useState(false);
     const [showDashboard, setShowDasboard] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [userNfts, setUserNfts] = useState<any>();
     const [userData, setUserData] = useState<any>();
     const [{ connectedChain }] = useSetChain();
     const [postData, setPostData] = useState<boolean>(false);
     const [{ wallet }] = useConnectWallet();
+    const [connectedWallet] = useWallets();
+
 
     const fetchUserData = async (str: string) => {
         setLoading(true);
@@ -61,8 +66,20 @@ const UserDashboard = (props: Props) => {
             });
     };
 
+    const fetchUserNFTs = async () => {
+        try {
+            const provider = new ethers.providers.Web3Provider(connectedWallet.provider);
+            const contract = new ethers.Contract(ERC721Address, erc721abi, provider);
+            let tx = await contract.getNFTHolders();
+            setUserNfts(tx.filter((nft: any) => nft["1"]?.toLowerCase() === wallet?.accounts[0]?.address))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         fetchUserData(`get_user_data/${wallet?.accounts[0]?.address}`);
+        fetchUserNFTs();
     }, []);
 
     const showAllEvents = () => {
@@ -147,6 +164,23 @@ const UserDashboard = (props: Props) => {
                                     <div className="flex flex-col items-start py-6 pr-20 pl-6 rounded-xl bg-white text-black max-md:px-5">
                                         <div className="flex flex-col justify-center p-4 text-sm font-bold leading-4 whitespace-nowrap rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
                                             <div className="flex py-1 items-center justify-center bg-white rounded-full h-8 w-8">
+                                                N
+                                            </div>
+                                        </div>
+                                        <div className="mt-1.5 text-base font-medium tracking-tight w-full">
+                                            Events NFT
+                                        </div>
+                                        <div className="mt-1.5 text-2xl font-extrabold">
+                                            {userNfts?.length ?? 0}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex grow flex-col w-full md:w-[250px] max-md:ml-0 max-md:w-full">
+                                <div className="flex flex-col grow justify-center text-white max-md:mt-10">
+                                    <div className="flex flex-col items-start py-6 pr-20 pl-6 rounded-xl bg-white text-black max-md:px-5">
+                                        <div className="flex flex-col justify-center p-4 text-sm font-bold leading-4 whitespace-nowrap rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
+                                            <div className="flex py-1 items-center justify-center bg-white rounded-full h-8 w-8">
                                                 R
                                             </div>
                                         </div>
@@ -188,6 +222,7 @@ const UserDashboard = (props: Props) => {
                     <div className="">
                         {showEventTicketTable && (
                             <MyEventsTickets
+                                nfts={userNfts}
                                 referrals={userData?.user_event_referrals}
                                 tickets={userData?.user_event_tickets}
                                 events={userData?.all_events}

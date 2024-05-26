@@ -22,17 +22,12 @@ import { Wallet, Voucher } from "cartesi-wallet";
 //abi of erc721 smart contract on L1
 import { erc721abi } from "./erc721";
 
-import { Event, EventPayload, EventStatus } from "./interface";
+import { Event, EventStatus } from "./interface";
 
 const rollup_server =
   process.env.ROLLUP_HTTP_SERVER_URL ??
   "0xF5DE34d6BbC0446E2a45719E718efEbaaE179daE";
 
-//NFT address
-let erc721_contract_address = getAddress(
-  "0x5067457698Fd6Fa1C6964e416b3f42713513B3dD"
-);
-let admin = getAddress("0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266");
 //wallet instance
 const wallet = new Wallet(new Map());
 
@@ -102,15 +97,19 @@ let DAPP_ADDRESS: any =
 
 class MintNft extends AdvanceRoute {
   execute = (request: any) => {
-    const dat = this.parse_request(request);
-    console.log("minting erc721 token.....", this.request_args);
-    console.log("minting erc721 data.....", request);
+    this.parse_request(request);
+    const payload = JSON.parse(hexToString(request.payload));
+    const event_id = payload.event_id;
+    const ticket_id = payload.ticket_id;
+    const erc721_address = getAddress(payload.erc721_address);
+    console.log("erc721 token.....", erc721_address);
+    console.log("minting erc721 data.....", ticket_id);
     const call = encodeFunctionData({
       abi: erc721abi,
       functionName: "mintPOAP",
-      args: [this.msg_sender, "ipps"],
+      args: [this.msg_sender, event_id, ticket_id],
     });
-    return new Voucher(erc721_contract_address, hexToBytes(call));
+    return new Voucher(erc721_address, hexToBytes(call));
   };
 }
 
@@ -434,14 +433,6 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
         } else throw new Error("Access Denied");
       }
 
-      //change nft address
-      if (eventPayload.action === "set_nft_address") {
-        if (admin !== data.metadata.msg_sender.toLowerCase()) {
-          erc721_contract_address = eventPayload.nft_address;
-          processed = true;
-        } else throw new Error("Access Denied");
-      }
-
       //claim poap after event ends
       if (eventPayload.action === "claim_nft") {
         const event: any = await db.get(
@@ -477,6 +468,18 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
           BigInt(eventPayload?.args?.amount)
         );
 
+        if (voucher?.destination) {
+          await fetch(rollup_server + "/voucher", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(voucher),
+          });
+          return "accept";
+        }
+      }
+
+      if (eventPayload.action === "mint") {
+        let voucher: any = router.process("mint_nft", data);
         if (voucher?.destination) {
           await fetch(rollup_server + "/voucher", {
             method: "POST",
@@ -558,42 +561,6 @@ const handleInspect: InspectRequestHandler = async (data) => {
       console.log("Received report status " + inspect_req.status);
       return "accept";
     }
-
-    // if (eventPayload[0] == "get_event_participants") {
-    //   const event_participants = await db.all(
-    //     "SELECT * FROM event_tickets WHERE event_id = ?",
-    //     `${eventPayload[1]}`
-    //   );
-
-    //   const payload = toHex(JSON.stringify(event_participants));
-    //   const inspect_req = await fetch(rollup_server + "/report", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ payload }),
-    //   });
-    //   console.log("Received report status " + inspect_req.status);
-    //   return "accept";
-    // }
-
-    // if (eventPayload[0] == "get_event_referrals") {
-    //   const event_referrals = await db.all(
-    //     "SELECT * FROM event_referrals WHERE event_id = ?",
-    //     `${eventPayload[1]}`
-    //   );
-
-    //   const payload = toHex(JSON.stringify(event_referrals));
-    //   const inspect_req = await fetch(rollup_server + "/report", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ payload }),
-    //   });
-    //   console.log("Received report status " + inspect_req.status);
-    //   return "accept";
-    // }
 
     if (eventPayload[0] == "get_user_data") {
       const all_events = await db.all("SELECT * FROM events");

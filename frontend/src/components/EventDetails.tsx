@@ -152,36 +152,6 @@ const EventDetails = () => {
             });
     }
 
-    // const fetchReferralCodes = async (str: string) => {
-    //     let payload = str;
-    //     if (!connectedChain) {
-    //         return;
-    //     }
-
-    //     let apiURL = ""
-
-    //     if (config[connectedChain.id]?.inspectAPIURL) {
-    //         apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
-    //     } else {
-    //         console.error(`No inspect interface defined for chain ${connectedChain.id}`);
-    //         return;
-    //     }
-
-    //     let fetchData: Promise<Response>;
-    //     fetchData = fetch(`${apiURL}/${payload}`);
-
-    //     fetchData
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             // Decode payload from each report
-    //             const decode = data.reports.map((report: Report) => {
-    //                 return ethers.utils.toUtf8String(report.payload);
-    //             });
-    //             const reportData = JSON.parse(decode)
-    //             setEventReferrals(reportData);
-    //         });
-    // }
-
     const showProposalModal = () => {
         if (eventParticipants?.length > 0 && eventParticipants.finwallet?.accounts[0]?.address === eventDetails?.organizer) {
             toast.error("Unauthorized access. You'are Event Organizer");
@@ -307,9 +277,6 @@ const EventDetails = () => {
                                                     </div>
                                                     <div className="pt-2 font-sans">
                                                         Maximum Capacity: {eventDetails?.capacity}
-                                                    </div>
-                                                    <div className="pt-2 font-sans">
-                                                        Location: {eventDetails?.location}
                                                     </div>
                                                     {eventDetails?.dao === 1 &&
                                                         <div className="pt-2 font-sans">This Event allows the creation/voting of proposals.</div>

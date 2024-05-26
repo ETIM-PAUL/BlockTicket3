@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
-import { DappAddress } from "../../constants";
+import { DappAddress, ERC721Address } from "../../constants";
 import { useRollups } from "../../useRollups";
 import { toast } from "react-toastify";
 import { useSetChain } from "@web3-onboard/react";
@@ -74,7 +74,7 @@ const ClaimNFTModal = ({ isVisible, onClose, id, ticket_id, walletNavigate }: Pr
     if (rollups) {
       try {
         setProcessing(true);
-        let str = `{"action": "claim_nft", "id": ${id}, "ticket_id": ${ticket_id}, "nft_url":"${nftUrl}"}`
+        let str = `{"action": "claim_nft", "id": ${id}, "ticket_id": ${ticket_id}, "event_id":${id}, "erc721_address": "${ERC721Address}"}`
         let data = ethers.utils.toUtf8Bytes(str);
         const result = await rollups.inputContract.addInput(DappAddress, data);
         const receipt = await result.wait(1);

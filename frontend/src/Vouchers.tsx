@@ -65,16 +65,15 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
             const newVoucherToExecute = { ...voucher };
             try {
                 const tx = await rollups.dappContract.executeVoucher(voucher.destination, voucher.payload, voucher.proof);
-                const receipt = await tx.wait();
+                const receipt: any = await tx.wait();
                 newVoucherToExecute.msg = `voucher executed! (tx="${tx.hash}")`;
-
-                if (receipt.events) {
+                console.log(receipt)
+                if (receipt.events?.length > 0) {
                     newVoucherToExecute.msg = `${newVoucherToExecute.msg} - resulting events: ${JSON.stringify(receipt.events)}`;
                     newVoucherToExecute.executed = await rollups.dappContract.wasVoucherExecuted(BigNumber.from(voucher.input.index), BigNumber.from(voucher.index));
-                    console.log("newVoucher", newVoucherToExecute)
                     toast.success("Voucher Executed successfully!");
-                    setExecuting(false);
                 }
+                setExecuting(false);
             } catch (e) {
                 setExecuting(false);
                 toast.error("Could not execute voucher")
@@ -153,7 +152,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                         payload = `Erc1155 Batch Transfer - Ids: ${decode[2]} Amounts: ${decode[3]} - Address: ${decode[1]}`;
                         break;
                     }
-                    case '0xd0def521': {
+                    case '0x8c19b4d8': {
                         //erc721 mint;
                         const decode = decoder.decode(["address", "string"], payload);
                         payload = `Mint Erc721 - String: ${decode[1]} - Address: ${decode[0]}`;
@@ -197,6 +196,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
             return b.input.index - a.input.index;
         }
     });
+
 
     // const forceUpdate = useForceUpdate();
     return (

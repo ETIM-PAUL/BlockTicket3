@@ -16,7 +16,7 @@ type Props = {
 const VoteModal = ({ isVisible, onClose, proposal, event_id, event_organizer }: Props) => {
     const [downVoteProcessing, setDownVoteProcessing] = useState<boolean>(false)
     const [upvoteProcessing, setUpvoteProcessing] = useState<boolean>(false)
-    const [voters, setVoters] = useState<any>(JSON.parse(proposal?.voters))
+    const [voters, setVoters] = useState<any>(typeof proposal?.voters === "string" ? JSON.parse(proposal?.voters) : proposal?.voters)
     const rollups = useRollups(DappAddress);
     const [{ wallet }] = useConnectWallet();
 
