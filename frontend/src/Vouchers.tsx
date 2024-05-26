@@ -9,7 +9,6 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations
 // under the License.
-
 import { BigNumber, ethers } from "ethers";
 import React, { useEffect } from "react";
 import { useVouchersQuery, useVoucherQuery } from "./generated/graphql";
@@ -28,6 +27,8 @@ import {
     Text
 } from '@chakra-ui/react'
 import { toast } from "react-toastify";
+import { useConnectWallet } from "@web3-onboard/react";
+import { getAddress } from "ethers/lib/utils";
 
 type Voucher = {
     id: string;
@@ -52,6 +53,8 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
     });
     const [voucherToExecute, setVoucherToExecute] = React.useState<any>();
     const { data, fetching, error } = result;
+    const [{ wallet }]: any = useConnectWallet();
+
     const rollups = useRollups(propos.dappAddress);
 
     const getProof = async (voucher: Voucher) => {
@@ -104,7 +107,9 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
 
     const vouchers: Voucher[] = data.vouchers.edges.map((node: any) => {
         const n = node.node;
+
         let payload = n?.payload;
+        let owner;
         let inputPayload = n?.input.payload;
         if (inputPayload) {
             try {
@@ -119,6 +124,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
             const decoder = new ethers.utils.AbiCoder();
             const selector = decoder.decode(["bytes4"], payload)[0];
             payload = ethers.utils.hexDataSlice(payload, 4);
+
             try {
                 switch (selector) {
                     case '0xa9059cbb': {
@@ -136,6 +142,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                     case '0x522f6815': {
                         //ether transfer; 
                         const decode2 = decoder.decode(["address", "uint256"], payload)
+                        owner = decode2[0]
                         payload = `Ether Transfer - Amount: ${ethers.utils.formatEther(decode2[1])} (Native eth) - Address: ${decode2[0]}`;
                         break;
                     }
@@ -154,7 +161,8 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                     case '0x8c19b4d8': {
                         //erc721 mint;
                         const decode = decoder.decode(["address", "string"], payload);
-                        payload = `Mint Erc721 - String: ${decode[1]} - Address: ${decode[0]}`;
+                        owner = decode[0]
+                        payload = `Mint Erc721 NFT - Event: ${decode[1]} - Address: ${decode[0]}`;
                         break;
                     }
                     case '0x755edd17': {
@@ -181,6 +189,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
         }
         return {
             id: `${n?.id}`,
+            owner: owner,
             index: parseInt(n?.index),
             destination: `${n?.destination ?? ""}`,
             payload: `${payload}`,
@@ -196,8 +205,6 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
         }
     });
 
-
-    // const forceUpdate = useForceUpdate();
     return (
         <div>
             <p></p>
@@ -210,61 +217,36 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                         <Tr>
                             <Th>Input Index</Th>
                             <Th>Action</Th>
-                            <Th>Voucher Index</Th>
-                            {/*<Th>Destination</Th> */}
-                            {/* <Th>Payload</Th> */}
-                            {/* <th>Proof</th> */}
-                            {/* <Th>Input Payload</Th> */}
-                            {/* <Th>Msg</Th> */}
                         </Tr>
                     </Thead>
                     <Tbody>
                         <Tr key={`${voucherToExecute.input.index}-${voucherToExecute.index}`}>
                             <Td>{voucherToExecute.input.index}</Td>
-                            {/*<Td>{voucherToExecute.destination}</Td> */}
                             <Td>
                                 <Button size='sm' isDisabled={!voucherToExecute.proof || voucherToExecute.executed || executing} onClick={() => executeVoucher(voucherToExecute)}>{voucherToExecute.proof ? (voucherToExecute.executed ? "Voucher executed" : executing ? "Executing" : "Execute voucher") : "No proof yet"}</Button>
                             </Td>
-                            <Td>{voucherToExecute.index}</Td>
-                            {/* <td>{voucherToExecute.payload}</td> */}
-                            {/* <td>{voucherToExecute.proof}</td> */}
-                            {/* <Td>{voucherToExecute.input.payload}</Td> */}
-                            {/* <Td>{voucherToExecute.msg}</Td> */}
-                            <br /> <br />
                         </Tr>
                     </Tbody>
                 </Table> : <Text></Text>}
             <Table marginTop={'20px'}>
                 <Thead>
                     <Tr>
-                        {/*<Th>Input Index</Th>
-                        <Th>Voucher Index</Th>
-                        <Th>Destination</Th> */}
                         <Th>Action</Th>
-                        {/* <th>Input Payload</th> */}
                         <Th>Payload</Th>
-                        {/* <th>Proof</th> */}
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {vouchers.length === 0 && (
+                    {vouchers.filter((voucher: any) => getAddress(voucher.owner) === getAddress(wallet?.accounts[0]?.address)).length === 0 && (
                         <Tr>
                             <Td textAlign={'center'} colSpan={4}>-</Td>
                         </Tr>
                     )}
-                    {vouchers.map((n: any) => (
+                    {vouchers.filter((voucher: any) => getAddress(voucher.owner) === getAddress(wallet?.accounts[0]?.address)).map((n: any) => (
                         <Tr key={`${n.input.index}-${n.index}`}>
-                            {/*<Td>{n.input.index}</Td>
-                            <Td>{n.index}</Td>
-                            <Td>{n.destination}</Td> */}
                             <Td>
                                 <Button size='sm' onClick={() => getProof(n)}>Info</Button>
                             </Td>
-                            {/* <td>{n.input.payload}</td> */}
                             <span className="text-gray-500 text-wrap max-w-[200px] my-2 block">{n.payload}</span>
-                            {/* <td>
-                                <button disabled={!!n.proof} onClick={() => executeVoucher(n)}>Execute voucher</button>
-                            </td> */}
                         </Tr>
                     ))}
                 </Tbody>

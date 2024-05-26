@@ -122,7 +122,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
 
 
   return (
-    <div className="px-4">
+    <div className="px-4 my-12">
       <div className="flex justify-center w-full gap-2 md:gap-8">
         <div onClick={() => setActive("deposit")} className="flex flex-col gap- w-[100px] md:w-[150px] items-center p-3 shadow-xl rounded-[24px] border py-2 px-1 text-base hover:cursor-pointer bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
           <RiLuggageDepositFill className="text-center text-white text-2xl" />

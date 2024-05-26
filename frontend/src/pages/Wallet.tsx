@@ -50,9 +50,7 @@ const Wallet: FC = () => {
                     <GraphQLProvider>
                         <SimpleGrid className="bg-white border my-4 rounded-t-[8px] w-[90%] md:max-w-[70%] mx-auto ">
                             <Balance />
-                            <br /> <br />
                             <Transfers dappAddress={DappAddress} />
-                            <br /> <br />
                         </SimpleGrid>
                     </GraphQLProvider>
                 )}

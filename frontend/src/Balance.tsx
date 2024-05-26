@@ -48,7 +48,6 @@ export const Balance: React.FC = () => {
   const [postData, setPostData] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // const rollups = useRollups();
   const [{ connectedChain }] = useSetChain();
   const [{ wallet }] = useConnectWallet();
 
@@ -88,14 +87,13 @@ export const Balance: React.FC = () => {
       .then((response) => response.json())
       .then((data) => {
         setReports(data.reports);
-        // Decode payload from each report
+
         const decode = data.reports.map((report: Report) => {
           return ethers.utils.toUtf8String(report.payload);
         });
         const reportData = JSON.parse(decode);
         setDecodedReports(reportData);
         toast.success("current balance fetched")
-        //console.log(parseEther("1000000000000000000", "gwei"))
         setLoading(false)
       }
       );
@@ -148,37 +146,6 @@ export const Balance: React.FC = () => {
           </div>
         )}
       </div>
-      {/* <TableContainer>
-        <Stack>
-          <Table variant='striped' size="lg">
-            <Thead>
-              <Tr>
-                <Th textAlign={'center'}>Ether</Th>
-                <Th textAlign={'center'}>ERC-20</Th>
-                <Th textAlign={'center'}>ERC-721</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {reports?.length === 0 && (
-                <Tr>
-                  <Td colSpan={4} textAlign={'center'} fontSize='14' color='grey' >looks like your BlockTicket3 balance is zero! 🙁</Td>
-                </Tr>
-              )}
-
-              {<Tr key={`${decodedReports}`}>
-                {decodedReports && decodedReports.ether && (
-                  <Td textAlign={'center'}>{ethers.utils.formatEther(decodedReports.ether)}</Td>)}
-                {decodedReports && decodedReports.erc721 && (
-                  <Td textAlign={'center'}>
-                    <div>📍 {String(decodedReports.erc721).split(",")[0]}</div>
-                    <div>🆔 {String(decodedReports.erc721).split(",")[1]}</div>
-                  </Td>)}
-              </Tr>}
-            </Tbody>
-          </Table>
-          <Button onClick={() => inspectCall(`balance/${wallet?.accounts[0]?.address}`)}>Get Balance</Button>
-        </Stack>
-      </TableContainer> */}
     </Box>
   );
 };
