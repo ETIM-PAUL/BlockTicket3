@@ -106,7 +106,7 @@ const MyEventsTickets = ({ tickets, referrals, events, nfts }: Props) => {
                                     <td className="space-x-1 lg:space-x-2 items-center">
                                         <button onClick={() => navigate(`/event-details/${ticket.event_id}`)} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View Event</button>
                                         {(getEventStatus(ticket.event_id) === 2) &&
-                                            <button disabled={ticket.claimedNFT === 1} onClick={() => { setSelectedTicket(ticket); showNFTModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">{ticket.claimedNFT === 1 ? "NFT Claimed" : "Claim POAP(NFT)"}</button>
+                                            <button disabled={ticket.claimedNFT === 1} onClick={() => { setSelectedTicket(ticket); showNFTModal() }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690] disabled:cursor-not-allowed  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">{ticket.claimedNFT === 1 ? "NFT Claimed" : "Claim POAP(NFT)"}</button>
                                         }
                                         {(isNFTMinted(ticket.event_id, ticket.id)) &&
                                             <button onClick={() => { setSelectedNFT(getEventDetails(ticket.event_id, "tokenUrl")); showNFT(); }} className="bg-gradient-to-r from-[#5522CC] to-[#ED4690]  text-white hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] text-xs font-bold p-1">View NFT</button>
@@ -213,5 +213,5 @@ const MyEventsTickets = ({ tickets, referrals, events, nfts }: Props) => {
         </div>
     );
 };
-// 300501
+
 export default MyEventsTickets;

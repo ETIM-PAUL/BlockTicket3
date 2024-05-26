@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { bgImage } from "../assets";
 import TopNav from "./TopNav";
@@ -8,14 +8,10 @@ import { ethers } from "ethers";
 import { useRollups } from "../useRollups";
 import { DappAddress } from "../constants";
 import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
-import configFile from "../config.json";
 import { GlobalContext } from "../context/GlobalContext";
 
 type Props = {};
-interface Report {
-    payload: string;
-}
-const config: any = configFile;
+
 interface TicketTypes {
     id: number;
     ticketType: string;
@@ -55,41 +51,6 @@ const CreateEvent = (props: Props) => {
     const [nftFile, updateNftFile] = useState("");
     const [nftIpfsLoading, setNftIpfsLoading] = useState(false);
     const [isSubmitLoading, setIsSubmitLoading] = useState(false);
-
-    // const getBalance = async (str: string) => {
-    //     let payload = str;
-
-    //     if (!connectedChain) {
-    //         return;
-    //     }
-
-    //     let apiURL = ""
-
-    //     if (config[connectedChain.id]?.inspectAPIURL) {
-    //         apiURL = `${config[connectedChain.id].inspectAPIURL}/inspect`;
-    //     } else {
-    //         console.error(`No inspect interface defined for chain ${connectedChain.id}`);
-    //         return;
-    //     }
-
-    //     let fetchData: Promise<Response>;
-    //     if (postData) {
-    //         const payloadBlob = new TextEncoder().encode(payload);
-    //         fetchData = fetch(`${apiURL}`, { method: 'POST', body: payloadBlob });
-    //     } else {
-    //         fetchData = fetch(`${apiURL}/${payload}`);
-    //     }
-    //     fetchData
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             // Decode payload from each report
-    //             const decode = data.reports.map((report: Report) => {
-    //                 return ethers.utils.toUtf8String(report.payload);
-    //             });
-    //             const reportData: any = JSON.parse(decode)
-    //             setBalance(ethers.utils.formatEther(reportData?.ether))
-    //         });
-    // };
 
     async function uploadNftIPFS() {
         const file = nftFile;

@@ -1,15 +1,4 @@
-import { ethers } from "ethers";
-import React, { useEffect, useState } from "react";
-import { DappAddress, ERC721Address, formatIPFS } from "../../constants";
-import { useRollups } from "../../useRollups";
-import { toast } from "react-toastify";
-import { useSetChain } from "@web3-onboard/react";
-import configFile from "../../config.json";
-
-const config: any = configFile;
-interface Report {
-  payload: string;
-}
+import { formatIPFS } from "../../constants";
 
 type Props = {
   isVisible: boolean;
@@ -18,11 +7,6 @@ type Props = {
 };
 
 const NFTModal = ({ isVisible, nft_url, onClose }: Props) => {
-  const [processing, setProcessing] = useState<boolean>(false)
-  const [nftUrl, setNFTUrl] = useState<string>("")
-  const rollups = useRollups(DappAddress);
-  const [postData, setPostData] = useState<boolean>(false);
-  const [{ connectedChain }] = useSetChain();
 
 
   if (!isVisible) return null;

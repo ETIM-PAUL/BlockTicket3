@@ -14,7 +14,6 @@ const outputFile = "src/schema.d.ts";
 // import types from viem in generated code
 const inject = "import { Address, Hex } from 'viem';\n";
 
-console.log(`${inputFile} -> ${outputFile}`);
 openapiTS(inputFile, {
   inject,
   transform: (schemaObject, _options) => {

@@ -102,8 +102,6 @@ class MintNft extends AdvanceRoute {
     const event_id = payload.event_id;
     const ticket_id = payload.ticket_id;
     const erc721_address = getAddress(payload.erc721_address);
-    console.log("erc721 token.....", erc721_address);
-    console.log("minting erc721 data.....", ticket_id);
     const call = encodeFunctionData({
       abi: erc721abi,
       functionName: "mintPOAP",
@@ -403,7 +401,6 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
           updated_voters?.length > 0 &&
           updated_voters.find((voter: any) => voter === msg_sender)
         ) {
-          console.log("Already Voted");
           throw new Error("Access Denied");
         }
 

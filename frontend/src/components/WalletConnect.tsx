@@ -20,7 +20,6 @@ const WalletConnect = () => {
                 payload: !state?.fetching,
             });
         } catch (switchError: any) {
-            console.log(switchError)
             // The network has not been added to MetaMask
             if (switchError.code === 4902) {
                 console.log("Please add the Localhost network to MetaMask")
@@ -33,13 +32,10 @@ const WalletConnect = () => {
     useEffect(() => {
         const provider: any = new ethers.providers.Web3Provider(window.ethereum);
         const handleAccountsChanged = (accounts: any) => {
-            // console.log(accounts[0])
-            // console.log(wallet && wallet.accounts[0].address)
             if (accounts.length === 0) {
                 console.log('Please connect to a wallet.');
             } else {
                 getBalance(`balance/${accounts[0]}`);
-                console.log('current account:', accounts[0]);
             }
         };
 

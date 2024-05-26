@@ -37,9 +37,9 @@ const config = configFile;
 const injected = injectedModule();
 
 const web3Onboard = init({
-    connect: {
-        autoConnectAllPreviousWallet: true
-    },
+    // connect: {
+    //     autoConnectAllPreviousWallet: true
+    // },
     wallets: [injected],
     chains: Object.entries(config).map(([k, v], i) => ({
         id: k,

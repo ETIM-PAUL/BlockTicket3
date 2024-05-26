@@ -43,7 +43,17 @@ const TopNav = (props: Props) => {
                         <div className="md:-ml-8 mt- md:mt-0 ">
                             <Logo />
                         </div>
-                        <div className=" hidden md:flex  -mr-8  md:order-2 md:space-x-0 rtl:space-x-reverse gap-6">
+                        <div className=" hidden lg:flex  -mr-8  md:order-2 md:space-x-0 rtl:space-x-reverse gap-6">
+                            {wallet && (
+                                <button>
+                                    <Link
+                                        to="/events"
+                                        className="font-medium  rounded-lg text-base md:text-lg p-2 md:px-4 md:py-3 text-center bg-white text-black"
+                                    >
+                                        Events
+                                    </Link>
+                                </button>
+                            )}
                             {wallet && (
                                 <button>
                                     <Link
@@ -72,7 +82,7 @@ const TopNav = (props: Props) => {
                     {/* Mobile Nav */}
 
                     <button
-                        className="w-16 block md:hidden"
+                        className="w-16 block lg:hidden"
                         onClick={toggleMobileNav}
                     >
                         <svg
@@ -95,7 +105,17 @@ const TopNav = (props: Props) => {
 
                 {mobileNavOpen && (
                     <div className="w-full px-">
-                        <div className="flex md:hidden flex-col items-end absolute top-14 menu menu-sm dropdown-content mt-3 z-40 py-2 px-8 shadow-xl bg-base-100 w-full rounded-sm space-y-3 ">
+                        <div className="flex lg:hidden flex-col items-end absolute right-0 top-14 menu menu-sm dropdown-content mt-3 z-40 py-2 px-8 shadow-xl bg-base-100 w-full rounded-sm space-y-3 ">
+                            <li>
+                                {wallet && (
+                                    <Link
+                                        to="/events"
+                                        className="font-medium rounded-md  text-base md:text-xl px-4 py-3 text-center bg-white text-black"
+                                    >
+                                        Events
+                                    </Link>
+                                )}
+                            </li>
                             <li>
                                 {wallet && (
                                     <Link

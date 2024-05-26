@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { useRollups } from "../../useRollups";
 import { DappAddress } from "../../constants";
 import { ethers } from "ethers";
-import { useConnectWallet } from "@web3-onboard/react";
 
 type Props = {
     id: number;

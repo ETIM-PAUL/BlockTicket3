@@ -1,4 +1,3 @@
-import React from "react";
 import { shortenAddress } from "../utils";
 import moment from "moment";
 
