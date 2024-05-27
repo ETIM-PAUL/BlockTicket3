@@ -474,18 +474,6 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
           return "accept";
         }
       }
-
-      if (eventPayload.action === "mint") {
-        let voucher: any = router.process("mint_nft", data);
-        if (voucher?.destination) {
-          await fetch(rollup_server + "/voucher", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(voucher),
-          });
-          return "accept";
-        }
-      }
     }
 
     try {
