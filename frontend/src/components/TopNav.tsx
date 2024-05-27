@@ -130,7 +130,7 @@ const TopNav = (props: Props) => {
                                 {wallet && (
                                     <Link
                                         to="/my-wallet"
-                                        className="font-medium rounded-md  text-base md:text-xl px-4 py-3 text-center bg-white text-black"
+                                        className="font-medium rounded-md  text-base md:text-xl md:px-4 py-3 text-center bg-white text-black"
                                     >
                                         My Wallet
                                     </Link>

@@ -50,7 +50,7 @@ const web3Onboard = init({
     appMetadata: {
         name: "BlockTicket3",
         icon: "<svg><svg/>",
-        description: "BlockTicket3An Event Ticket and DAO Application",
+        description: "BlockTicket3 is An Event Ticketing and DAO Application",
         recommendedInjectedWallets: [
             { name: "MetaMask", url: "https://metamask.io" },
         ],
