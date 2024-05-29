@@ -124,7 +124,6 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
             const decoder = new ethers.utils.AbiCoder();
             const selector = decoder.decode(["bytes4"], payload)[0];
             payload = ethers.utils.hexDataSlice(payload, 4);
-
             try {
                 switch (selector) {
                     case '0xa9059cbb': {
@@ -160,7 +159,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                     }
                     case '0x8c19b4d8': {
                         //erc721 mint;
-                        const decode = decoder.decode(["address", "string"], payload);
+                        const decode = decoder.decode(["address", "uint256", "uint256"], payload);
                         owner = decode[0]
                         payload = `Mint Erc721 NFT - Event: ${decode[1]} - Address: ${decode[0]}`;
                         break;
@@ -178,6 +177,9 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                         break;
                     }
                     default: {
+                        const decode = decoder.decode(["address", "uint256", "uint256"], payload);
+                        owner = decode[0]
+                        payload = `Mint Erc721 NFT - Event: ${decode[1]} - Address: ${decode[0]}`;
                         break;
                     }
                 }
