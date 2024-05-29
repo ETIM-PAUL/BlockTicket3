@@ -17,7 +17,7 @@ const UserDashboard = (props: Props) => {
     const [showEvents, setShowEvents] = useState(false);
     const [showDashboard, setShowDasboard] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [userNfts, setUserNfts] = useState<any>();
+    const [userNfts, setUserNfts] = useState<any>([]);
     const [userData, setUserData] = useState<any>();
     const [{ connectedChain }] = useSetChain();
     const [postData, setPostData] = useState<boolean>(false);
