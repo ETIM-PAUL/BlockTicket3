@@ -28,6 +28,7 @@ import UserDashboardPage from "./pages/UserDashboardPage";
 import { ChakraProvider } from "@chakra-ui/react";
 import Wallet from "./pages/Wallet";
 import GlobalProvider from "./context/GlobalContext";
+import { GraphQLProvider } from "./GraphQL";
 
 const container = document.getElementById("root");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript

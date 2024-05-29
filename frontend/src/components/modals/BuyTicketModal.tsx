@@ -105,7 +105,7 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, setBalance, 
                     type: "SET_BALANCE",
                     payload: (Number(state.balance) - Number(ticket_details?.price)).toString(),
                 });
-                setBalance(ticket_details?.price.toString())
+                setBalance((Number(state.balance) - Number(ticket_details?.price)).toString())
                 toast.success("Event ticket purchased successfully")
                 setProcessing(false);
                 setEventParticipants([...purchased_tickets, { "id": purchased_tickets[purchased_tickets.length - 1] ? purchased_tickets[purchased_tickets.length - 1].id + 1 : 1, "event_id": id, "ticket_type_id": ticket_details?.id, "purchased_time": new Date(), "ticket_type": ticket_details?.ticketType, "address": wallet?.accounts[0]?.address, "refunded": false, "claimedNFT": false }]);

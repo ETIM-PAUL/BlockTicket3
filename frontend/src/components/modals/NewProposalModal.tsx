@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useRollups } from "../../useRollups";
 import { DappAddress } from "../../constants";
 import { ethers } from "ethers";
+import { useConnectWallet } from "@web3-onboard/react";
 
 type Props = {
     id: number;
@@ -16,6 +17,7 @@ type Props = {
 const NewProposalModal = ({ isVisible, onClose, setEventProposals, eventProposals, id }: Props) => {
     const [proposal, setProposal] = useState("");
     const [processing, setProcessing] = useState<boolean>(false)
+    const [{ wallet }] = useConnectWallet();
     const rollups = useRollups(DappAddress);
 
     if (!isVisible) return null;
@@ -43,7 +45,7 @@ const NewProposalModal = ({ isVisible, onClose, setEventProposals, eventProposal
                     setProposal("");
                     toast.success("Proposal created successfully")
                     setProcessing(false);
-                    setEventProposals([...eventProposals, { "id": eventProposals[eventProposals.length - 1] ? eventProposals[eventProposals.length - 1].id + 1 : 1, "proposer": proposal, "upvotes": 0, "downvotes": 0 }])
+                    setEventProposals([...eventProposals, { "id": eventProposals[eventProposals.length - 1] ? eventProposals[eventProposals.length - 1].id + 1 : 1, "proposer": proposal, proposal: wallet?.accounts[0]?.address, voters: '[]', "upvotes": 0, "downvotes": 0 }])
                     onClose();
                 } catch (error) {
                     console.log("error", error)

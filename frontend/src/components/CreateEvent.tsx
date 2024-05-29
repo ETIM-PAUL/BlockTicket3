@@ -131,26 +131,26 @@ const CreateEvent = (props: Props) => {
 
     async function createEvent() {
         let creation_price: number = 0;
-
-        if (Number(balance) < 0.06 && referral === "true") {
+        console.log(Number(state?.balance))
+        if (Number(state?.balance) < 0.06 && referral === "true") {
             toast.error("Insufficient Funds for Referral based Event. Please Deposit into the DAPP")
             return;
         } else {
             creation_price = 0.06
         }
-        if (Number(balance) < 0.04 && dao === "true") {
+        if (Number(state?.balance) < 0.04 && dao === "true") {
             toast.error("Insufficient Funds for DAO based Event. Please Deposit into the DAPP")
             return;
         } else {
             creation_price = 0.04
         }
-        if (Number(balance) < 0.02 && dao === "false" && referral === "false") {
+        if (Number(state?.balance) < 0.02 && dao === "false" && referral === "false") {
             toast.error("Insufficient Funds for Normal Event. Please Deposit into the DAPP")
             return;
         } else {
             creation_price = 0.02
         }
-        if (Number(balance) < 0.1 && dao === "true" && referral === "true") {
+        if (Number(state?.balance) < 0.1 && dao === "true" && referral === "true") {
             toast.error("Insufficient Funds for Full-Packaged Event. Please Deposit into the DAPP")
             return;
         } else {
@@ -173,6 +173,7 @@ const CreateEvent = (props: Props) => {
             toast.error("Please add a referral discount value greater than One(1)");
             return;
         }
+
         try {
             if (rollups) {
                 setIsSubmitLoading(true)
@@ -193,6 +194,11 @@ const CreateEvent = (props: Props) => {
                                 logoUrl: logo
                             }
 
+                            if (!nft && !logo) {
+                                toast.error("Issue uploading event logo and NFT. Please try again OR make sure there are added");
+                                return;
+                            }
+
                             let str = `{"action": "create_event", "title": "${payload.title}", "date": "${payload.date}", "location": "${payload.location}", "tickets": ${JSON.stringify(ticketTypes)}, "capacity": ${payload.capacity}, "organizer": "${wallet?.accounts[0]?.address}", "dao": ${payload.dao}, "referral": ${payload.referral}, "minReferrals": ${payload.minReferal}, "referralDiscount": ${payload.referalDiscount}, "tokenUrl": "${payload.nftUrl}", "logoUrl": "${payload.logoUrl}"}`
                             let data = ethers.utils.toUtf8Bytes(str);
 
@@ -209,7 +215,7 @@ const CreateEvent = (props: Props) => {
                                     type: "SET_BALANCE",
                                     payload: (Number(state.balance) - Number(creation_price)).toString(),
                                 });
-                                setBalance(creation_price.toString())
+                                setBalance((Number(state.balance) - Number(creation_price)).toString())
                                 dispatch({
                                     type: "APPEND_EVENTS",
                                     payload: { ...payload, "id": state?.events[state?.events.length - 1] ? state?.events[state?.events.length - 1].id + 1 : 1, "organizer": wallet?.accounts[0]?.address, "status": 0 },

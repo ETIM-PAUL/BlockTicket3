@@ -30,12 +30,13 @@ const WalletConnect = () => {
     }
 
     useEffect(() => {
-        if (wallet?.account) {
+        if (wallet?.accounts) {
             const provider: any = new ethers.providers.Web3Provider(window.ethereum);
             const handleAccountsChanged = (accounts: any) => {
                 if (accounts.length === 0) {
                     console.log('Please connect to a wallet.');
                 } else {
+                    console.log('Wallet connected');
                     getBalance(`balance/${accounts[0]}`);
                 }
             };

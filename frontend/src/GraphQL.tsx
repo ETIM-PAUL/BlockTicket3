@@ -32,7 +32,6 @@ const useGraphQL = () => {
             console.error(`No GraphQL interface defined for chain ${connectedChain.id}`);
             return null;
         }
-
         if (!url) {
             return null;
         }

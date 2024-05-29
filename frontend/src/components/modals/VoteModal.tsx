@@ -19,7 +19,7 @@ const VoteModal = ({ isVisible, onClose, proposal, event_id, event_organizer }: 
     const [voters, setVoters] = useState<any>(typeof proposal?.voters === "string" ? JSON.parse(proposal?.voters) : proposal?.voters)
     const rollups = useRollups(DappAddress);
     const [{ wallet }] = useConnectWallet();
-
+    console.log(proposal)
     if (!isVisible) return null;
 
     const handleClose = (e: any) => {

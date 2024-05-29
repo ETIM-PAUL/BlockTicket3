@@ -192,7 +192,8 @@ const EventDetails = () => {
                                                 {(wallet?.accounts[0]?.address === eventDetails?.organizer && eventDetails?.status < 2) &&
                                                     <div className="flex gap-2 md:gap-5 justify-center mx-2 md:mx-6 mt-10 text-base font-bold text-center max-md:max-w-full">
                                                         <button
-                                                            className=" w-1/2 bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] px-6 py-3 "
+                                                            disabled={eventDetails?.status === 1}
+                                                            className=" w-1/2 bg-gradient-to-r from-[#5522CC] to-[#ED4690] hover:bg-gradient-to-r hover:from-[#9a8abd] hover:to-[#5946ed] hover:text-[#FFFFFF] disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3 "
                                                             onClick={() => startEvent()}
                                                         >
                                                             Start Event
@@ -257,14 +258,19 @@ const EventDetails = () => {
                                                 </div>
 
                                                 <div className="px-5 md:px-8 text-base md:text-base text-white">
+                                                    {eventDetails?.status === 1 &&
+                                                        <div className="pt-2 font-sans text-lg text-red-700">
+                                                            This Event is ongoing!!!
+                                                        </div>
+                                                    }
                                                     {eventDetails?.status === 3 &&
                                                         <div className="pt-2 font-sans text-lg text-red-700">
-                                                            ooops! This Event has been cancelled
+                                                            ooops! This Event has been cancelled!!!
                                                         </div>
                                                     }
                                                     {eventDetails?.status === 2 &&
                                                         <div className="pt-2 font-sans text-lg text-red-700">
-                                                            ooops! This Event has ended
+                                                            ooops! This Event has ended!!!
                                                         </div>
                                                     }
                                                     <div className="pt-2 font-sans">
@@ -327,7 +333,7 @@ const EventDetails = () => {
                                 <BuyTicketModal
                                     id={Number(id)}
                                     isVisible={showModal}
-                                    balance={balance}
+                                    balance={state?.balance}
                                     setBalance={setBalance}
                                     organizer={eventDetails.organizer}
                                     capacity={eventDetails.capacity}
