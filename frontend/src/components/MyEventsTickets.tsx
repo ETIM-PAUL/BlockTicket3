@@ -53,6 +53,9 @@ const MyEventsTickets = ({ tickets, referrals, events, nfts }: Props) => {
     }
 
     function isNFTMinted(event_id: any, ticket_id: any) {
+        if (nfts.length === 0) {
+            return false;
+        }
         const nft_url = nfts?.find((nft: any) => (Number(nft?.eventid) === event_id) && (Number(nft?.ticketid) === ticket_id));
         return nft_url
     }
