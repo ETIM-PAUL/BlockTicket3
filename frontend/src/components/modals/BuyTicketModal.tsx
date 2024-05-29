@@ -82,7 +82,7 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, setBalance, 
             toast.error("Unauthorized access. You are Event Organizer")
             return;
         }
-        if (Number(referralCode) > 0 && !eventReferrals.find((referral: any) => Number(referral?.code) === Number(referralCode))?.code) {
+        if (Number(referralCode) > 0 && !eventReferrals?.find((referral: any) => Number(referral?.code) === Number(referralCode))?.code) {
             toast.error("Invalid Event Referral Code")
             return;
         }
