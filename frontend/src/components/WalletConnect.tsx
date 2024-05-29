@@ -11,6 +11,7 @@ const WalletConnect = () => {
     const [{ wallet }, connect, disconnect]: any = useConnectWallet();
     const [{ connectedChain }, setChain]: any = useSetChain();
     const { state, dispatch }: any = useContext(GlobalContext);
+    const [currentAccount, setAccount] = useState<any>(wallet?.accounts[0]?.address)
 
     const switchNetwork = async () => {
         try {
@@ -30,25 +31,20 @@ const WalletConnect = () => {
     }
 
     useEffect(() => {
-        if (wallet?.accounts) {
-            const provider: any = new ethers.providers.Web3Provider(window.ethereum);
+        if (wallet?.accounts[0]) {
+            setAccount(wallet?.accounts[0]?.address)
             const handleAccountsChanged = (accounts: any) => {
                 if (accounts.length === 0) {
                     console.log('Please connect to a wallet.');
                 } else {
-                    console.log('Wallet connected');
-                    getBalance(`balance/${accounts[0]}`);
+                    getBalance(`balance/${accounts[0].address}`);
                 }
             };
-
-            provider.provider.on("accountsChanged", handleAccountsChanged);
-
-            // Clean up the event listener on component unmount
-            return () => {
-                provider.provider.removeListener("accountsChanged");
-            };
+            if (currentAccount !== wallet?.accounts[0]?.address) {
+                handleAccountsChanged(wallet?.accounts);
+            }
         }
-    }, []);
+    }, [wallet && wallet?.accounts[0] && wallet?.accounts[0]?.address]);
 
     const getBalance = async (str: string) => {
         let payload = str;

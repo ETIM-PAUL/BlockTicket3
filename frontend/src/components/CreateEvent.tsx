@@ -131,7 +131,6 @@ const CreateEvent = (props: Props) => {
 
     async function createEvent() {
         let creation_price: number = 0;
-        console.log(Number(state?.balance))
         if (Number(state?.balance) < 0.06 && referral === "true") {
             toast.error("Insufficient Funds for Referral based Event. Please Deposit into the DAPP")
             return;
