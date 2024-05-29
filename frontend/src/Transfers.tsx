@@ -31,6 +31,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
   const rollups = useRollups(propos.dappAddress);
   const [connectedWallet] = useWallets();
   const [dappRelayedAddress, setDappRelayedAddress] = useState<boolean>(false)
+  const [isRelayed, setIsRelayed] = useState<any>(sessionStorage.getItem("isRelayed"))
   const [etherAmount, setEtherAmount] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false)
   const [depositing, setDepositing] = useState<boolean>(false)
@@ -43,6 +44,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
     if (rollups) {
       try {
         await rollups.relayContract.relayDAppAddress(propos.dappAddress);
+        sessionStorage.setItem("isRelayed", "true")
         setDappRelayedAddress(true);
       } catch (e) {
         console.log(`${e}`);
@@ -224,7 +226,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                 After the withdraw request, the user has to execute a voucher to transfer assets from blockTicket3 dApp to their account.
               </h3>
               <br />
-              {!dappRelayedAddress &&
+              {(!dappRelayedAddress && !sessionStorage.getItem("isRelayed")) &&
                 <div className="w-full flex flex-col items-center">
                   Let the dApp know its address! <br />
                   <button
@@ -238,7 +240,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                   <br />
                 </div>
               }
-              {dappRelayedAddress && <Vouchers dappAddress={propos.dappAddress} />}
+              {sessionStorage.getItem("isRelayed") && <Vouchers dappAddress={propos.dappAddress} />}
             </div>
           </div>
         }
