@@ -61,15 +61,19 @@ class CheckActions {
         const bal = JSON.parse(fromHex(balance.payload, "string"))
         const eth_balance = bal.ether
         let check;
+        let full_ticket_fee = event_tickets.find((event_ticket) => event_ticket.id === ticket_type_id).price;
         let ticket_fee = event_tickets.find((event_ticket) => event_ticket.id === ticket_type_id).price;
-        const user_referral = event_referrals.find((event_referral) => event_referral.owner === msg_sender)
+        let referrer_address = event_tickets.find((event_ticket) => event_ticket.id === ticket_type_id).owner;
+        let bonus_referrer_ticket_fee;
+        const user_referral = event_referrals.find((event_referral) => event_referral.owner === referrer_address)
 
         if (!ticket_fee) {
             throw new Error(`Invalid Ticket`);
         }
-        if (user_referral && user_referral?.count >= event_data.minReferrals && (user_referral?.claimed === false || user_referral?.claimed === 0)) {
+        if (user_referral && user_referral?.count >= event_data.minReferrals) {
             let holding_ticket_fee = ticket_fee;
-            ticket_fee = (event_data.referralDiscount * holding_ticket_fee) / 100
+            ticket_fee = (holding_ticket_fee * event_data.referralDiscount) / 100;
+            bonus_referrer_ticket_fee = holding_ticket_fee - ticket_fee;
             this.db.run(
                 `UPDATE event_referrals SET claimed = true WHERE code = ${user_referral.code};`
             );
@@ -84,7 +88,10 @@ class CheckActions {
                 `UPDATE events SET totalETHBal = ${increase_bal} WHERE id = ${event_data.id};`
             );
 
-            this.wallet.ether_transfer(getAddress(msg_sender), getAddress(dapp_address), parseEther(ticket_fee.toString()))
+            this.wallet.ether_transfer(getAddress(msg_sender), getAddress(dapp_address), parseEther(full_ticket_fee.toString()))
+            if (bonus_referrer_ticket_fee > 0) {
+            this.wallet.ether_transfer(getAddress(msg_sender), getAddress(referrer_address), parseEther(bonus_referrer_ticket_fee.toString()))    
+            }
             return true;
         } else {
             return false;
