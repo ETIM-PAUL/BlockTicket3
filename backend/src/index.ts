@@ -92,9 +92,6 @@ type AdvanceRequestHandler = (
   data: AdvanceRequestData
 ) => Promise<RequestHandlerResult>;
 
-let DAPP_ADDRESS: any =
-  "0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e".toLowerCase();
-
 class MintNft extends AdvanceRoute {
   execute = (request: any) => {
     this.parse_request(request);
@@ -163,7 +160,7 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
           eventPayload,
           listOfEventTypes,
           data.metadata.msg_sender,
-          DAPP_ADDRESS
+          eventPayload.DAPP_ADDRESS.toLowerCase()
         );
         if (create_process) {
           event_id++;
@@ -211,12 +208,13 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
           );
           const ticket_process = check_actions.buy_event_ticket(
             eventPayload.ticket,
-            DAPP_ADDRESS,
+            eventPayload.DAPP_ADDRESS.toLowerCase(),
             JSON.parse(event?.tickets),
             data.metadata.msg_sender,
-            event_referrals,
+            referralCodes,
             event,
-            event_participants
+            event_participants,
+            eventPayload?.referral_code
           );
           if (ticket_process) {
             const generatedCode = generate_code(referralCodes);
@@ -297,7 +295,7 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
               `UPDATE events SET totalETHBal = 0 WHERE id = ${eventPayload.id};`
             );
             await wallet.ether_transfer(
-              getAddress(DAPP_ADDRESS),
+              getAddress(eventPayload.DAPP_ADDRESS.toLowerCase()),
               getAddress(msg_sender),
               parseEther((event?.totalETHBal).toString())
             );
@@ -342,7 +340,7 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
           event?.status === EventStatus.Cancelled
         ) {
           const data = wallet.ether_transfer(
-            getAddress(DAPP_ADDRESS),
+            getAddress(eventPayload.DAPP_ADDRESS.toLowerCase()),
             getAddress(msg_sender),
             parseEther(ticket_price.toString())
           );

@@ -49,8 +49,8 @@ class CheckActions {
         }
     }
 
-    buy_event_ticket(ticket_type_id, dapp_address, event_tickets, msg_sender, event_referrals, event_data, event_participants) {
-
+    buy_event_ticket(ticket_type_id, dapp_address, event_tickets, msg_sender, event_referrals, event_data, event_participants, referral_code) {
+        let user_referral;
         if (event_data.status !== 0) {
             throw new Error("Event has either ended, cancelled or ongoing");
         }
@@ -63,17 +63,19 @@ class CheckActions {
         let check;
         let full_ticket_fee = event_tickets.find((event_ticket) => event_ticket.id === ticket_type_id).price;
         let ticket_fee = event_tickets.find((event_ticket) => event_ticket.id === ticket_type_id).price;
-        let referrer_address = event_tickets.find((event_ticket) => event_ticket.id === ticket_type_id).owner;
         let bonus_referrer_ticket_fee;
-        const user_referral = event_referrals.find((event_referral) => event_referral.owner === referrer_address)
+
+        if (referral_code) {
+            user_referral = event_referrals.find((event_referral) => Number(event_referral.code) === Number(referral_code))
+        }
 
         if (!ticket_fee) {
             throw new Error(`Invalid Ticket`);
         }
         if (user_referral && user_referral?.count >= event_data.minReferrals) {
             let holding_ticket_fee = ticket_fee;
-            ticket_fee = (holding_ticket_fee * event_data.referralDiscount) / 100;
-            bonus_referrer_ticket_fee = holding_ticket_fee - ticket_fee;
+            bonus_referrer_ticket_fee = (holding_ticket_fee * event_data.referralDiscount) / 100;
+            ticket_fee = holding_ticket_fee - ticket_fee;
             this.db.run(
                 `UPDATE event_referrals SET claimed = true WHERE code = ${user_referral.code};`
             );
@@ -90,7 +92,7 @@ class CheckActions {
 
             this.wallet.ether_transfer(getAddress(msg_sender), getAddress(dapp_address), parseEther(full_ticket_fee.toString()))
             if (bonus_referrer_ticket_fee > 0) {
-            this.wallet.ether_transfer(getAddress(msg_sender), getAddress(referrer_address), parseEther(bonus_referrer_ticket_fee.toString()))    
+            this.wallet.ether_transfer(getAddress(dapp_address), getAddress(user_referral.owner), parseEther(bonus_referrer_ticket_fee.toString()))    
             }
             return true;
         } else {
@@ -106,6 +108,7 @@ class CheckActions {
             return false;
         }
     }
+
     isRefunded(msg_sender, participants) {
         const event_participant = participants.find((participant) => (participant.address === msg_sender && participant?.refunded !== 1));
         if (event_participant) {
@@ -114,6 +117,7 @@ class CheckActions {
             return false;
         }
     }
+
     isClaimNFT(msg_sender, participants) {
         const event_participant = participants.find((participant) => (participant.address === msg_sender && participant?.claimedNFT !== 1));
         if (event_participant) {
