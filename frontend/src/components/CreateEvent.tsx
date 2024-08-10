@@ -198,7 +198,7 @@ const CreateEvent = (props: Props) => {
                                 return;
                             }
 
-                            let str = `{"action": "create_event", "title": "${payload.title}", "date": "${payload.date}", "location": "${payload.location}", "tickets": ${JSON.stringify(ticketTypes)}, "capacity": ${payload.capacity}, "organizer": "${wallet?.accounts[0]?.address}", "dao": ${payload.dao}, "referral": ${payload.referral}, "minReferrals": ${payload.minReferal}, "referralDiscount": ${payload.referalDiscount}, "tokenUrl": "${payload.nftUrl}", "logoUrl": "${payload.logoUrl}"}`
+                            let str = `{"action": "create_event", "title": "${payload.title}", "date": "${payload.date}", "location": "${payload.location}", "tickets": ${JSON.stringify(ticketTypes)}, "capacity": ${payload.capacity}, "organizer": "${wallet?.accounts[0]?.address}", "dao": ${payload.dao}, "referral": ${payload.referral}, "minReferrals": ${payload.minReferal}, "referralDiscount": ${payload.referalDiscount}, "tokenUrl": "${payload.nftUrl}", "logoUrl": "${payload.logoUrl}", "DAPP_ADDRESS": "${DappAddress}"}`
                             let data = ethers.utils.toUtf8Bytes(str);
 
                             const result = await rollups.inputContract.addInput(DappAddress, data);

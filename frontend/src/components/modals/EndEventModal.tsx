@@ -25,7 +25,7 @@ const EndEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails }
 
             try {
                 setProcessing(true);
-                let str = `{"action": "end_event", "id": "${id}"}`
+                let str = `{"action": "end_event", "id": "${id}", "DAPP_ADDRESS": "${DappAddress}"}`
                 let data = ethers.utils.toUtf8Bytes(str);
 
                 const result = await rollups.inputContract.addInput(DappAddress, data);

@@ -48,7 +48,7 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, setBalance, 
             setTicketId(ticket_details?.id)
             try {
                 setProcessing(true);
-                let str = `{"action": "purchase_ticket", "id": ${id}, "ticket":${ticket_details?.id}, "purchased_time": "${new Date()}", "ticket_type":"${ticket_details?.ticketType}"}`
+                let str = `{"action": "purchase_ticket", "id": ${id}, "ticket":${ticket_details?.id}, "purchased_time": "${new Date()}", "ticket_type":"${ticket_details?.ticketType}", "DAPP_ADDRESS": "${DappAddress}"}`
                 let data = ethers.utils.toUtf8Bytes(str);
 
                 const result = await rollups.inputContract.addInput(DappAddress, data);

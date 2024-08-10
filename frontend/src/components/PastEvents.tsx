@@ -6,7 +6,7 @@ import { GiTakeMyMoney } from "react-icons/gi";
 
 type Props = {};
 
-const UpcomingEvents = (props: Props) => {
+const PastEvents = (props: Props) => {
     return (
         <div className=" bg-white">
             <div className="px-6 md:px-24">
@@ -69,4 +69,4 @@ const UpcomingEvents = (props: Props) => {
     );
 };
 
-export default UpcomingEvents;
+export default PastEvents;

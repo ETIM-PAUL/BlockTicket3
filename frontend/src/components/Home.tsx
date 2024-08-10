@@ -3,7 +3,7 @@ import React from "react";
 import { event7 } from "../assets";
 
 import HeroNav from "./HeroNav";
-import UpcomingEvents from "./UpcomingEvents";
+import PastEvents from "./PastEvents";
 import { Link } from "react-router-dom";
 
 const Home = () => {
@@ -11,7 +11,7 @@ const Home = () => {
         <div className="w-full">
             <HeroNav />
 
-            <UpcomingEvents />
+            <PastEvents />
 
             <div className="bg-[#EEE1FF] py-6 pb-20">
                 <div className="flex  flex-col md:flex-row items-center justify-center mx-auto gap-20">

@@ -15,7 +15,7 @@ const HeroNav = (props: Props) => {
     return (
         <>
             {/* Background Image and Hero */}
-            <nav className="bg-white border-gray-200 px-3 py-3 md:py-2 md:px-24  bg-gradient-to-r from-[#5522CC] to-[#ED4690]">
+            <nav className="bg-white border-gray-200 px-3 py-3 md:py-2 md:px-24 bg-gradient-to-r from-[#5522CC] to-[#ED4690]">
                 <div className="flex items-center  justify-between">
                     <div className="w-full flex flex-wrap  justify-between md:mx-auto  md:p-4 mx-10">
                         <div className="md:-ml-8 mt- md:mt-0 ">
@@ -120,10 +120,10 @@ const HeroNav = (props: Props) => {
                         </div>
 
                         <div className="flex flex-col md:w-1/2 md:mr-24 mr-0  items-center">
-                            <p className="font-roboto font-medium md:text-3xl text-3xl text-white sm:leading-[75px] leading-[55px]  text-center">
+                            <p className="font-roboto font-bold md:text-3xl text-3xl text-white sm:leading-[75px] leading-[55px]  text-center">
                                 On-Chain Tickets Gateway
                             </p>
-                            <p className="text-dimBlack text-justify md:leading-8 leading-2 text-lg md:text-lg text-white items-center justify-center mx-10 md:mx-auto  ">
+                            <p className="text-dimBlack text-justify md:leading-7 leading-2 text-lg md:text-lg text-white items-center justify-center mx-10 md:mx-auto  mt-4">
                                 On-Chain Event Ticketing, Management and DAO
                                 proposal, allowing user to make proposal by
                                 Upvoting or downvoting the events that they have
@@ -131,10 +131,10 @@ const HeroNav = (props: Props) => {
                                 satisfaction.
                             </p>
 
-                            <div className="flex md:w-full w-1/2 items-center  justify-center mx-auto md:mx-0 ">
+                            <div className="flex md:w-full w-full items-center  justify-center mx-auto md:mx-0 ">
                                 <Link
                                     to="/events"
-                                    className="bg-[#F5167E]  text-center  mt-6 px-2 py-3 rounded-md  text-white text-xl hover:bg-[#ED4690] w-full"
+                                    className="bg-[#F5167E]  text-center  mt-6 px-12 py-3 rounded-md  text-white text-xl hover:bg-[#ED4690] w-fit"
                                 >
                                     Explore Events
                                 </Link>

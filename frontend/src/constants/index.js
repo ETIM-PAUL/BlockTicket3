@@ -8,48 +8,48 @@ import {
 } from "../assets";
 
 
-export const ProposalData = [
-    {
-        id: "1",
-        proposal: "AC Room",
-        upvote: "5",
-        downvote: "1",
-    },
+// export const ProposalData = [
+//     {
+//         id: "1",
+//         proposal: "AC Room",
+//         upvote: "5",
+//         downvote: "1",
+//     },
 
-    {
-        id: "2",
-        proposal: "Charging Port",
-        upvote: "10",
-        downvote: "2",
-    },
-    {
-        id: "3",
-        proposal: "Chilled Drink",
-        upvote: "50",
-        downvote: "4",
-    },
+//     {
+//         id: "2",
+//         proposal: "Charging Port",
+//         upvote: "10",
+//         downvote: "2",
+//     },
+//     {
+//         id: "3",
+//         proposal: "Chilled Drink",
+//         upvote: "50",
+//         downvote: "4",
+//     },
 
-    {
-        id: "4",
-        proposal: "PopCorn",
-        upvote: "20",
-        downvote: "2",
-    },
+//     {
+//         id: "4",
+//         proposal: "PopCorn",
+//         upvote: "20",
+//         downvote: "2",
+//     },
 
-    {
-        id: "5",
-        proposal: "Smoking",
-        upvote: "1",
-        downvote: "50",
-    },
+//     {
+//         id: "5",
+//         proposal: "Smoking",
+//         upvote: "1",
+//         downvote: "50",
+//     },
 
-    {
-        id: "6",
-        proposal: "Ice Creams",
-        upvote: "100",
-        downvote: "5",
-    },
-];
+//     {
+//         id: "6",
+//         proposal: "Ice Creams",
+//         upvote: "100",
+//         downvote: "5",
+//     },
+// ];
 
 
 export const PastEventsData = [
@@ -59,16 +59,16 @@ export const PastEventsData = [
         title: "Wonder Girls 2010 Wonder Girls World Tour San Francisco",
         description:
             "We’ll get you directly seated and inside for you to enjoy the show.",
-        date: "14th May",
+        date: "14th May, 2024",
         price: "0.002ETH",
         location: "Kenya",
     },
     {
         id: "2",
         flyer: event2,
-        title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
-        description: "Directly seated and inside for you to enjoy the show.",
-        date: "20th June",
+        title: "2024 Summerville Tech Camp",
+        description: "Let your teen build the next big thing.",
+        date: "20th June, 2024",
         price: "0.001ETH",
         location: "Nigeria",
     },
@@ -76,9 +76,9 @@ export const PastEventsData = [
     {
         id: "3",
         flyer: event3,
-        title: "2011 Super Junior SM Town Live '10 World Tour New York City",
-        description: "Directly seated and inside for you to enjoy the show.",
-        date: "18th Sept",
+        title: "Eventify Launch Dinner",
+        description: "Eventify Demo Meeting in West Africa, Harnessing the power of Cartesi.",
+        date: "18th Sept, 2023",
         price: "0.2ETH",
         location: "Ghana",
     },
@@ -86,9 +86,9 @@ export const PastEventsData = [
     {
         id: "4",
         flyer: event4,
-        title: " Wonder Girls 2010 Wonder Girls World Tour San Francisco",
+        title: " Wonder Girls 2023 Wonder Girls World Tour San Francisco",
         description: "Directly seated and inside for you to enjoy the show.",
-        date: "20th June",
+        date: "20th June, 2023",
         price: "0.02ETH",
         location: "New York",
     },
@@ -98,7 +98,7 @@ export const PastEventsData = [
         flyer: event5,
         title: "2011 Super Junior SM Town Live '10 World Tour New York City",
         description: "Directly seated and inside for you to enjoy the show.",
-        date: "25th May",
+        date: "25th Oct, 2023",
         price: "0.03ETH",
         location: "London",
     },
@@ -106,29 +106,29 @@ export const PastEventsData = [
     {
         id: "6",
         flyer: event6,
-        title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
-        description: "Directly seated and inside for you to enjoy the show.",
-        date: " 18th July",
+        title: "Reggae Worldwide Concert, Jamaica",
+        description: "The origin of reggae in Jamaica.",
+        date: " 18th July, 2023",
         price: "0.002ETH",
-        location: "India",
+        location: "Jamaica",
     },
 
     {
         id: "7",
         flyer: event1,
-        title: "Wonder Girls 2010 Wonder Girls World Tour San Francisco",
+        title: "Senegal Community Shield Cup Final",
         description:
-            "We’ll get you directly seated and inside for you to enjoy the show.",
-        date: "14th May",
+            "The supercup final between Tigers FC vs Dolphins United.",
+        date: "14th Jan, 2024",
         price: "0.015ETH",
-        location: "Dubai",
+        location: "Dakar",
     },
     {
         id: "7",
         flyer: event2,
-        title: "JYJ 2011 JYJ Worldwide Concert Barcelona",
-        description: "Directly seated and inside for you to enjoy the show.",
-        date: "20th June",
+        title: "Dancehall Townhall Competition",
+        description: "Showcase your dancing skills and win a grand price of $2000.",
+        date: "20th Mar, 2024",
         price: "0.001ETH",
         location: "Canada",
     },

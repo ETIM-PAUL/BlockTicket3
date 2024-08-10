@@ -23,7 +23,7 @@ const GetRefundModal = ({ isVisible, onClose, id, ticket_id, ticket_type_id, fet
 
       try {
         setProcessing(true);
-        let str = `{"action": "withdraw_cancelled_ticket", "event_id": ${Number(id)}, "ticket_id": ${Number(ticket_id)}, "ticket_type":${Number(ticket_type_id)}}`
+        let str = `{"action": "withdraw_cancelled_ticket", "event_id": ${Number(id)}, "ticket_id": ${Number(ticket_id)}, "ticket_type":${Number(ticket_type_id)}, "DAPP_ADDRESS": "${DappAddress}"}`
         let data = ethers.utils.toUtf8Bytes(str);
 
         const result = await rollups.inputContract.addInput(DappAddress, data);
