@@ -99,6 +99,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
           action: "ether_withdraw",
           args: {
             amount: ether_amount,
+            DappAddress: DappAddress
           },
         };
         const data = JSON.stringify(input_obj);

@@ -9,6 +9,7 @@ import { useRollups } from "../useRollups";
 import { DappAddress } from "../constants";
 import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
 import { GlobalContext } from "../context/GlobalContext";
+import { isDateAheadBy24Hours } from "../utils";
 
 type Props = {};
 
@@ -158,6 +159,10 @@ const CreateEvent = (props: Props) => {
 
         if (!title || !date || !location || !capacity) {
             toast.error("Incomplete Event Details");
+            return;
+        }
+        if (!isDateAheadBy24Hours(date)) {
+            toast.error("Start date has to be at least 24 hours ahead");
             return;
         }
         if (ticketTypes.length === 0) {
