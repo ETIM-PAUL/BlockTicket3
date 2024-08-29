@@ -286,7 +286,7 @@ const EventDetails = () => {
                                                         <div className="pt-2 font-sans">This Event allows the creation/voting of proposals.</div>
                                                     }
                                                     {eventDetails?.referral === 1 &&
-                                                        <div className="pt-2 font-sans">{`This Event gives referral code at the purchase of ticket and offer ${eventDetails?.referralDiscount}% discount when you get ${eventDetails?.minReferrals} referrals`}.</div>
+                                                        <div className="pt-2 font-sans">{`This Event gives referral code at the purchase of ticket and offer ${eventDetails?.referralDiscount}% reward when you get ${eventDetails?.minReferrals} referrals`}.</div>
                                                     }
                                                 </div>
                                             </div>
