@@ -458,7 +458,7 @@ const handleAdvance: AdvanceRequestHandler = async (data: any) => {
       //withdraw ether from the dapp
       if (eventPayload.action === "ether_withdraw") {
         let voucher: any = wallet.ether_withdraw(
-          getAddress("0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e"),
+          getAddress(eventPayload?.args?.DappAddress),
           getAddress(msg_sender),
           BigInt(eventPayload?.args?.amount)
         );

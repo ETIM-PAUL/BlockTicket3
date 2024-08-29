@@ -4,3 +4,6 @@
 src/schema.d.ts
 testnet.env
 sunodo.env
+fly.toml
+/0x9eb6d72b2531f6e9c4f554870f7fd3b8e633c9b0e5543782ee6c728031df658f.env
+0x9eb6d72b2531f6e9c4f554870f7fd3b8e633c9b0e5543782ee6c728031df658f.env
