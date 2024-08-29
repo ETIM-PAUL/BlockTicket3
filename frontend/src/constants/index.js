@@ -137,7 +137,7 @@ export const PastEventsData = [
 export const default_DappAddress = "0xab7528bb862fb57e8a2bcd567a2e929a0be56a5e";
 export const DappAddress = "0x3757455b4D1eac987992Ff9b78c15A5527a29590";
 export const default_ERC721Address = "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9";
-export const ERC721Address = "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9";
+export const ERC721Address = "0x271f063684Ed7e903D45829a2616dfbB38189c5B";
 
 export function formatDate(inputDate) {
     const date = new Date(inputDate);
