@@ -68,10 +68,10 @@ db.run(
 
 //insert into event_creation_prices table
 const event_creation_price: Array<{ name: string; price: number }> = [
-  { name: "neutral", price: 2e16 },
-  { name: "dao_based", price: 4e16 },
-  { name: "referral_based", price: 6e16 },
-  { name: "full_package", price: 1e17 },
+  { name: "neutral", price: 2e13 },
+  { name: "dao_based", price: 4e13 },
+  { name: "referral_based", price: 6e13 },
+  { name: "full_package", price: 1e14 },
 ];
 for (let index = 0; index < event_creation_price.length; index++) {
   const element = event_creation_price[index];
