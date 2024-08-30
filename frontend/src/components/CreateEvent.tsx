@@ -132,29 +132,29 @@ const CreateEvent = (props: Props) => {
 
     async function createEvent() {
         let creation_price: number = 0;
-        if (Number(state?.balance) < 0.06 && referral === "true") {
+        if (Number(state?.balance) < 0.00006 && referral === "true") {
             toast.error("Insufficient Funds for Referral based Event. Please Deposit into the DAPP")
             return;
         } else {
-            creation_price = 0.06
+            creation_price = 0.00006
         }
-        if (Number(state?.balance) < 0.04 && dao === "true") {
+        if (Number(state?.balance) < 0.00004 && dao === "true") {
             toast.error("Insufficient Funds for DAO based Event. Please Deposit into the DAPP")
             return;
         } else {
-            creation_price = 0.04
+            creation_price = 0.00004
         }
-        if (Number(state?.balance) < 0.02 && dao === "false" && referral === "false") {
+        if (Number(state?.balance) < 0.00002 && dao === "false" && referral === "false") {
             toast.error("Insufficient Funds for Normal Event. Please Deposit into the DAPP")
             return;
         } else {
-            creation_price = 0.02
+            creation_price = 0.00002
         }
-        if (Number(state?.balance) < 0.1 && dao === "true" && referral === "true") {
+        if (Number(state?.balance) < 0.0001 && dao === "true" && referral === "true") {
             toast.error("Insufficient Funds for Full-Packaged Event. Please Deposit into the DAPP")
             return;
         } else {
-            creation_price = 0.1
+            creation_price = 0.0001
         }
 
         if (!title || !date || !location || !capacity) {
@@ -330,10 +330,10 @@ const CreateEvent = (props: Props) => {
 
                             <div>
                                 <ul className="text-red-500 text-[14px] font-bold">
-                                    <li>Normal Event - 0.02ETH</li>
-                                    <li>DAO Event - 0.04ETH</li>
-                                    <li>Referral Event - 0.06ETH</li>
-                                    <li>Full-Package Event - 0.1ETH</li>
+                                    <li>Normal Event - 0.00002ETH</li>
+                                    <li>DAO Event - 0.00004ETH</li>
+                                    <li>Referral Event - 0.00006ETH</li>
+                                    <li>Full-Package Event - 0.0001ETH</li>
                                 </ul>
                             </div>
 
