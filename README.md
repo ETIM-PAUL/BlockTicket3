@@ -1,5 +1,8 @@
 # Welcome to BlockTicket3
 
+# Link to live
+https://block-ticket3.vercel.app/
+
 # Link to Notion for Setting up and testing locally
 https://illustrious-cinema-9e2.notion.site/Setting-Up-36999c14f94347da881cef04f05a1b9f
 
