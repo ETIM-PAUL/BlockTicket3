@@ -13,7 +13,7 @@
         "Erc1155SinglePortalAddress": "0x7CFB0193Ca87eB6e48056885E026552c3A941FC4",
         "Erc1155BatchPortalAddress": "0xedB53860A6B52bbb7561Ad596416ee9965B055Aa"
     },
-    "11155420":{
+    "0xaa37dc":{
         "token": "SepOPT",
         "label": "Optimism Sepolia Test Network",
         "rpcUrl": "https://sepolia.optimism.io",
