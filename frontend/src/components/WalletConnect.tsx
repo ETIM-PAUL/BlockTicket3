@@ -15,7 +15,7 @@ const WalletConnect = () => {
 
     const switchNetwork = async () => {
         try {
-            await setChain({ chainId: '0x7a69', chainNamespace: 'evm', token: 'DummyETH', label: 'localhost', rpcUrl: 'http://localhost:8545' })
+            await setChain({ chainId: '0xaa36a7', chainNamespace: 'evm', token: 'OptSep', rpcUrl: 'https://opt-sepolia.g.alchemy.com/v2/OaicbPo0w4HwmD9ThU22jiR0F39vq_mj' })
             dispatch({
                 type: "SET_FETCHING",
                 payload: !state?.fetching,
