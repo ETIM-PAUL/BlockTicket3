@@ -23,7 +23,7 @@ const WalletConnect = () => {
         } catch (switchError: any) {
             // The network has not been added to MetaMask
             if (switchError.code === 4902) {
-                console.log("Please add the Localhost network to MetaMask")
+                console.log("Please add Optimism Sepolia network to MetaMask")
             }
             console.log("Cannot switch to the network")
 

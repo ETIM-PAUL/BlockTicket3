@@ -164,6 +164,13 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
                         payload = `Mint Erc721 NFT - Event: ${decode[1]} - Address: ${decode[0]}`;
                         break;
                     }
+                    case '0x75297e6f': {
+                        //erc721 mint;
+                        const decode = decoder.decode(["address", "uint256", "uint256"], payload);
+                        owner = decode[0]
+                        payload = `Mint Erc721 NFT - Event: ${decode[1]} - Address: ${decode[0]}`;
+                        break;
+                    }
                     case '0x755edd17': {
                         //erc721 mintTo;
                         const decode = decoder.decode(["address"], payload);
