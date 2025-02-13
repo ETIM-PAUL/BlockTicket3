@@ -80,7 +80,7 @@ const UserDashboard = (props: Props) => {
     useEffect(() => {
         fetchUserData(`get_user_data/${wallet?.accounts[0]?.address}`);
         fetchUserNFTs();
-    }, []);
+    },);
 
     const showAllEvents = () => {
         setShowDasboard(false);

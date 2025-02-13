@@ -31,7 +31,6 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
   const rollups = useRollups(propos.dappAddress);
   const [connectedWallet] = useWallets();
   const [dappRelayedAddress, setDappRelayedAddress] = useState<boolean>(false)
-  const [isRelayed, setIsRelayed] = useState<any>(sessionStorage.getItem("isRelayed"))
   const [etherAmount, setEtherAmount] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false)
   const [depositing, setDepositing] = useState<boolean>(false)

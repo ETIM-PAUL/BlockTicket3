@@ -101,7 +101,6 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, setBalance, 
                 const result = await rollups.inputContract.addInput(DappAddress, data);
                 const receipt = await result.wait(1);
                 // Search for the InputAdded event
-                const event = receipt.events?.find((e: any) => e.event === "InputAdded");
                 dispatch({
                     type: "SET_BALANCE",
                     payload: (Number(state.balance) - Number(ticket_details?.price)).toString(),

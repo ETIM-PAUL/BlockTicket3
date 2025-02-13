@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { bgImage, heroImage } from "../assets";
 import Logo from "./Logo";
 import { Link, useNavigate } from "react-router-dom";
 import configFile from "../config.json";
@@ -31,7 +30,7 @@ const TopNav = (props: Props) => {
             navigate("/events")
             return;
         }
-    }, [])
+    },)
 
 
     return (

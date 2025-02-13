@@ -16,7 +16,7 @@ type Props = {
 const EndEventModal = ({ isVisible, onClose, id, setEventDetails, eventDetails }: Props) => {
     const [processing, setProcessing] = useState<boolean>(false)
     const rollups = useRollups(DappAddress);
-    const { state, dispatch }: any = useContext(GlobalContext);
+    const { dispatch }: any = useContext(GlobalContext);
 
     if (!isVisible) return null;
 

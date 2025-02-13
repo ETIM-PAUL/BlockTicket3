@@ -7,9 +7,6 @@ import { formatDate, formatIPFS } from "../constants";
 type Props = {
     events: any;
 };
-interface Report {
-    payload: string;
-}
 
 const MyEvents = ({ events }: Props) => {
     const [loading, setLoading] = useState(false);

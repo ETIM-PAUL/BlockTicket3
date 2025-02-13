@@ -27,9 +27,7 @@ const GetRefundModal = ({ isVisible, onClose, id, ticket_id, ticket_type_id, fet
         let data = ethers.utils.toUtf8Bytes(str);
 
         const result = await rollups.inputContract.addInput(DappAddress, data);
-        const receipt = await result.wait(1);
         // Search for the InputAdded event
-        const event = receipt.events?.find((e: any) => e.event === "InputAdded");
         toast.success("Event Ticket has been refunded successfully")
         setProcessing(false);
         fetchEventDetails();

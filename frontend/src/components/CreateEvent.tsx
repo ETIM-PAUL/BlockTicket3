@@ -33,8 +33,6 @@ const CreateEvent = (props: Props) => {
     const [referral, setReferral] = useState("false");
     const rollups = useRollups(DappAddress);
     const [connectedWallet] = useWallets();
-    const [{ connectedChain }] = useSetChain();
-    const [postData, setPostData] = useState<boolean>(false);
 
     //Event Logo
     const [logoUrl, updateLogoUrl] = useState("");

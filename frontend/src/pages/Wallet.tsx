@@ -11,15 +11,9 @@
 // under the License.
 
 import React, { FC, useEffect } from "react";
-import { useState } from "react";
 
 import { GraphQLProvider } from "../GraphQL";
-import { Notices } from "../Notices";
 import { Transfers } from "../Transfers";
-import { Inspect } from "../Inspect";
-import { Network } from "../Network";
-import { Vouchers } from "../Vouchers";
-import { Reports } from "../Reports";
 
 //import "./App.css";
 import { Balance } from "../Balance";
@@ -39,7 +33,7 @@ const Wallet: FC = () => {
             toast.error("Wallet not connected");
             navigate("/");
         }
-    }, []);
+    },);
 
     return (
         <>

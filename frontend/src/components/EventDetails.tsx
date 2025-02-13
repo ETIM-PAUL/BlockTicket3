@@ -23,7 +23,7 @@ interface Report {
 
 const EventDetails = () => {
     // Get the id from the URL
-    const { state, dispatch }: any = useContext(GlobalContext);
+    const { state }: any = useContext(GlobalContext);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const [{ connectedChain }] = useSetChain();
@@ -168,7 +168,7 @@ const EventDetails = () => {
 
     useEffect(() => {
         fetchEventDetails(`get/${Number(id)}`)
-    }, [])
+    },)
 
     return (
         <div className="h-full">
