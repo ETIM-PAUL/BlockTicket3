@@ -52,9 +52,8 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, setBalance, 
                 let data = ethers.utils.toUtf8Bytes(str);
 
                 const result = await rollups.inputContract.addInput(DappAddress, data);
-                const receipt = await result.wait(1);
+                await result.wait(1);
                 // Search for the InputAdded event
-                const event = receipt.events?.find((e: any) => e.event === "InputAdded");
                 dispatch({
                     type: "SET_BALANCE",
                     payload: (Number(state.balance) - Number(ticket_details?.price)).toString(),
@@ -99,7 +98,7 @@ const BuyTicketModal = ({ isVisible, onClose, tickets, id, balance, setBalance, 
                 let data = ethers.utils.toUtf8Bytes(str);
 
                 const result = await rollups.inputContract.addInput(DappAddress, data);
-                const receipt = await result.wait(1);
+                await result.wait(1);
                 // Search for the InputAdded event
                 dispatch({
                     type: "SET_BALANCE",

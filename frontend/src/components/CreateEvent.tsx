@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { ethers } from "ethers";
 import { useRollups } from "../useRollups";
 import { DappAddress } from "../constants";
-import { useConnectWallet, useSetChain, useWallets } from "@web3-onboard/react";
+import { useConnectWallet, useWallets } from "@web3-onboard/react";
 import { GlobalContext } from "../context/GlobalContext";
 import { isDateAheadBy24Hours } from "../utils";
 
@@ -264,7 +264,7 @@ const CreateEvent = (props: Props) => {
     const queryPinataFiles = async () => {
         try {
             const url = `${pinataConfig.root}/data/pinList?status=pinned`;
-            const response = await axios.get(url, pinataConfig);
+            await axios.get(url, pinataConfig);
         } catch (error) {
             console.log(error);
         }
