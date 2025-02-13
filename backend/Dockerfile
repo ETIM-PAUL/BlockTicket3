@@ -42,7 +42,7 @@ WORKDIR /opt/cartesi/dapp
 COPY --from=build-stage /opt/cartesi/dapp/dist .
 COPY --from=build-stage /opt/cartesi/dapp/node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm /opt/cartesi/dapp/
 
-ENV ROLLUP_HTTP_SERVER_URL="http://127.0.0.1:5004"
+ENV ROLLUP_HTTP_SERVER_URL="https://blockticket3.fly.dev"
 
 ENTRYPOINT ["rollup-init"]
 CMD ["node", "index.js"]
