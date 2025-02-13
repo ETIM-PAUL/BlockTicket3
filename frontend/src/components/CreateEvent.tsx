@@ -291,7 +291,7 @@ const CreateEvent = (props: Props) => {
     useEffect(() => {
         window.scrollTo(0, 0);
         testPinataConnection();
-    });
+    }, []);
 
     return (
         <>

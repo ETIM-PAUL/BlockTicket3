@@ -33,7 +33,7 @@ const Wallet: FC = () => {
             toast.error("Wallet not connected");
             navigate("/");
         }
-    },);
+    },[]);
 
     return (
         <>

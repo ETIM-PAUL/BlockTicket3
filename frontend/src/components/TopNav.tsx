@@ -30,7 +30,7 @@ const TopNav = (props: Props) => {
             navigate("/events")
             return;
         }
-    },)
+    },[])
 
 
     return (

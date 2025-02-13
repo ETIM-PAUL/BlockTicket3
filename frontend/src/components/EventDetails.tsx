@@ -168,7 +168,7 @@ const EventDetails = () => {
 
     useEffect(() => {
         fetchEventDetails(`get/${Number(id)}`)
-    },)
+    },[])
 
     return (
         <div className="h-full">
