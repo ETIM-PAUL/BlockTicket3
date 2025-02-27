@@ -22,10 +22,9 @@ const AllEventsPage = (props: Props) => {
                         <div className="w-full bg-[#EEE1FF] h-2"></div>
 
                         <div className="bg-base-100 h-full py-8 px-10 md:px-24 bg-gradient-to-l from-[#5522CC] to-[#ED4690]">
-                            <div className="text-white font-medium text-lg md:text-3xl mt-10 ">
+                            <div className="text-white font-medium text-lg md:text-2xl mt-10 ">
                                 <h3>
-                                    Please Connect Your Wallet to Fetch All
-                                    Events
+                                    Please Connect Your Wallet to Use All Features
                                 </h3>
                             </div>
                         </div>

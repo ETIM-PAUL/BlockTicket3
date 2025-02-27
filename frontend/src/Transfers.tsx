@@ -39,7 +39,13 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
 
   const provider = new ethers.providers.Web3Provider(connectedWallet.provider);
 
-  const sendAddress = async () => {
+/*************  ✨ Codeium Command ⭐  *************/
+  /**
+   * Relays the DApp address to the InputBox contract. If the function
+   * succeeds, it sets the isRelayed state variable to true and saves
+   * this value to session storage.
+   */
+/******  4a70ef66-23f4-4df0-a231-0441b8df26cf  *******/  const sendAddress = async () => {
     if (rollups) {
       try {
         await rollups.relayContract.relayDAppAddress(propos.dappAddress);
@@ -140,10 +146,10 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
         </div>
       </div>
 
-      <div className="mx-4 mt-6">
+      <div className="mx-4 mt-6 mb-9">
         {active === "deposit" &&
           <div>
-            <h3 className="text-gray-600 text-sm text-start">
+            <h3 className="text-gray-600 text-sm text-center">
               BlockTicket3 receives asset deposits via Portal smart contracts on
               the base layer.
             </h3>
@@ -169,7 +175,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
 
             <div className="flex justify-center">
               <button
-                className="w-[360px] h-[58px] rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
+                className="w-[360px] h-[58px] disabled:opacity-50 rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
                 onClick={() => {
                   depositEtherToPortal(Number(etherAmount));
                 }}
@@ -208,7 +214,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
 
             <div className="flex justify-center">
               <button
-                className="w-[360px] h-[58px] disabled:cursor-not-allowed rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
+                className="w-[360px] h-[58px] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-[17px] leading-[25.5px] tracking-[0.5%] mt-6"
                 onClick={() => {
                   withdrawEther(Number(etherAmount));
                 }}
@@ -226,7 +232,7 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                 After the withdraw request, the user has to execute a voucher to transfer assets from blockTicket3 dApp to their account.
               </h3>
               <br />
-              {(!dappRelayedAddress && !sessionStorage.getItem("isRelayed")) &&
+              {/* {(!dappRelayedAddress && !sessionStorage.getItem("isRelayed")) &&
                 <div className="w-full flex flex-col items-center">
                   Let the dApp know its address! <br />
                   <button
@@ -239,8 +245,8 @@ export const Transfers: React.FC<IInputPropos> = (propos) => {
                   <br />
                   <br />
                 </div>
-              }
-              {sessionStorage.getItem("isRelayed") && <Vouchers dappAddress={propos.dappAddress} />}
+              } */}
+              <Vouchers dappAddress={propos.dappAddress} />
             </div>
           </div>
         }

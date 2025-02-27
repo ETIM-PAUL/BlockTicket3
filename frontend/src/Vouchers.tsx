@@ -97,7 +97,7 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
         }
     }, [voucherResult, rollups]);
 
-    if (fetching) return <p>Loading...</p>;
+    if (fetching) return <p className="block text-center text-sm font-boldta">Fetching vouchers...</p>;
     if (error) return <p>Oh no... {error.message}</p>;
 
     if (!data || !data.vouchers) return <p>No vouchers</p>;
@@ -212,52 +212,60 @@ export const Vouchers: React.FC<IVoucherPropos> = (propos) => {
     });
 
     return (
-        <div>
+        <div className="mb-24 block">
             <p></p>
-            <Button marginTop={'15px'} float={'right'} size='sm' onClick={() => reexecuteQuery({ requestPolicy: 'network-only' })}>
-                Reload 🔃
-            </Button>
-            {voucherToExecute ?
-                <Table>
-                    <Thead>
-                        <Tr>
-                            <Th>Input Index</Th>
-                            <Th>Action</Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        <Tr key={`${voucherToExecute.input.index}-${voucherToExecute.index}`}>
-                            <Td>{voucherToExecute.input.index}</Td>
-                            <Td>
-                                <Button size='sm' isDisabled={!voucherToExecute.proof || voucherToExecute.executed || executing} onClick={() => executeVoucher(voucherToExecute)}>{voucherToExecute.proof ? (voucherToExecute.executed ? "Voucher executed" : executing ? "Executing" : "Execute voucher") : "No proof yet"}</Button>
-                            </Td>
-                        </Tr>
-                    </Tbody>
-                </Table> : <Text></Text>}
-            <Table marginTop={'20px'}>
-                <Thead>
-                    <Tr>
-                        <Th>Action</Th>
-                        <Th>Payload</Th>
-                    </Tr>
-                </Thead>
-                <Tbody>
-                    {vouchers.filter((voucher: any) => getAddress(voucher.owner) === getAddress(wallet?.accounts[0]?.address)).length === 0 && (
-                        <Tr>
-                            <Td textAlign={'center'} colSpan={4}>-</Td>
-                        </Tr>
-                    )}
-                    {vouchers.filter((voucher: any) => getAddress(voucher.owner) === getAddress(wallet?.accounts[0]?.address)).map((n: any) => (
-                        <Tr key={`${n.input.index}-${n.index}`}>
-                            <Td>
-                                <Button size='sm' onClick={() => getProof(n)}>Info</Button>
-                            </Td>
-                            <span className="text-gray-500 text-wrap max-w-[200px] my-2 block">{n.payload}</span>
-                        </Tr>
-                    ))}
-                </Tbody>
-            </Table>
+            
+            <div className="w-full flex jusify-between" style={{"justifyContent": "space-between"}}>
+                <span>{" "}</span>
+                <button
+                    className="w-fit p-2 flex items-center font-bold h-[35px] disabled:opacity-50 rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-sm leading-[25.5px] tracking-[0.5%] mt-6 text-center"
+                    onClick={() => reexecuteQuery({ requestPolicy: 'network-only' })}
+                >
+                    Reload
+                </button>
+            </div>
 
+                <table className=" flex table text-white space-y-4 ">
+                    <thead className="text-black font-semibold text-base bg-white">
+                        <tr>
+                            {/* <th>Id</th> */}
+                            <th>Info</th>
+                            <th>Payload</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody className="text-base">
+                    {vouchers.filter((voucher: any) => getAddress(voucher.owner) === getAddress(wallet?.accounts[0]?.address)).map((n: any, index:number) => (
+                        <tr
+                        key={`${n.input.index}-${n.index}`}
+                    >
+                        <td>
+                            <button
+                                className="w-fit px-8 py-2 font-bold disabled:opacity-50 rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-sm leading-[25.5px] tracking-[0.5%] text-center"
+                                onClick={() => getProof(n)}
+                            >
+                            Get Info
+                            </button>
+                        </td>
+                        <td>
+                            <span className="text-gray-500 text-wrap max-w-[200px] my-2 block">{n.payload.replace(/Ether Transfer - Amount: ([0-9.]+) \(Native eth\).*/, 'Ether Transfer - $1ETH')}</span>
+                        </td>
+                        <td>
+                        {voucherToExecute ?
+                            <button
+                                className="w-fit p-2 flex items-center font-bold disabled:opacity-50 rounded-lg bg-gradient-to-l from-[#5522CC] to-[#ED4690] text-[#FEFEFE] text-sm leading-[25.5px] tracking-[0.5%] text-center"
+                                disabled={!voucherToExecute.proof || voucherToExecute.executed || executing} onClick={() => executeVoucher(voucherToExecute)}
+                            >
+                                {voucherToExecute.proof ? (voucherToExecute.executed ? "Voucher executed" : executing ? "Executing" : "Execute voucher") : "No proof yet"}
+                            </button>
+                            :
+                            <span></span>
+                        }
+                        </td>
+                    </tr>
+                    ))}
+                    </tbody>
+                </table>
         </div>
     );
 };
